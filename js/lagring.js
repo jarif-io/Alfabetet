@@ -18,7 +18,8 @@ var Lagring = (function () {
       /* Standard er innstilt på de aller minste: kort runde, få valg,
        * hjelp med én gang, og en stemme som snakker rolig. */
       niva: 'liten',
-      talefart: 0.7,
+      talefart: 0.9,
+      stemmenavn: null,   /* null = spillet velger den beste norske selv */
       visMal: true,     /* vis bokstaven i oppdraget, ikke bare si den */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null   /* null = alle bokstaver er med */

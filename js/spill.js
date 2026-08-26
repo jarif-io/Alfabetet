@@ -290,6 +290,7 @@ var Spill = (function () {
     el('inn-navn-oy').placeholder = VERDENER.oy.standardnavn;
 
     tegnNiva();
+    tegnStemmevalg();
     tegnBokstavvelger();
     tegnStatus();
   }
@@ -302,9 +303,47 @@ var Spill = (function () {
     }
   }
 
+  /* Lister stemmene maskinen faktisk har. Norske først, resten under, slik at
+   * den voksne kan høre seg fram til den minst robotaktige. */
+  function tegnStemmevalg() {
+    var velger = el('inn-stemmevalg');
+    var norske = Tale.norskeStemmer();
+    var alle = Tale.alleStemmer();
+    var valgt = Lagring.innstilling('stemmenavn');
+
+    velger.innerHTML = '';
+    var auto = document.createElement('option');
+    auto.value = '';
+    auto.textContent = norske.length
+      ? 'Velg beste norske automatisk (' + norske[0].name + ')'
+      : 'Velg automatisk';
+    velger.appendChild(auto);
+
+    function gruppe(tittel, stemmer) {
+      if (!stemmer.length) return;
+      var g = document.createElement('optgroup');
+      g.label = tittel;
+      stemmer.forEach(function (v) {
+        var o = document.createElement('option');
+        o.value = v.name;
+        o.textContent = v.name + ' (' + v.lang + ')';
+        g.appendChild(o);
+      });
+      velger.appendChild(g);
+    }
+
+    gruppe('Norske stemmer', norske);
+    gruppe('Andre stemmer', alle.filter(function (v) {
+      return norske.indexOf(v) === -1;
+    }));
+
+    velger.value = valgt || '';
+    if (velger.value !== (valgt || '')) velger.value = '';
+  }
+
   function visFart() {
     var v = parseFloat(el('inn-fart').value);
-    el('ut-fart').textContent = v <= 0.65 ? 'veldig rolig' : (v <= 0.85 ? 'rolig' : 'vanlig');
+    el('ut-fart').textContent = v <= 0.8 ? 'rolig' : (v <= 0.95 ? 'vanlig' : 'rask');
   }
 
   function tegnBokstavvelger() {
@@ -410,25 +449,59 @@ var Spill = (function () {
       visMeny();
     });
 
-    /* Tannhjulet må holdes inne i to sekunder, så barnet ikke havner her. */
+    /* Tannhjulet må holdes inne, så barnet ikke havner her ved et uhell.
+     * Et vanlig klikk gjorde tidligere ingenting og sa ingenting – nå sier
+     * knappen fra hva den vil ha. */
+    var HOLDETID = 1200;
     var holdTimer = null;
+    var holdStart = 0;
+    var hintTimer = null;
     var tannhjul = el('tannhjul');
+
+    function visHint() {
+      var hint = el('tannhjul-hint');
+      hint.hidden = false;
+      window.clearTimeout(hintTimer);
+      hintTimer = window.setTimeout(function () { hint.hidden = true; }, 2600);
+    }
+
     function startHold(e) {
+      if (e.button && e.button !== 0) return;
       e.preventDefault();
+      holdStart = Date.now();
+      el('tannhjul-hint').hidden = true;
       tannhjul.classList.add('holdes');
+      window.clearTimeout(holdTimer);
       holdTimer = window.setTimeout(function () {
         tannhjul.classList.remove('holdes');
+        holdStart = 0;
         apneForeldre();
-      }, 2000);
+      }, HOLDETID);
     }
+
     function avbrytHold() {
       tannhjul.classList.remove('holdes');
       if (holdTimer) { window.clearTimeout(holdTimer); holdTimer = null; }
+      /* Slapp taket for tidlig: da har den voksne prøvd, og fortjener beskjed. */
+      if (holdStart && Date.now() - holdStart < HOLDETID) visHint();
+      holdStart = 0;
     }
-    tannhjul.addEventListener('mousedown', startHold);
-    tannhjul.addEventListener('touchstart', startHold, { passive: false });
-    ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(function (h) {
-      tannhjul.addEventListener(h, avbrytHold);
+
+    if (window.PointerEvent) {
+      tannhjul.addEventListener('pointerdown', startHold);
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (h) {
+        tannhjul.addEventListener(h, avbrytHold);
+      });
+    } else {
+      tannhjul.addEventListener('mousedown', startHold);
+      tannhjul.addEventListener('touchstart', startHold, { passive: false });
+      ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(function (h) {
+        tannhjul.addEventListener(h, avbrytHold);
+      });
+    }
+    /* Tastatur: knappen skal også kunne nås uten å holde musa nede. */
+    tannhjul.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apneForeldre(); }
     });
 
     pa('foreldre-lukk', 'click', lukkForeldre);
@@ -448,6 +521,12 @@ var Spill = (function () {
       Lagring.settInnstilling('bevegelse', this.checked);
       settBevegelse();
     });
+    pa('inn-stemmevalg', 'change', function () {
+      Tale.velgStemme(this.value || null);
+      Tale.prov();
+    });
+    pa('inn-prov', 'click', function () { Tale.prov(); });
+
     pa('inn-fart', 'input', function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));
       visFart();

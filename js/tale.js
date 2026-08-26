@@ -15,39 +15,56 @@ var Tale = (function () {
    * Uten dette snakker spillet i munnen på seg selv når barnet trykker fort. */
   var generasjon = 0;
 
+  /* Stemmer med disse ordene i navnet er nyere, nevrale stemmer og høres
+   * langt mindre robotaktige ut enn de gamle innebygde. På Windows heter de
+   * gjerne «Microsoft Iselin Online (Natural)», på Mac «Nora (Premium)». */
+  var KVALITETSORD = ['premium', 'enhanced', 'neural', 'natural', 'online', 'siri'];
+
+  function erNorsk(v) {
+    var kode = (v.lang || '').replace('_', '-').toLowerCase();
+    return kode.indexOf('nb') === 0 || kode.indexOf('no') === 0 || kode.indexOf('nn') === 0;
+  }
+
+  function poeng(v) {
+    var p = 0;
+    var kode = (v.lang || '').replace('_', '-').toLowerCase();
+    if (kode.indexOf('nb') === 0) p += 40;        /* bokmål først */
+    else if (kode.indexOf('no') === 0) p += 30;
+    else if (kode.indexOf('nn') === 0) p += 20;
+
+    var navn = (v.name || '').toLowerCase();
+    for (var i = 0; i < KVALITETSORD.length; i++) {
+      if (navn.indexOf(KVALITETSORD[i]) !== -1) { p += 25; break; }
+    }
+    /* En stemme som hentes over nett er som regel den nyere, nevrale. */
+    if (v.localService === false) p += 8;
+    if (v.default) p += 2;
+    return p;
+  }
+
+  /* Alle norske stemmer maskinen har, best først. Brukes av foreldremenyen. */
+  function norskeStemmer() {
+    if (!stotte) return [];
+    var alle = window.speechSynthesis.getVoices() || [];
+    return alle.filter(erNorsk).sort(function (a, b) { return poeng(b) - poeng(a); });
+  }
+
   function finnStemme() {
     if (!stotte) return null;
     var alle = window.speechSynthesis.getVoices();
     if (!alle || !alle.length) return null;
     lette = true;
 
-    /* Norsk bokmål først, så nynorsk/norsk generelt, så ingenting. */
-    var rekkefolge = ['nb-NO', 'nb_NO', 'nb', 'no-NO', 'no', 'nn-NO', 'nn'];
-    for (var i = 0; i < rekkefolge.length; i++) {
-      for (var j = 0; j < alle.length; j++) {
-        var kode = (alle[j].lang || '').replace('_', '-').toLowerCase();
-        if (kode === rekkefolge[i].replace('_', '-').toLowerCase()) return alle[j];
+    /* Har den voksne valgt en stemme selv, gjelder den. */
+    var valgt = Lagring.innstilling('stemmenavn');
+    if (valgt) {
+      for (var i = 0; i < alle.length; i++) {
+        if (alle[i].name === valgt) return alle[i];
       }
     }
-    for (var k = 0; k < alle.length; k++) {
-      if ((alle[k].lang || '').toLowerCase().indexOf('n') === 0) {
-        var l = alle[k].lang.toLowerCase();
-        if (l.indexOf('nb') === 0 || l.indexOf('nn') === 0 || l.indexOf('no') === 0) {
-          return alle[k];
-        }
-      }
-    }
-    return null;
-  }
 
-  function oppdater() { stemme = finnStemme(); }
-
-  if (stotte) {
-    oppdater();
-    /* Stemmelista lastes ofte asynkront – vi prøver igjen når den kommer. */
-    window.speechSynthesis.onvoiceschanged = oppdater;
-    window.setTimeout(oppdater, 300);
-    window.setTimeout(oppdater, 1200);
+    var norske = norskeStemmer();
+    return norske.length ? norske[0] : null;
   }
 
   function pa() {
@@ -63,8 +80,11 @@ var Tale = (function () {
       var ytring = new window.SpeechSynthesisUtterance(tekst);
       ytring.lang = 'nb-NO';
       if (stemme) ytring.voice = stemme;
-      ytring.rate = Lagring.innstilling('talefart') || 0.75;
-      ytring.pitch = 1.05;
+      /* Under ca. 0,8 begynner de fleste talesynteser å slure og høres mer
+       * robotaktige ut, ikke roligere. Roen kommer fra pausene mellom
+       * setningene i stedet – se Tale.rekke. */
+      ytring.rate = Math.max(0.75, Lagring.innstilling('talefart') || 0.9);
+      ytring.pitch = 1;
       ytring.volume = 1;
 
       var lost = false;
@@ -118,8 +138,22 @@ var Tale = (function () {
       }
     },
 
-    /* Brukes av foreldremenyen for å si fra om stemmen mangler. */
-    harNorskStemme: function () { return !!stemme; },
+    /* Brukes av foreldremenyen. */
+    norskeStemmer: norskeStemmer,
+    alleStemmer: function () {
+      return stotte ? (window.speechSynthesis.getVoices() || []) : [];
+    },
+    naStemme: function () { return stemme; },
+    velgStemme: function (navn) {
+      Lagring.settInnstilling('stemmenavn', navn || null);
+      oppdater();
+    },
+    /* Prøvesetning, så den voksne kan høre forskjell mellom stemmene. */
+    prov: function () {
+      this.stopp();
+      return this.rekke(['Hei! Skal vi finne bokstaven be?']);
+    },
+    harNorskStemme: function () { return !!stemme && erNorsk(stemme); },
     stottes: function () { return stotte; },
     harLett: function () { return lette; }
   };

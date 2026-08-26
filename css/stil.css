@@ -266,7 +266,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   white-space: nowrap;
 }
 
-.topp-hoyre { display: flex; align-items: center; gap: 10px; }
+.topp-hoyre { display: flex; align-items: center; gap: 10px; position: relative; }
 
 .ikonknapp {
   font: inherit;
@@ -314,9 +314,11 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   stroke-dashoffset: 120;
 }
 .ikonknapp--stille.holdes .hold-ring circle {
-  transition: stroke-dashoffset 2s linear;
+  transition: stroke-dashoffset 1.2s linear;
   stroke-dashoffset: 0;
 }
+/* Knappen skal se ut som noe man holder på, mens man holder. */
+.ikonknapp--stille.holdes { background: #fff; opacity: 1; }
 
 /* Stjernetelleren gjør framgangen synlig hele tiden. */
 .teller {
@@ -1157,6 +1159,10 @@ body[data-verden="oy"] .skilt::after {
   border-radius: var(--r-xl);
   padding: 24px 30px 26px;
   width: min(620px, 100%);
+  /* Menyen er blitt lang. Den ruller inni seg selv, med tittel og
+     lukkeknapp låst fast, så man aldri må lete etter veien ut. */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -1164,7 +1170,18 @@ body[data-verden="oy"] .skilt::after {
   animation: trinn-inn 300ms cubic-bezier(.2, .8, .3, 1);
 }
 
-.panel-topp { display: flex; align-items: center; justify-content: space-between; }
+.panel-topp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: -24px;
+  z-index: 3;
+  background: var(--flate);
+  margin: -24px -30px 0;
+  padding: 24px 30px 12px;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
 .panel h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; }
 .panel h3 {
   margin: 0 0 8px;
@@ -1188,7 +1205,21 @@ body[data-verden="oy"] .skilt::after {
 
 .panel-del { border-top: 2px solid var(--flate-2); padding-top: 14px; }
 .panel-del:first-of-type { border-top: none; padding-top: 0; }
-.panel-del--bunn { display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.panel-del--bunn {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  position: sticky;
+  bottom: -26px;
+  z-index: 3;
+  background: var(--flate);
+  margin: 0 -30px -26px;
+  padding: 14px 30px 26px;
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  box-shadow: 0 -8px 16px -8px rgba(40, 30, 15, .18);
+}
 
 /* Egen bryter i stedet for standard avkrysningsboks. */
 .bryter {
@@ -1355,6 +1386,75 @@ body[data-verden="oy"] .skilt::after {
   font-size: .85rem;
   margin-top: 4px;
 }
+
+/* Hintet som dukker opp når noen bare klikker på tannhjulet */
+.holdhint {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  background: var(--blekk);
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--sk-2);
+  animation: trinn-inn 240ms cubic-bezier(.2, .9, .3, 1);
+  z-index: 40;
+}
+.holdhint[hidden] { display: none; }
+.holdhint::before {
+  content: "";
+  position: absolute;
+  top: -5px; right: 16px;
+  width: 10px; height: 10px;
+  background: var(--blekk);
+  transform: rotate(45deg);
+}
+
+/* Stemmevelger og prøveknapp i foreldremenyen */
+.velgerrad {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-weight: 600;
+}
+.velgerrad select {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: .95rem;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--flate-2);
+  color: var(--blekk);
+  cursor: pointer;
+}
+.provrad { padding-bottom: 4px; }
+
+.hjelpetekst {
+  margin-top: 10px;
+  border-radius: 12px;
+  background: var(--flate-2);
+  padding: 10px 14px;
+}
+.hjelpetekst summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--blekk);
+}
+.hjelpetekst p {
+  margin: 10px 0 0;
+  font-size: .87rem;
+  line-height: 1.5;
+  color: var(--blekk-svak);
+}
+.hjelpetekst b { color: var(--blekk); }
 
 /* ============================================================
    14. Mindre skjermer og mindre bevegelse

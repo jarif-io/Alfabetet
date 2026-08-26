@@ -245,7 +245,14 @@ var Moduser = (function () {
 
     function si(bokstav, oppslag) {
       Tale.stopp();
-      Tale.rekke([bokstav, 250, lydFor(verdenId, bokstav), 250, 'som i ' + oppslag.ord]);
+      /* «L» … «L for Løve» – samme formel som i alfabetbøkene, og kort nok
+       * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»),
+       * ellers leser talesyntesen det store tegnet som «stor L». */
+      var navn = bokstavnavnFor(bokstav);
+      Tale.rekke([
+        navn + '.', 450,
+        navn + ' for ' + oppslag.ord.toLowerCase() + '.'
+      ]);
     }
 
     return {
@@ -321,9 +328,14 @@ var Moduser = (function () {
 
     function sporsmalstale() {
       var v = VERDENER[okt.verden];
-      if (okt.type === 'finn') return [v.oppdrag, 200, okt.fasit];
+      if (okt.type === 'finn') {
+        return [v.oppdrag + '…', 280, bokstavnavnFor(okt.fasit) + '.'];
+      }
       var oppslag = ordFor(okt.verden, okt.fasit);
-      return [oppslag.ord, 350, 'Hvilken bokstav begynner ' + oppslag.ord.toLowerCase() + ' på?'];
+      return [
+        oppslag.ord + '.', 420,
+        'Hvilken bokstav begynner ' + oppslag.ord.toLowerCase() + ' på?'
+      ];
     }
 
     function visOppgave() {
@@ -413,7 +425,7 @@ var Moduser = (function () {
       }
       riktigKnapp.classList.add('pekes');
       Tale.stopp();
-      Tale.rekke(['Her er ' + okt.fasit + '. Trykk på den.']);
+      Tale.rekke(['Her er ' + bokstavnavnFor(okt.fasit) + '.', 300, 'Trykk på den.']);
     }
 
     function riktig(knapp) {
@@ -447,7 +459,7 @@ var Moduser = (function () {
 
       var ros = forsteForsok
         ? tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!'
-        : 'Der ja! Det er ' + okt.fasit + '.';
+        : 'Der ja! Det er ' + bokstavnavnFor(okt.fasit) + '.';
 
       Tale.stopp();
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
@@ -532,7 +544,7 @@ var Moduser = (function () {
 
       Lyd.ferdig();
       var hilsen = okt.nyeMestrede.length
-        ? 'Se her! ' + okt.nyeMestrede[0] + ' kan du nå.'
+        ? 'Se her! ' + bokstavnavnFor(okt.nyeMestrede[0]) + ' kan du nå.'
         : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
       window.setTimeout(function () { Tale.rekke([hilsen]); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */

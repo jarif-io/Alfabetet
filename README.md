@@ -25,7 +25,7 @@ Så er det tre ting å gjøre:
 
 | | Hva det er |
 | --- | --- |
-| **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «B … b-b-bil … som i Bil». Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil — fint å slå opp i mens dere leser. |
+| **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «L … L for Løve» — samme formel som alfabetbøkene bruker. Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil, fint å slå opp i mens dere leser. |
 | **Finn bokstaven** | Spillet ber om en bokstav, og han velger blant skiltene. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? |
 
@@ -67,8 +67,9 @@ tingen i spillet som får en liten fanfare når den øker.
 
 ## For voksne
 
-Hold inne **tannhjulet** oppe til høyre i to sekunder. (Det må holdes inne, slik at
-barnet ikke havner der ved et uhell.) Der kan du:
+**Hold inne tannhjulet** oppe til høyre i ett sekund — det må holdes, slik at barnet
+ikke havner der ved et uhell. Trykker du bare kort, sier knappen fra hva den vil ha.
+Er du på tastaturet, går det an å gå dit med `Tab` og trykke `Enter`. Der kan du:
 
 - Skru stemme og lydeffekter av og på, og **justere hvor fort stemmen snakker**.
   Standardstemmen snakker som regel for fort for en femåring, så den er satt tregere
@@ -106,10 +107,31 @@ da kjenner han dem igjen begge veier.
 
 ## Om stemmen
 
-Spillet bruker nettleserens egen talesyntese og leter etter en norsk stemme. Finnes
-ingen, sier foreldremenyen fra, og spillet fungerer fortsatt — da må en voksen si
-bokstavlyden ved siden av. Norsk stemme legges til i operativsystemets innstillinger
-for språk og tale.
+Spillet bruker nettleserens egen talesyntese. **Kvaliteten kommer fra stemmen
+operativsystemet har installert, ikke fra spillet.** De gamle innebygde norske
+stemmene er metalliske; de nyere nevrale stemmene er langt bedre, og gratis:
+
+- **Mac:** Systeminnstillinger → Tilgjengelighet → Talt innhold → Systemstemme →
+  Tilpass. Last ned **Nora (Premium)**.
+- **Windows:** Innstillinger → Tid og språk → Tale → Legg til stemmer → Norsk bokmål.
+  Stemmer som heter **Natural** eller **Online** er de nye. Microsoft Edge viser som
+  regel flere av dem enn Chrome gjør.
+
+Spillet plukker den beste norske stemmen det finner av seg selv, men i foreldremenyen
+ligger det en liste over alle stemmene maskinen har, med en **Hør stemmen**-knapp så
+du kan sammenligne og velge selv.
+
+To ting til om lyden:
+
+- Bokstavnavnene er skrevet ut i koden («ku» for Q, «dobbelt-ve» for W). Får
+  talesyntesen bare tegnet, leser flere stemmer det som «stor L» eller staver det på
+  engelsk.
+- **Ikke skru talefarten for langt ned.** Under «rolig» begynner de fleste stemmer å
+  slure og høres *mer* robotaktige ut. Roen i spillet kommer fra pausene mellom
+  setningene i stedet.
+
+Finnes ingen norsk stemme i det hele tatt, sier foreldremenyen fra, og spillet
+fungerer fortsatt — da må en voksen si bokstaven ved siden av.
 
 ## Legge det på nett
 

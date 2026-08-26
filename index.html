@@ -41,6 +41,9 @@
         <circle cx="22" cy="22" r="19"></circle>
       </svg>
     </button>
+    <div class="holdhint" id="tannhjul-hint" role="status" hidden>
+      Hold knappen inne et øyeblikk
+    </div>
   </div>
 </header>
 
@@ -175,12 +178,47 @@
         <span class="bryter-spor"></span>
         <span>Lydeffekter</span>
       </label>
+      <label class="velgerrad">
+        <span>Hvilken stemme</span>
+        <select id="inn-stemmevalg"></select>
+      </label>
+      <div class="provrad">
+        <button class="lyttknapp" id="inn-prov" type="button">
+          <span aria-hidden="true">🔊</span> Hør stemmen
+        </button>
+      </div>
       <label class="skyver">
         <span>Hvor fort stemmen snakker</span>
-        <input type="range" id="inn-fart" min="0.5" max="1.1" step="0.05">
+        <input type="range" id="inn-fart" min="0.75" max="1.1" step="0.05">
         <output id="ut-fart"></output>
       </label>
+      <p class="merknad">
+        Går farten under «rolig», begynner de fleste stemmer å slure og høres
+        mer robotaktige ut. Roen i spillet kommer fra pausene mellom setningene,
+        ikke fra å bremse stemmen.
+      </p>
       <p class="merknad" id="stemme-merknad" hidden></p>
+      <details class="hjelpetekst">
+        <summary>Stemmen høres robotaktig ut — hva kan jeg gjøre?</summary>
+        <p>
+          Kvaliteten kommer fra stemmen operativsystemet har installert, ikke fra
+          spillet. De gamle innebygde stemmene er metalliske; de nyere er langt
+          bedre og gratis å laste ned:
+        </p>
+        <p>
+          <b>Mac:</b> Systeminnstillinger → Tilgjengelighet → Talt innhold →
+          Systemstemme → Tilpass. Last ned <b>Nora (Premium)</b>. Velg den i lista over.
+        </p>
+        <p>
+          <b>Windows:</b> Innstillinger → Tid og språk → Tale → Legg til stemmer →
+          Norsk bokmål. Stemmer som heter <b>Natural</b> eller <b>Online</b> er de nye.
+          Microsoft Edge har som regel flere av dem enn Chrome.
+        </p>
+        <p>
+          Spillet velger den beste norske stemmen det finner av seg selv, men du
+          kan overstyre valget i lista over.
+        </p>
+      </details>
     </section>
 
     <section class="panel-del">

@@ -11,8 +11,8 @@
  * Hvert felt betyr:
  *   ord   – ordet som sies og vises
  *   ikon  – en emoji som vises stort på skjermen
- *   lyd   – hvordan stemmen skal si SELVE LYDEN (ikke bokstavnavnet).
- *           Utelates den, lager spillet en av seg selv ("b-b-bil").
+ *
+ * Spillet sier «L … L for Løve» – samme formel som alfabetbøkene bruker.
  */
 
 var ALFABET = [
@@ -20,11 +20,19 @@ var ALFABET = [
   'O','P','Q','R','S','T','U','V','W','X','Y','Z','Æ','Ø','Å'
 ];
 
-/* Vokalene kan stemmen si som ren lyd. Konsonantene lages av ordet. */
-var VOKALLYD = {
-  'A': 'aaa', 'E': 'eee', 'I': 'iii', 'O': 'ooo',
-  'U': 'uuu', 'Y': 'yyy', 'Æ': 'æææ', 'Ø': 'øøø', 'Å': 'ååå'
+/* Bokstavnavnene skrevet ut. Får talesyntesen bare tegnet «Q», staver noen
+ * stemmer det på engelsk eller sier «bokstaven Q». Skriver vi «ku», sier alle
+ * norske stemmer det riktig. */
+var BOKSTAVNAVN = {
+  'A': 'a',   'B': 'be',  'C': 'se',  'D': 'de',  'E': 'e',
+  'F': 'eff', 'G': 'ge',  'H': 'hå',  'I': 'i',   'J': 'je',
+  'K': 'kå',  'L': 'ell', 'M': 'emm', 'N': 'enn', 'O': 'o',
+  'P': 'pe',  'Q': 'ku',  'R': 'err', 'S': 'ess', 'T': 'te',
+  'U': 'u',   'V': 've',  'W': 'dobbelt-ve',      'X': 'eks',
+  'Y': 'y',   'Z': 'sett','Æ': 'æ',   'Ø': 'ø',   'Å': 'å'
 };
+
+function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
 
 var VERDENER = {
   bane: {
@@ -125,13 +133,4 @@ var VERDENER = {
 /* Henter oppslaget for én bokstav i én verden. */
 function ordFor(verdenId, bokstav) {
   return VERDENER[verdenId].ord[bokstav];
-}
-
-/* Teksten stemmen skal si for å vise lyden bokstaven lager. */
-function lydFor(verdenId, bokstav) {
-  var oppslag = ordFor(verdenId, bokstav);
-  if (oppslag.lyd) return oppslag.lyd;
-  if (VOKALLYD[bokstav]) return VOKALLYD[bokstav];
-  var forste = oppslag.ord.charAt(0).toLowerCase();
-  return forste + '-' + forste + '-' + oppslag.ord.toLowerCase();
 }
