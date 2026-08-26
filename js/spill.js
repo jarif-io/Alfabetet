@@ -1,16 +1,20 @@
 /* Bokstavløpet – navigasjon og oppsett
  *
  * Holder styr på hvilken skjerm som vises, hvilken verden som er valgt,
- * tastaturet, og foreldremenyen.
+ * scenen bak, tastaturet og foreldremenyen.
  */
 
 var Spill = (function () {
 
   function el(id) { return document.getElementById(id); }
 
-  var FIGUR_MERKE = {
-    bil:  { id: '#fig-bil',  vb: '0 0 140 70' },
-    skip: { id: '#fig-skip', vb: '0 0 140 90' }
+  /* Skjermene der figuren skal stå på bakken. */
+  var MED_FIGUR = {
+    'skjerm-meny': true,
+    'skjerm-utforsk': true,
+    'skjerm-oppgave': true,
+    'skjerm-oppsummering': true,
+    'skjerm-samling': true
   };
 
   var naVerden = null;
@@ -23,6 +27,7 @@ var Spill = (function () {
   function visSkjerm(id) {
     var alle = document.querySelectorAll('.skjerm');
     for (var i = 0; i < alle.length; i++) alle[i].hidden = (alle[i].id !== id);
+    el('figurbane').hidden = !MED_FIGUR[id];
   }
 
   function settTopp(tittel, visTilbake) {
@@ -32,9 +37,30 @@ var Spill = (function () {
 
   function settTastLytter(fn) { tastLytter = fn; }
 
-  function figurMerke(verdenId) {
-    var m = FIGUR_MERKE[VERDENER[verdenId].figur];
-    return '<svg viewBox="' + m.vb + '"><use href="' + m.id + '"></use></svg>';
+  /* Telleren i toppen viser hvor mange bokstaver som er blitt hans. */
+  function oppdaterTeller(medSmell) {
+    var teller = el('stjerneteller');
+    var antall = Lagring.mestrede().length;
+    el('teller-tall').textContent = antall;
+    el('teller-av').textContent = '/' + ALFABET.length;
+    if (medSmell) {
+      teller.classList.remove('smell');
+      void teller.offsetWidth;
+      teller.classList.add('smell');
+    }
+  }
+
+  /* Bytter himmel, landskap og bakke. */
+  function settScene(verdenId) {
+    if (verdenId) document.body.setAttribute('data-verden', verdenId);
+    else document.body.removeAttribute('data-verden');
+    el('scene-landskap').innerHTML = Figurer.landskapFor(verdenId || 'bane');
+    el('figur').innerHTML = Figurer.figurFor(verdenId || 'bane');
+    el('figur').style.transform = 'translateX(24px)';
+  }
+
+  function settBevegelse() {
+    document.body.classList.toggle('bevegelse', !!Lagring.innstilling('bevegelse'));
   }
 
   /* ---------- skjermene ---------- */
@@ -43,8 +69,10 @@ var Spill = (function () {
     Tale.stopp();
     settTastLytter(null);
     tilbakeHandling = null;
-    document.body.removeAttribute('data-verden');
     naVerden = null;
+    settScene(null);
+    el('start-figur').innerHTML = Figurer.bil();
+    oppdaterTeller(false);
     settTopp('Bokstavløpet', false);
     visSkjerm('skjerm-start');
   }
@@ -53,7 +81,9 @@ var Spill = (function () {
     Tale.stopp();
     settTastLytter(null);
     tilbakeHandling = visStart;
-    document.body.removeAttribute('data-verden');
+    naVerden = null;
+    settScene(null);
+    oppdaterTeller(false);
     settTopp('Bokstavløpet', true);
     visSkjerm('skjerm-verden');
 
@@ -61,31 +91,27 @@ var Spill = (function () {
     felt.innerHTML = '';
     ['bane', 'oy'].forEach(function (id) {
       var v = VERDENER[id];
-      felt.appendChild(lagKort(v.ikon, v.navn, Lagring.harNavn(id)
-        ? 'Sammen med ' + Lagring.navnFor(id)
-        : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter'),
-        function () {
-          Lyd.klikk();
-          velgVerden(id);
-        }));
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'verdenkort verdenkort--' + id;
+      b.innerHTML =
+        '<span class="verdenkort-bilde">' + Figurer.figurFor(id) + '</span>' +
+        '<span class="verdenkort-under">' +
+          '<span class="verdenkort-navn">' + v.navn + '</span>' +
+          '<span class="verdenkort-tekst">' +
+            (Lagring.harNavn(id)
+              ? 'Sammen med ' + Lagring.navnFor(id)
+              : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter')) +
+          '</span>' +
+        '</span>';
+      b.addEventListener('click', function () { Lyd.klikk(); velgVerden(id); });
+      felt.appendChild(b);
     });
-  }
-
-  function lagKort(ikon, tittel, tekst, nar) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'kort';
-    b.innerHTML =
-      '<span class="kort-ikon" aria-hidden="true">' + ikon + '</span>' +
-      '<span class="kort-tittel">' + tittel + '</span>' +
-      '<span class="kort-tekst">' + tekst + '</span>';
-    b.addEventListener('click', nar);
-    return b;
   }
 
   function velgVerden(id) {
     naVerden = id;
-    document.body.setAttribute('data-verden', id);
+    settScene(id);
     if (Lagring.harNavn(id)) visMeny();
     else visNavn();
   }
@@ -98,7 +124,7 @@ var Spill = (function () {
     settTopp(v.navn, true);
     visSkjerm('skjerm-navn');
 
-    el('navn-figur').innerHTML = figurMerke(naVerden);
+    el('navn-figur').innerHTML = Figurer.figurFor(naVerden);
     el('navn-sporsmal').textContent = v.navnesporsmal;
     var felt = el('navn-felt');
     felt.value = '';
@@ -122,36 +148,43 @@ var Spill = (function () {
     tilbakeHandling = visVerden;
     settTopp(v.navn + ' · ' + Lagring.navnFor(naVerden), true);
     visSkjerm('skjerm-meny');
-    el('meny-tittel').textContent = 'Hva vil du gjøre?';
+    oppdaterTeller(false);
 
     var felt = el('meny-valg');
     felt.innerHTML = '';
 
-    felt.appendChild(lagKort('🔤', naVerden === 'oy' ? 'Skattekartet' : 'Garasjen',
-      'Trykk på en bokstav og hør den', function () {
-        Lyd.klikk();
-        tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
-        Moduser.Utforsk.start(naVerden);
-      }));
+    function flis(ikon, navn, tekst, nar) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'flis';
+      b.innerHTML =
+        '<span class="flis-stripe" aria-hidden="true"></span>' +
+        '<span class="flis-merke" aria-hidden="true">' + ikon + '</span>' +
+        '<span class="flis-navn">' + navn + '</span>' +
+        '<span class="flis-tekst">' + tekst + '</span>';
+      b.addEventListener('click', nar);
+      felt.appendChild(b);
+    }
 
-    felt.appendChild(lagKort('🎯', 'Finn bokstaven',
-      'Hør bokstaven, og velg riktig skilt', function () {
-        Lyd.klikk();
-        startOppgave('finn');
-      }));
+    flis(v.utforskIkon, v.utforsk, 'Trykk på en bokstav og hør den', function () {
+      Lyd.klikk();
+      tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
+      Moduser.Utforsk.start(naVerden);
+    });
 
-    felt.appendChild(lagKort('👂', 'Første lyd',
-      'Hvilken bokstav begynner ordet på?', function () {
-        Lyd.klikk();
-        startOppgave('forstelyd');
-      }));
+    flis('🎯', 'Finn bokstaven', 'Hør bokstaven, og velg riktig skilt', function () {
+      Lyd.klikk();
+      startOppgave('finn');
+    });
+
+    flis('👂', 'Første lyd', 'Hvilken bokstav begynner ordet på?', function () {
+      Lyd.klikk();
+      startOppgave('forstelyd');
+    });
 
     var antall = Lagring.mestrede().length;
-    felt.appendChild(lagKort('⭐', 'Samlingen din',
-      antall + ' av ' + ALFABET.length + ' bokstaver er dine', function () {
-        Lyd.klikk();
-        visSamling();
-      }));
+    flis('⭐', 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
+      function () { Lyd.klikk(); visSamling(); });
   }
 
   function startOppgave(type) {
@@ -160,9 +193,10 @@ var Spill = (function () {
     Moduser.Oppgave.start(type, naVerden);
   }
 
-  function settOppsummering(type, verdenId) {
+  function settOppsummering(type) {
     sisteModus = type;
     tilbakeHandling = visMeny;
+    oppdaterTeller(false);
   }
 
   function visSamling() {
@@ -170,7 +204,7 @@ var Spill = (function () {
     settTastLytter(null);
     var v = VERDENER[naVerden];
     tilbakeHandling = visMeny;
-    settTopp(v.samling, true);
+    settTopp(v.navn + ' · ' + Lagring.navnFor(naVerden), true);
     visSkjerm('skjerm-samling');
 
     var mestrede = Lagring.mestrede();
@@ -181,11 +215,12 @@ var Spill = (function () {
 
     var felt = el('samling-rutenett');
     felt.innerHTML = '';
-    ALFABET.forEach(function (bokstav) {
+    ALFABET.forEach(function (bokstav, i) {
       var dager = Lagring.dagerFor(bokstav);
       var mestret = Lagring.erMestret(bokstav);
       var rute = document.createElement('div');
       rute.className = 'samling-rute' + (mestret ? ' tatt' : (dager > 0 ? ' pa-vei' : ''));
+      rute.style.animationDelay = (i * 14) + 'ms';
       rute.innerHTML =
         '<div class="stor">' + bokstav + '</div>' +
         '<div class="liten">' +
@@ -193,17 +228,24 @@ var Spill = (function () {
         '</div>';
       felt.appendChild(rute);
     });
+
+    /* Stolpen fylles etter at skjermen er tegnet, så bevegelsen synes. */
+    var fyll = el('framdrift-fyll');
+    fyll.style.width = '0';
+    window.setTimeout(function () {
+      fyll.style.width = (mestrede.length / ALFABET.length * 100) + '%';
+    }, 60);
   }
 
   /* ---------- foreldremeny ---------- */
 
   function apneForeldre() {
-    var f = el('foreldre');
-    f.hidden = false;
+    el('foreldre').hidden = false;
 
     el('inn-stemme').checked = Lagring.innstilling('stemme');
     el('inn-lyd').checked = Lagring.innstilling('lyd');
     el('inn-vis-mal').checked = Lagring.innstilling('visMal');
+    el('inn-bevegelse').checked = Lagring.innstilling('bevegelse');
     el('inn-fart').value = Lagring.innstilling('talefart');
     visFart();
 
@@ -312,6 +354,9 @@ var Spill = (function () {
     el('oppgave-lytt').addEventListener('click', function () {
       Moduser.Oppgave.gjentaSporsmal();
     });
+    el('utforsk-lytt').addEventListener('click', function () {
+      Moduser.Utforsk.gjenta();
+    });
 
     el('oppsum-igjen').addEventListener('click', function () {
       Lyd.klikk();
@@ -344,6 +389,8 @@ var Spill = (function () {
     });
 
     el('foreldre-lukk').addEventListener('click', lukkForeldre);
+    el('foreldre-lukk-x').addEventListener('click', lukkForeldre);
+
     el('inn-stemme').addEventListener('change', function () {
       Lagring.settInnstilling('stemme', this.checked);
       if (!this.checked) Tale.stopp();
@@ -353,6 +400,10 @@ var Spill = (function () {
     });
     el('inn-vis-mal').addEventListener('change', function () {
       Lagring.settInnstilling('visMal', this.checked);
+    });
+    el('inn-bevegelse').addEventListener('change', function () {
+      Lagring.settInnstilling('bevegelse', this.checked);
+      settBevegelse();
     });
     el('inn-fart').addEventListener('input', function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));
@@ -366,6 +417,7 @@ var Spill = (function () {
       if (window.confirm('Slette all framgang og starte helt på nytt?')) {
         Lagring.nullstill();
         el('foreldre').hidden = true;
+        settBevegelse();
         visStart();
       }
     });
@@ -391,15 +443,24 @@ var Spill = (function () {
         tastLytter(tegn);
       }
     });
+
+    /* Figuren står på bakken – den må finne plassen sin på nytt ved omskalering. */
+    window.addEventListener('resize', function () {
+      el('figur').style.transform = 'translateX(24px)';
+    });
   }
 
   return {
     visSkjerm: visSkjerm,
     settTopp: settTopp,
     settTastLytter: settTastLytter,
-    figurMerke: figurMerke,
     settOppsummering: settOppsummering,
-    start: function () { koble(); visStart(); }
+    oppdaterTeller: oppdaterTeller,
+    start: function () {
+      koble();
+      settBevegelse();
+      visStart();
+    }
   };
 })();
 

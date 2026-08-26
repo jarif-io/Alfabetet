@@ -21,7 +21,7 @@ Så er det tre ting å gjøre:
 
 | | Hva det er |
 | --- | --- |
-| **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «B … b-b-bil … som i Bil». Ingen oppgaver, ingen feil. Fint å slå opp i mens dere leser. |
+| **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «B … b-b-bil … som i Bil». Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil — fint å slå opp i mens dere leser. |
 | **Finn bokstaven** | Spillet ber om en bokstav, og han velger blant skiltene. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? |
 
@@ -50,7 +50,9 @@ det kjennes ut som å klare noe.
 
 En bokstav regnes som **mestret** først når han har truffet den på tre *ulike dager*.
 Tre på rad i én økt er gjenkjenning; tre ulike dager er læring. Mestrede bokstaver
-flyttes over på garasjeveggen eller skattekartet og blir liggende der.
+flyttes over på **garasjeveggen** eller i **skattekista** og blir liggende der. Telleren
+oppe i høyre hjørne viser hvor mange av de 29 som er blitt hans, og er den eneste
+tingen i spillet som får en liten fanfare når den øker.
 
 ## For voksne
 
@@ -65,6 +67,9 @@ barnet ikke havner der ved et uhell.) Der kan du:
   lesestundene.
 - Skru av **«vis bokstaven i oppdraget»**. Da må han kjenne igjen bokstaven kun på
   lyden — et vanskeligere steg å ta når han begynner å sitte trygt.
+- Skru av **«la skyer og bølger drive sakte»**. Bakgrunnen er det eneste i spillet som
+  beveger seg av seg selv, og den bruker over to minutter på en runde. Holder han
+  lettest fokus på en helt stille skjerm, så slå den av.
 - Se **hvilke bokstaver han sitter godt i** og hvilke som henger igjen.
 - Bytte navn på figurene, eller nullstille alt.
 
@@ -102,12 +107,21 @@ samme ånd, og barnet gir dem navn selv.
 ## Filene
 
 ```
-index.html        hele skjermen, og figurene tegnet som SVG
-css/stil.css      utseende, farger og de få animasjonene
+index.html        hele skjermen: scenen, de sju skjermbildene og foreldremenyen
+css/stil.css      designsystem, scene, farger og animasjoner
+css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
 js/data.js        bokstavene og ordene  ← denne kan dere endre
+js/figurer.js     bil, skip og landskap, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage)
 js/tale.js        norsk talesyntese
 js/lyd.js         lydeffekter, laget av nettleseren selv
 js/moduser.js     de tre modusene
-js/spill.js       navigasjon, tastatur og foreldremeny
+js/spill.js       navigasjon, scene, tastatur og foreldremeny
 ```
+
+## Skriftene
+
+Spillet bruker **Baloo 2** til de store bokstavene — runde, tydelige former som ligner
+dem barn møter i alfabetbøker — og **Nunito** til all annen tekst. Begge ligger lagret
+inne i `css/fonter.css` som base64, slik at de virker selv når `index.html` åpnes rett
+fra disk uten nett. Begge er lisensiert under SIL Open Font License 1.1.

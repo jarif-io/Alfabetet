@@ -1,439 +1,987 @@
 /* Bokstavløpet – utseende
  *
- * To regler styrer alt her:
- *   1. Bokstaven skal alltid være det største og tydeligste på skjermen.
- *   2. Ingenting beveger seg med mindre barnet gjorde noe. Ingen løkker,
- *      ingen bakgrunnsanimasjon, ingen blink.
+ * Spillet skal se ut som et sted, ikke som et skjema. Derfor ligger det en
+ * sammenhengende scene bak alt – himmel, landskap og bakke – og figuren
+ * kjører på bakken nederst uansett hvilken skjerm som vises.
+ *
+ * To regler holder det rolig samtidig:
+ *   1. Ingen animasjon går i løkke bortsett fra skyer og bølger, som bruker
+ *      over ett minutt på en runde og kan skrus av.
+ *   2. Alt annet skjer som svar på et trykk, og varer under ett sekund.
  */
 
+/* ============================================================
+   1. Grunnverdier
+   ============================================================ */
+
 :root {
-  --bg: #f4efe6;
-  --kort: #ffffff;
-  --ink: #22252b;
-  --dempet: #6c7178;
-  --kant: #ddd4c4;
-  --kant-sterk: #c3b8a4;
+  --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --font-ui: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
 
-  --aksent: #c62d20;
-  --aksent-mork: #93190f;
-  --aksent-lys: #fbe9e6;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-xl: 34px;
 
-  --god: #2f7d54;
-  --god-lys: #e6f2ea;
+  --grunn-h: 170px;
 
-  --radius: 18px;
-  --skygge: 0 2px 0 var(--kant), 0 6px 14px rgba(40, 30, 15, .07);
-  --rolig: 320ms cubic-bezier(.32, .72, .35, 1);
+  /* Nøytral scene – brukes på start- og verdensskjermen */
+  --himmel-topp: #b7e0f2;
+  --himmel-bunn: #ffe7c9;
+  --sol: rgba(255, 236, 190, .85);
+  --as-bak: #9ec9a8;
+  --as-fram: #7bb18c;
+  --palme: #3f8f6a;
+  --grunn-topp: #86b58f;
+  --grunn-bunn: #5e8f6c;
+  --stripe: transparent;
+
+  --lakk: #dc3327;
+  --lakk-lys: #f4574a;
+  --lakk-mork: #a4200f;
+
+  --blekk: #23262d;
+  --blekk-svak: #5d646f;
+  --flate: #fffdf8;
+  --flate-2: #f4ede0;
+  --kant: rgba(35, 38, 45, .1);
+
+  --aksent: #dc3327;
+  --aksent-mork: #a4200f;
+  --aksent-svak: #fdeceb;
+
+  --god: #2e8055;
+  --god-mork: #1f5c3c;
+  --god-svak: #e6f4ec;
+  --gull: #e2a017;
+
+  --sk-1: 0 1px 2px rgba(40, 30, 15, .1), 0 3px 8px rgba(40, 30, 15, .08);
+  --sk-2: 0 2px 4px rgba(40, 30, 15, .1), 0 10px 24px rgba(40, 30, 15, .13);
+  --sk-3: 0 4px 8px rgba(40, 30, 15, .12), 0 20px 44px rgba(40, 30, 15, .18);
+
+  --mykt: 260ms cubic-bezier(.33, .78, .4, 1);
 }
 
-/* Fargene bytter med verden. Bare disse linjene skiller de to. */
+/* Racerbanen: ettermiddagshimmel over asfalt. */
+body[data-verden="bane"] {
+  --himmel-topp: #8fcdea;
+  --himmel-bunn: #ffdcae;
+  --sol: rgba(255, 226, 168, .9);
+  --as-bak: #8fbb9c;
+  --as-fram: #6aa47f;
+  --grunn-topp: #4a4f5b;
+  --grunn-bunn: #33373f;
+  --stripe: #f2c33d;
+  --aksent: #dc3327;
+  --aksent-mork: #a4200f;
+  --aksent-svak: #fdeceb;
+  --lakk: #dc3327;
+  --lakk-lys: #f4574a;
+  --lakk-mork: #a4200f;
+}
+
+/* Sjørøverøya: gullhimmel over dypt vann. */
 body[data-verden="oy"] {
-  --aksent: #1a6b87;
-  --aksent-mork: #0d4457;
-  --aksent-lys: #e4f0f4;
-  --bg: #eef1ee;
+  --himmel-topp: #9fd8e8;
+  --himmel-bunn: #ffe3b0;
+  --sol: rgba(255, 233, 178, .95);
+  --as-bak: #cdb98c;
+  --as-fram: #b9a173;
+  --palme: #3f8f6a;
+  --grunn-topp: #2b8fa8;
+  --grunn-bunn: #14607a;
+  --stripe: transparent;
+  --aksent: #16788f;
+  --aksent-mork: #0d4c5e;
+  --aksent-svak: #e2f1f5;
+  --lakk: #c8492f;
+  --lakk-lys: #e0674c;
+  --lakk-mork: #8f2f1c;
 }
 
 * { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
-  height: 100%;
-}
+html, body { height: 100%; margin: 0; }
 
 body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-  font-size: 18px;
-  line-height: 1.45;
+  font-family: var(--font-ui);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--blekk);
+  background: var(--himmel-bunn);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
-
-.svg-kilde { position: absolute; width: 0; height: 0; }
 
 .skjult-visuelt {
   position: absolute; width: 1px; height: 1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
 
-/* ---------- topplinje ---------- */
+:focus-visible {
+  outline: 4px solid var(--blekk);
+  outline-offset: 3px;
+}
+
+/* ============================================================
+   2. Scenen
+   ============================================================ */
+
+#scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scene-himmel {
+  position: absolute;
+  inset: 0 0 calc(var(--grunn-h) - 20px) 0;
+  background: linear-gradient(to bottom, var(--himmel-topp) 0%, var(--himmel-bunn) 100%);
+  transition: background 600ms ease;
+}
+
+.scene-sol {
+  position: absolute;
+  top: -140px; right: 8%;
+  width: 460px; height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--sol) 0%, rgba(255, 255, 255, 0) 68%);
+}
+
+/* Skyene ligger i to lag som driver i ulik takt. En runde tar over to
+   minutter, så det leses som «levende», ikke som noe som skjer. */
+.scene-skyer {
+  position: absolute;
+  inset: 0 0 var(--grunn-h) 0;
+  background-repeat: repeat-x;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='760' height='300'%3E%3Cg fill='%23ffffff' opacity='.5'%3E%3Cellipse cx='120' cy='70' rx='58' ry='26'/%3E%3Cellipse cx='168' cy='78' rx='44' ry='20'/%3E%3Cellipse cx='78' cy='80' rx='38' ry='18'/%3E%3Cellipse cx='520' cy='140' rx='50' ry='22'/%3E%3Cellipse cx='566' cy='146' rx='38' ry='17'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1100' height='340'%3E%3Cg fill='%23ffffff' opacity='.75'%3E%3Cellipse cx='300' cy='96' rx='78' ry='34'/%3E%3Cellipse cx='368' cy='106' rx='58' ry='26'/%3E%3Cellipse cx='240' cy='108' rx='50' ry='23'/%3E%3Cellipse cx='860' cy='60' rx='66' ry='28'/%3E%3Cellipse cx='918' cy='68' rx='48' ry='21'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: 0 0, 0 0;
+  background-size: 760px 300px, 1100px 340px;
+}
+
+body.bevegelse .scene-skyer { animation: driv 190s linear infinite; }
+
+@keyframes driv {
+  to { background-position: -760px 0, -1100px 0; }
+}
+
+.scene-landskap {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: calc(var(--grunn-h) - 26px);
+  height: 190px;
+}
+.scene-landskap .lag {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+}
+.scene-landskap .lag--bak { height: 150px; opacity: .85; }
+.scene-landskap .lag--fram { height: 118px; }
+
+.scene-grunn {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--grunn-h);
+  background: linear-gradient(to bottom, var(--grunn-topp), var(--grunn-bunn));
+  transition: background 600ms ease;
+}
+
+/* Midtstripa på asfalten. Havet har ingen. */
+.grunn-stripe {
+  position: absolute;
+  left: 0; right: 0;
+  top: 86px;
+  height: 8px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--stripe) 0 62px,
+    transparent 62px 124px);
+  opacity: .8;
+  border-radius: 4px;
+}
+
+/* Bølgetopper i havet. */
+body[data-verden="oy"] .scene-grunn::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: -13px;
+  height: 26px;
+  background-repeat: repeat-x;
+  background-size: 320px 26px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='26'%3E%3Cpath d='M0 18c30 0 30-12 60-12s30 12 60 12 30-12 60-12 30 12 60 12 30-12 60-12 30 12 60 12v14H0z' fill='%232b8fa8'/%3E%3C/svg%3E");
+}
+body[data-verden="oy"] .scene-grunn::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 34px;
+  height: 60px;
+  background-repeat: repeat-x;
+  background-size: 420px 60px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='60'%3E%3Cg fill='%23ffffff' fill-opacity='.13'%3E%3Cellipse cx='70' cy='20' rx='46' ry='4'/%3E%3Cellipse cx='228' cy='42' rx='62' ry='4.5'/%3E%3Cellipse cx='340' cy='14' rx='38' ry='3.5'/%3E%3Cellipse cx='150' cy='52' rx='30' ry='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+body.bevegelse[data-verden="oy"] .scene-grunn::after {
+  animation: skvulp 26s linear infinite;
+}
+@keyframes skvulp { to { background-position: 420px 0; } }
+
+/* ============================================================
+   3. Topplinja
+   ============================================================ */
 
 #topp {
+  position: relative;
+  z-index: 20;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 18px;
-  border-bottom: 2px solid var(--kant);
-  background: var(--kort);
+  padding: 12px 20px;
 }
+
+#topp-midt { flex: 1; text-align: center; min-width: 0; }
 
 #topp-tittel {
-  flex: 1;
-  margin: 0;
-  font-size: 1.1rem;
+  font-family: var(--font-display);
   font-weight: 600;
-  color: var(--dempet);
-  text-align: center;
-  letter-spacing: .02em;
-}
-
-.topp-knapp {
-  font: inherit;
-  font-size: 1rem;
-  border: 2px solid var(--kant);
-  background: var(--kort);
-  color: var(--ink);
+  font-size: 1.15rem;
+  color: var(--blekk);
+  background: rgba(255, 253, 248, .74);
+  backdrop-filter: blur(6px);
+  padding: 6px 20px;
   border-radius: 999px;
-  padding: 8px 16px;
-  cursor: pointer;
-  min-width: 116px;
-}
-.topp-knapp:hover { background: var(--aksent-lys); border-color: var(--aksent); }
-.topp-knapp[hidden] { visibility: hidden; display: block; }
-
-/* Tannhjulet er med vilje diskret, og krever at man holder inne. */
-.topp-knapp--stille {
-  position: relative;
-  min-width: 0;
-  padding: 8px 12px;
-  color: var(--dempet);
-  border-color: transparent;
-  opacity: .5;
+  box-shadow: var(--sk-1);
+  display: inline-block;
+  max-width: 100%;
   overflow: hidden;
-}
-.topp-knapp--stille:hover { opacity: 1; background: transparent; border-color: var(--kant); }
-.tannhjul-ring {
-  position: absolute; inset: auto 0 0 0; height: 3px;
-  background: var(--aksent); width: 0;
-}
-.topp-knapp--stille.holdes .tannhjul-ring {
-  width: 100%;
-  transition: width 2s linear;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ---------- skjermer ---------- */
+.topp-hoyre { display: flex; align-items: center; gap: 10px; }
+
+.ikonknapp {
+  font: inherit;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, .86);
+  color: var(--blekk);
+  box-shadow: var(--sk-1);
+  cursor: pointer;
+  transition: transform var(--mykt), background var(--mykt);
+}
+.ikonknapp:hover { background: #fff; transform: translateY(-2px); }
+.ikonknapp:active { transform: translateY(1px); }
+.ikonknapp[hidden] { visibility: hidden; display: inline-flex; }
+.ikonknapp .pil { font-size: 1.15rem; line-height: 1; }
+
+/* Tannhjulet må holdes inne. Ringen tegner seg rundt mens man holder. */
+.ikonknapp--stille {
+  position: relative;
+  padding: 9px 12px;
+  background: rgba(255, 253, 248, .5);
+  color: var(--blekk-svak);
+  box-shadow: none;
+}
+.ikonknapp--stille:hover { background: rgba(255, 253, 248, .9); }
+
+.hold-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.hold-ring circle {
+  fill: none;
+  stroke: var(--aksent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+}
+.ikonknapp--stille.holdes .hold-ring circle {
+  transition: stroke-dashoffset 2s linear;
+  stroke-dashoffset: 0;
+}
+
+/* Stjernetelleren gjør framgangen synlig hele tiden. */
+.teller {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, .86);
+  box-shadow: var(--sk-1);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.teller-stjerne { color: var(--gull); font-size: 1.15rem; }
+.teller-av { color: var(--blekk-svak); font-size: .82rem; font-weight: 600; }
+.teller[hidden] { display: none; }
+.teller.smell { animation: smell 520ms cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes smell {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================================
+   4. Knapper
+   ============================================================ */
+
+.knapp {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 13px 30px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, var(--aksent) 0%, var(--aksent-mork) 100%);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, .22), var(--sk-2);
+  transition: transform 120ms ease, box-shadow 120ms ease, filter var(--mykt);
+  position: relative;
+}
+.knapp > span {
+  display: block;
+  line-height: 1.2;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .22);
+}
+.knapp::before {
+  content: "";
+  position: absolute;
+  inset: 3px 12px auto;
+  height: 38%;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, .32), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+.knapp:hover { filter: brightness(1.06); }
+.knapp:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, .22), var(--sk-1);
+}
+
+.knapp--stor { font-size: 1.45rem; padding: 17px 52px; }
+.knapp--liten { font-size: .95rem; padding: 10px 20px; }
+
+.knapp--flat {
+  background: rgba(255, 253, 248, .9);
+  color: var(--blekk-svak);
+  box-shadow: 0 3px 0 var(--kant), var(--sk-1);
+}
+.knapp--flat:hover { color: var(--blekk); }
+.knapp--flat::before { display: none; }
+
+.knapp--fare {
+  background: rgba(255, 253, 248, .9);
+  color: #b03a2b;
+  box-shadow: inset 0 0 0 2px rgba(176, 58, 43, .35);
+}
+.knapp--fare::before { display: none; }
+
+.knapperad { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+.lyttknapp {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: .95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, .92);
+  color: var(--blekk-svak);
+  box-shadow: var(--sk-1);
+  cursor: pointer;
+  transition: transform var(--mykt), color var(--mykt);
+}
+.lyttknapp:hover { color: var(--blekk); transform: translateY(-2px); }
+.lyttknapp:active { transform: translateY(1px); }
+
+/* ============================================================
+   5. Skjermer og typografi
+   ============================================================ */
 
 #app {
+  position: relative;
+  z-index: 10;
   flex: 1 1 auto;
   display: flex;
   min-height: 0;
-  padding: 20px;
+  padding: 8px 24px calc(var(--grunn-h) + 2px);
 }
 
 .skjerm {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   min-height: 0;
 }
 .skjerm[hidden] { display: none; }
+.skjerm--midt { justify-content: center; align-items: center; }
 
-.midtstilt {
-  margin: auto;
-  text-align: center;
+.stabel {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
-}
-
-.skjerm-tittel {
-  margin: 0;
-  text-align: center;
-  font-size: 1.7rem;
-  font-weight: 600;
-}
-
-.stor-tittel {
-  margin: 0;
-  font-size: 3rem;
-  letter-spacing: -.01em;
-}
-
-.undertekst {
-  margin: 0;
-  color: var(--dempet);
   text-align: center;
 }
 
-/* ---------- knapper ---------- */
+.titteltekst {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 7vw, 4.2rem);
+  line-height: 1;
+  margin: 0;
+  color: var(--flate);
+  text-shadow: 0 3px 0 var(--aksent-mork), 0 8px 22px rgba(40, 30, 15, .3);
+  letter-spacing: .01em;
+}
 
-.hovedknapp {
-  font: inherit;
-  font-size: 1.3rem;
+.skjermtittel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  margin: 0;
+  text-align: center;
+  color: var(--blekk);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+}
+
+.ingress {
+  margin: 0;
+  text-align: center;
   font-weight: 600;
-  padding: 16px 40px;
+  color: var(--blekk-svak);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+}
+
+.helt { width: min(440px, 74vw); filter: drop-shadow(0 16px 22px rgba(40, 30, 15, .28)); }
+.helt--liten { width: min(300px, 58vw); }
+.helt svg { display: block; width: 100%; height: auto; }
+
+.tekstfelt {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 13px 20px;
+  width: min(380px, 82vw);
   border: none;
-  border-radius: 999px;
-  background: var(--aksent);
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 3px 0 var(--aksent-mork);
-}
-.hovedknapp:hover { filter: brightness(1.07); }
-.hovedknapp:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--aksent-mork); }
-
-.flatknapp {
-  font: inherit;
-  padding: 14px 26px;
-  border: 2px solid var(--kant-sterk);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--dempet);
-  cursor: pointer;
-}
-.flatknapp:hover { color: var(--ink); border-color: var(--ink); }
-
-.farlig-knapp {
-  font: inherit;
-  padding: 12px 20px;
-  border: 2px solid #c0392b;
-  border-radius: 12px;
-  background: transparent;
-  color: #c0392b;
-  cursor: pointer;
+  border-radius: var(--r-md);
+  background: var(--flate);
+  color: var(--blekk);
+  box-shadow: inset 0 0 0 3px var(--kant), var(--sk-1);
 }
 
-.knapperad { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-
-button:focus-visible, input:focus-visible, .kort:focus-visible {
-  outline: 4px solid var(--ink);
-  outline-offset: 3px;
+.panelkort {
+  background: rgba(255, 253, 248, .95);
+  border-radius: var(--r-xl);
+  padding: 34px 46px;
+  box-shadow: var(--sk-3);
+  max-width: min(560px, 92vw);
 }
 
-/* ---------- store valgkort (verden og meny) ---------- */
+/* Innkomst: elementene faller kort på plass, én gang. */
+.trinn { animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards; }
+.trinn:nth-child(1) { animation-delay: 30ms; }
+.trinn:nth-child(2) { animation-delay: 90ms; }
+.trinn:nth-child(3) { animation-delay: 150ms; }
+.trinn:nth-child(4) { animation-delay: 210ms; }
+@keyframes trinn-inn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
 
-.valgrad {
+/* ============================================================
+   6. Verdenskort
+   ============================================================ */
+
+.verdenrad {
   margin: auto;
+  width: min(720px, 100%);
   display: flex;
-  gap: 26px;
+  gap: 30px;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 1000px;
 }
 
-.kort {
+.verdenkort {
   font: inherit;
   cursor: pointer;
-  background: var(--kort);
-  border: 3px solid var(--kant);
-  border-radius: 24px;
-  box-shadow: var(--skygge);
-  padding: 26px 22px;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  transition: border-color var(--rolig), transform var(--rolig);
+  border: none;
+  padding: 0;
+  width: 320px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: var(--flate);
+  box-shadow: var(--sk-2);
+  transition: transform var(--mykt), box-shadow var(--mykt);
+  animation: trinn-inn 460ms cubic-bezier(.2, .8, .3, 1) backwards;
+  text-align: center;
 }
-.kort:hover { border-color: var(--aksent); transform: translateY(-3px); }
-.kort-ikon { font-size: 3.4rem; line-height: 1; }
-.kort-tittel { font-size: 1.35rem; font-weight: 600; }
-.kort-tekst { font-size: .95rem; color: var(--dempet); text-align: center; }
+.verdenkort:nth-child(2) { animation-delay: 110ms; }
+.verdenkort:hover { transform: translateY(-8px); box-shadow: var(--sk-3); }
+.verdenkort:active { transform: translateY(-2px); }
 
-/* ---------- figuren og banen ---------- */
-
-.bane {
+.verdenkort-bilde {
+  height: 168px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
   position: relative;
-  height: 92px;
-  flex: 0 0 auto;
-  border-radius: 14px;
-  background:
-    linear-gradient(var(--kant), var(--kant)) center / 100% 3px no-repeat,
-    var(--kort);
-  border: 2px solid var(--kant);
   overflow: hidden;
 }
-
-.figur {
+.verdenkort-bilde svg { width: 76%; height: auto; position: relative; z-index: 2; }
+.verdenkort-bilde::after {
+  content: "";
   position: absolute;
-  bottom: 8px;
-  left: 0;
-  width: 132px;
-  transform: translateX(10px);
-  transition: transform 900ms cubic-bezier(.4, .1, .2, 1);
+  left: 0; right: 0; bottom: 0;
+  height: 42px;
 }
-.figur svg { display: block; width: 100%; height: auto; }
 
-/* ---------- utforsk ---------- */
+.verdenkort--bane .verdenkort-bilde { background: linear-gradient(to bottom, #8fcdea, #ffdcae); }
+.verdenkort--bane .verdenkort-bilde::after { background: linear-gradient(to bottom, #4a4f5b, #33373f); }
+.verdenkort--oy .verdenkort-bilde { background: linear-gradient(to bottom, #9fd8e8, #ffe3b0); }
+.verdenkort--oy .verdenkort-bilde::after { background: linear-gradient(to bottom, #2b8fa8, #14607a); }
 
-.utforsk-tavle {
+.verdenkort-under { padding: 18px 22px 24px; }
+.verdenkort-navn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  display: block;
+}
+.verdenkort-tekst { color: var(--blekk-svak); font-size: .95rem; font-weight: 600; }
+
+/* ============================================================
+   7. Menyfliser
+   ============================================================ */
+
+.menyrad {
+  margin: auto;
+  width: min(1140px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+
+.flis {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  padding: 22px 22px 20px;
+  border-radius: var(--r-lg);
+  background: rgba(255, 253, 248, .96);
+  box-shadow: var(--sk-2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform var(--mykt), box-shadow var(--mykt);
+  animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards;
+  position: relative;
+  overflow: hidden;
+}
+.flis:nth-child(2) { animation-delay: 70ms; }
+.flis:nth-child(3) { animation-delay: 140ms; }
+.flis:nth-child(4) { animation-delay: 210ms; }
+.flis:hover { transform: translateY(-7px); box-shadow: var(--sk-3); }
+.flis:active { transform: translateY(-1px); }
+
+.flis-merke {
+  width: 62px; height: 62px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  background: var(--aksent-svak);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .05);
+}
+.flis-navn { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; }
+.flis-tekst { color: var(--blekk-svak); font-size: .93rem; font-weight: 600; line-height: 1.35; }
+
+.flis-stripe {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 7px;
+  background: var(--aksent);
+}
+
+/* ============================================================
+   8. Utforsk
+   ============================================================ */
+
+.ordkort {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 28px;
-  background: var(--kort);
-  border: 3px solid var(--kant);
-  border-radius: var(--radius);
-  padding: 16px 30px;
-  box-shadow: var(--skygge);
+  gap: 26px;
+  align-self: center;
+  width: min(680px, 100%);
+  padding: 14px 22px 14px 18px;
+  border-radius: var(--r-xl);
+  background: rgba(255, 253, 248, .96);
+  box-shadow: var(--sk-2);
 }
 
-.tavle-bokstav {
-  font-size: 5.6rem;
-  font-weight: 700;
+.ordkort-bokstav {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 5.2rem;
   line-height: 1;
-  min-width: 120px;
-  text-align: center;
-  color: var(--aksent);
+  width: 118px;
+  min-width: 118px;
+  height: 118px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  color: #fff;
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+  box-shadow: var(--sk-1);
+}
+.ordkort-bokstav.bytter { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes kort-bytt {
+  0% { transform: scale(.86) rotate(-5deg); }
+  60% { transform: scale(1.05) rotate(2deg); }
+  100% { transform: none; }
 }
 
-.tavle-hoyre { display: flex; align-items: center; gap: 20px; }
-.tavle-ikon { font-size: 3.4rem; line-height: 1; }
-.tavle-ord { font-size: 2rem; font-weight: 600; }
+.ordkort-innhold { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
+.ordkort-ikon { font-size: 3.6rem; line-height: 1; }
+.ordkort-ord {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+.ordkort-innhold.bytter { animation: trinn-inn 380ms cubic-bezier(.2, .8, .3, 1); }
 
 .bokstavrutenett {
   flex: 1 1 auto;
   overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(76px, 104px));
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  align-content: start;
-  padding-bottom: 4px;
+  align-content: center;
+  gap: 11px;
+  padding: 8px 2px;
 }
 
 .bokstav {
-  font: inherit;
-  cursor: pointer;
-  background: var(--kort);
-  border: 3px solid var(--kant);
-  border-radius: 14px;
-  box-shadow: 0 2px 0 var(--kant);
-  aspect-ratio: 1 / 1;
-  min-height: 64px;
-  font-size: 2.3rem;
+  font-family: var(--font-display);
   font-weight: 700;
-  color: var(--ink);
+  font-size: 2.2rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 16px;
+  flex: 0 0 auto;
+  width: 92px;
+  height: 92px;
+  color: var(--blekk);
+  background: rgba(255, 253, 248, .94);
+  box-shadow: 0 3px 0 rgba(40, 30, 15, .16), var(--sk-1);
   position: relative;
-  transition: border-color var(--rolig), background var(--rolig);
+  transition: transform 130ms ease, box-shadow 130ms ease, background var(--mykt), color var(--mykt);
 }
-.bokstav:hover { border-color: var(--aksent); }
-.bokstav.aktiv { background: var(--aksent-lys); border-color: var(--aksent); color: var(--aksent-mork); }
+.bokstav:hover { transform: translateY(-4px); box-shadow: 0 7px 0 rgba(40, 30, 15, .16), var(--sk-2); }
+.bokstav:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(40, 30, 15, .16); }
+.bokstav.aktiv {
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .18);
+}
 .bokstav.mestret::after {
   content: "★";
   position: absolute;
-  right: 6px; bottom: 2px;
-  font-size: .95rem;
-  color: var(--god);
+  right: 6px; top: 4px;
+  font-size: .8rem;
+  color: var(--gull);
 }
+.bokstav.aktiv.mestret::after { color: #ffe9a0; }
 
-/* ---------- oppgave ---------- */
+/* ============================================================
+   9. Oppgave
+   ============================================================ */
 
 .prikker {
   flex: 0 0 auto;
   display: flex;
   gap: 9px;
   justify-content: center;
+  padding-top: 2px;
 }
 .prikk {
-  width: 13px; height: 13px;
+  width: 14px; height: 14px;
   border-radius: 50%;
-  border: 2px solid var(--kant-sterk);
-  background: transparent;
+  background: rgba(255, 255, 255, .55);
+  box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .18);
+  transition: background var(--mykt), transform var(--mykt);
 }
-.prikk.tatt { background: var(--god); border-color: var(--god); }
-.prikk.na { border-color: var(--aksent); border-width: 3px; }
+.prikk.tatt { background: var(--god); box-shadow: inset 0 0 0 2px var(--god-mork); }
+.prikk.na { transform: scale(1.35); background: var(--flate); box-shadow: inset 0 0 0 3px var(--aksent); }
 
 .oppdrag {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
+  min-height: 0;
 }
-.oppdrag-tekst { margin: 0; font-size: 1.5rem; color: var(--dempet); }
+.oppdrag-tekst {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: var(--blekk-svak);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .55);
+}
 
 .oppdrag-mal {
-  font-size: 4.4rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 4rem;
   line-height: 1.05;
   color: var(--aksent);
+  text-shadow: 0 3px 0 rgba(255, 255, 255, .8);
   min-height: 1.05em;
   text-align: center;
 }
-.oppdrag-mal .mal-ikon { font-size: 4rem; }
-.oppdrag-mal .mal-ord { display: block; font-size: 2.1rem; color: var(--ink); }
 
-.lytt-knapp {
-  font: inherit;
-  border: 2px solid var(--kant-sterk);
-  background: var(--kort);
-  color: var(--dempet);
-  border-radius: 999px;
-  padding: 8px 20px;
-  cursor: pointer;
+/* Én bokstav får samme merke som ellers i spillet, så den ikke blir
+   en løs strek på himmelen – særlig viktig for I og J. */
+.oppdrag-mal--bokstav {
+  width: 104px; height: 104px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  font-size: 4.2rem;
+  color: #fff;
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+  box-shadow: var(--sk-2);
 }
-.lytt-knapp:hover { color: var(--ink); border-color: var(--ink); }
+.oppdrag-mal .mal-ikon {
+  display: block;
+  font-size: 3.6rem;
+  filter: drop-shadow(0 6px 10px rgba(40, 30, 15, .25));
+}
+.oppdrag-mal .mal-ord {
+  display: block;
+  font-size: 2.1rem;
+  color: var(--blekk);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+}
+.oppdrag-mal.bytter { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
 
 .valg {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   display: flex;
-  align-items: center;
-  gap: 22px;
+  align-items: flex-end;
   justify-content: center;
+  gap: 26px;
   flex-wrap: wrap;
+  padding: 4px 0 0;
 }
 
+/* Skiltene står på stolper, litt skjevt, som skilt gjør. */
 .skilt {
-  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 4rem;
   cursor: pointer;
+  width: 142px;
+  height: 142px;
+  border: none;
+  border-radius: 24px;
+  color: var(--blekk);
+  background: var(--flate);
+  box-shadow: inset 0 0 0 6px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2);
   position: relative;
-  width: 150px;
-  height: 150px;
-  border-radius: 20px;
-  border: 4px solid var(--kant-sterk);
-  background: var(--kort);
-  box-shadow: var(--skygge);
-  font-size: 4.4rem;
-  font-weight: 700;
-  color: var(--ink);
-  transition: border-color var(--rolig), background var(--rolig), transform var(--rolig);
+  transition: transform 140ms ease, box-shadow 140ms ease, background var(--mykt), color var(--mykt);
+  animation: skilt-opp 380ms cubic-bezier(.2, .9, .3, 1) backwards;
 }
-.skilt:hover { border-color: var(--aksent); }
-.skilt.riktig { background: var(--god-lys); border-color: var(--god); color: var(--god); }
-.skilt.feil { opacity: .4; }
-.skilt.pekes { border-color: var(--aksent); border-width: 6px; }
-.skilt[disabled] { cursor: default; }
-.skilt.vugg { animation: vugg 420ms ease-in-out; }
-
-@keyframes vugg {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-7px); }
-  75% { transform: translateX(7px); }
-}
-
-/* Stjernen som lander når svaret er riktig. */
-.stjerne-lander {
+.skilt::after {
+  content: "";
   position: absolute;
-  font-size: 2.4rem;
-  color: #e0a107;
-  pointer-events: none;
-  animation: land 900ms ease-out forwards;
+  left: 50%; top: 100%;
+  width: 15px; height: 30px;
+  transform: translateX(-50%);
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(to right, #8a8f99, #b9bec7 40%, #7d838d);
 }
-@keyframes land {
-  0%   { transform: translate(-50%, -40px) scale(.3); opacity: 0; }
-  35%  { opacity: 1; }
-  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+body[data-verden="oy"] .skilt::after {
+  background: linear-gradient(to right, #7d5330, #a9713f 40%, #6b4322);
+}
+.skilt:nth-child(1) { transform: rotate(-2deg); animation-delay: 40ms; }
+.skilt:nth-child(2) { transform: rotate(1.5deg); animation-delay: 110ms; }
+.skilt:nth-child(3) { transform: rotate(-1deg); animation-delay: 180ms; }
+.skilt:nth-child(4) { transform: rotate(2deg); animation-delay: 250ms; }
+@keyframes skilt-opp {
+  from { opacity: 0; transform: translateY(22px) scale(.9); }
+}
+.skilt:hover:not([disabled]) { transform: translateY(-7px) rotate(0deg) scale(1.03); }
+.skilt:active:not([disabled]) { transform: translateY(-1px) rotate(0deg) scale(.99); }
+.skilt[disabled] { cursor: default; }
+
+.skilt.riktig {
+  background: var(--god-svak);
+  color: var(--god-mork);
+  box-shadow: inset 0 0 0 6px var(--god), 0 5px 0 var(--god-mork), var(--sk-3);
+  animation: sprett 560ms cubic-bezier(.3, 1.5, .45, 1);
+}
+@keyframes sprett {
+  0% { transform: rotate(0) scale(1); }
+  35% { transform: rotate(0) scale(1.13); }
+  70% { transform: rotate(0) scale(.97); }
+  100% { transform: rotate(0) scale(1.04); }
+}
+
+.skilt.feil {
+  background: var(--flate-2);
+  color: rgba(35, 38, 45, .32);
+  box-shadow: inset 0 0 0 6px rgba(35, 38, 45, .13), 0 3px 0 rgba(40, 30, 15, .1);
+  opacity: .62;
+}
+.skilt.vugg { animation: vugg 460ms ease-in-out; }
+@keyframes vugg {
+  0%, 100% { transform: rotate(0) translateX(0); }
+  20% { transform: rotate(0) translateX(-9px); }
+  45% { transform: rotate(0) translateX(8px); }
+  70% { transform: rotate(0) translateX(-5px); }
+}
+
+/* Etter to bom peker spillet på svaret – tre pulser, så ro. */
+.skilt.pekes {
+  animation: pek 900ms ease-out 3;
+  z-index: 2;
+}
+@keyframes pek {
+  0%, 100% { box-shadow: inset 0 0 0 6px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2); }
+  50% { box-shadow: inset 0 0 0 8px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), 0 0 0 12px var(--aksent-svak), var(--sk-2); }
 }
 
 .videre-felt {
-  flex: 0 0 auto;
-  min-height: 68px;
+  position: fixed;
+  right: 30px;
+  bottom: calc(var(--grunn-h) + 14px);
+  z-index: 30;
   display: flex;
-  justify-content: center;
-  align-items: center;
+}
+#oppgave-videre:not([hidden]) { animation: trinn-inn 320ms cubic-bezier(.2, .9, .3, 1); }
+
+/* Stjerna som flyr opp til telleren. */
+.flystjerne {
+  position: fixed;
+  z-index: 60;
+  font-size: 2.4rem;
+  color: var(--gull);
+  text-shadow: 0 2px 6px rgba(40, 30, 15, .35);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 720ms cubic-bezier(.4, -0.25, .5, 1), opacity 720ms ease-in;
 }
 
-/* ---------- oppsummering ---------- */
+/* Liten fanfare – bare når en bokstav faktisk blir hans. */
+.konfetti {
+  position: fixed;
+  z-index: 60;
+  width: 9px; height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: konfetti-fall 1100ms cubic-bezier(.2, .6, .4, 1) forwards;
+}
+@keyframes konfetti-fall {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); }
+}
 
-.malflagg { font-size: 4.5rem; line-height: 1; }
+/* ============================================================
+   10. Figuren på bakken
+   ============================================================ */
+
+#figurbane {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--grunn-h);
+  z-index: 12;
+  pointer-events: none;
+}
+#figurbane[hidden] { display: none; }
+
+.figur {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 208px;
+  transform: translateX(24px);
+  transition: transform 980ms cubic-bezier(.42, .05, .18, 1);
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .3));
+}
+.figur svg { display: block; width: 100%; height: auto; transition: transform 200ms ease; }
+/* Kjører den mot venstre, snur den seg. */
+.figur.speilet svg { transform: scaleX(-1); }
+.fig-skygge { fill: rgba(0, 0, 0, .22); }
+
+/* Hjulene ruller mens bilen kjører. */
+.hjul { transform-box: fill-box; transform-origin: center; }
+.figur.kjorer .hjul { animation: rull 620ms linear infinite; }
+@keyframes rull { to { transform: rotate(360deg); } }
+
+/* Skipet vugger i bølgene når det seiler. */
+.figur.kjorer .fig--skip { animation: vugg-skip 1500ms ease-in-out infinite; }
+@keyframes vugg-skip {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
+}
+.fig--skip { transform-origin: 50% 80%; }
+
+.stov { position: absolute; inset: 0; }
+.stov span {
+  position: absolute;
+  bottom: 44px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .5);
+  animation: stov-ut 800ms ease-out forwards;
+}
+@keyframes stov-ut {
+  0% { opacity: .75; transform: scale(.4); }
+  100% { opacity: 0; transform: scale(2.4) translateY(-16px); }
+}
+
+/* ============================================================
+   11. Oppsummering
+   ============================================================ */
+
+.malflagg { font-size: 4.2rem; line-height: 1; }
 
 .oppsum-liste {
   list-style: none;
@@ -441,157 +989,268 @@ button:focus-visible, input:focus-visible, .kort:focus-visible {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: 1.2rem;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--blekk-svak);
   text-align: center;
 }
-.oppsum-liste li { color: var(--dempet); }
-.oppsum-liste b { color: var(--ink); font-size: 1.4rem; }
-.oppsum-liste .ny-mestret { color: var(--god); font-weight: 600; }
+.oppsum-liste li { animation: trinn-inn 400ms cubic-bezier(.2, .8, .3, 1) backwards; }
+.oppsum-liste li:nth-child(2) { animation-delay: 120ms; }
+.oppsum-liste li:nth-child(3) { animation-delay: 240ms; }
+.oppsum-liste li:nth-child(4) { animation-delay: 360ms; }
+.oppsum-liste b {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--blekk);
+}
+.oppsum-liste .ny-mestret {
+  color: var(--god-mork);
+  background: var(--god-svak);
+  border-radius: 999px;
+  padding: 8px 18px;
+}
+.oppsum-liste .ny-mestret b { color: var(--god-mork); }
 
-/* ---------- samlingen ---------- */
+/* ============================================================
+   12. Samlingen
+   ============================================================ */
+
+.framdrift {
+  align-self: center;
+  width: min(520px, 90%);
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, .7);
+  box-shadow: inset 0 1px 3px rgba(40, 30, 15, .2);
+  overflow: hidden;
+}
+.framdrift span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--god), #4aa87a);
+  transition: width 900ms cubic-bezier(.2, .8, .3, 1);
+}
 
 .samling-rutenett {
   flex: 1 1 auto;
   overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(104px, 130px));
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 14px;
-  align-content: start;
+  align-content: center;
+  gap: 13px;
+  padding: 8px 2px;
 }
 
 .samling-rute {
-  background: var(--kort);
-  border: 3px dashed var(--kant);
-  border-radius: 16px;
-  padding: 10px 6px 8px;
+  flex: 0 0 auto;
+  width: 116px;
+  border-radius: 18px;
+  padding: 12px 6px 9px;
   text-align: center;
-  color: var(--kant-sterk);
+  background: rgba(255, 253, 248, .55);
+  box-shadow: inset 0 0 0 3px rgba(40, 30, 15, .1);
+  color: rgba(35, 38, 45, .3);
+  animation: trinn-inn 340ms cubic-bezier(.2, .8, .3, 1) backwards;
 }
-.samling-rute .stor { font-size: 2.6rem; font-weight: 700; line-height: 1.1; }
-.samling-rute .liten { font-size: .82rem; }
+.samling-rute .stor {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.5rem;
+  line-height: 1.05;
+}
+.samling-rute .liten { font-size: .78rem; font-weight: 700; }
+
+.samling-rute.pa-vei {
+  background: rgba(255, 253, 248, .94);
+  box-shadow: inset 0 0 0 3px rgba(40, 30, 15, .14), var(--sk-1);
+  color: var(--blekk-svak);
+}
+.samling-rute.pa-vei .stor { color: var(--blekk); }
 
 .samling-rute.tatt {
-  border-style: solid;
-  border-color: var(--god);
-  background: var(--god-lys);
-  color: var(--god);
+  background: linear-gradient(to bottom, #fff9e8, var(--god-svak));
+  box-shadow: inset 0 0 0 3px var(--god), var(--sk-2);
+  color: var(--god-mork);
 }
-.samling-rute.tatt .stor { color: var(--ink); }
-.samling-rute.pa-vei { border-color: var(--kant-sterk); color: var(--dempet); }
-.samling-rute.pa-vei .stor { color: var(--ink); }
+.samling-rute.tatt .stor { color: var(--god-mork); }
 
-/* ---------- foreldremeny ---------- */
+/* ============================================================
+   13. Foreldremeny
+   ============================================================ */
 
 .overlegg {
   position: fixed;
   inset: 0;
-  background: rgba(25, 22, 16, .55);
+  z-index: 100;
+  background: rgba(25, 22, 16, .5);
+  backdrop-filter: blur(3px);
   display: flex;
   padding: 24px;
   overflow-y: auto;
-  z-index: 50;
 }
 .overlegg[hidden] { display: none; }
 
 .panel {
   margin: auto;
-  background: var(--kort);
-  border-radius: 20px;
-  padding: 26px 30px;
-  width: min(640px, 100%);
+  background: var(--flate);
+  border-radius: var(--r-xl);
+  padding: 24px 30px 26px;
+  width: min(620px, 100%);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
+  box-shadow: var(--sk-3);
+  animation: trinn-inn 300ms cubic-bezier(.2, .8, .3, 1);
 }
-.panel h2 { margin: 0; font-size: 1.5rem; }
-.panel h3 { margin: 0 0 8px; font-size: 1.05rem; }
 
-.panel-del {
-  border-top: 2px solid var(--kant);
-  padding-top: 14px;
+.panel-topp { display: flex; align-items: center; justify-content: space-between; }
+.panel h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; }
+.panel h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--blekk-svak);
 }
-.panel-del:first-of-type { border-top: none; padding-top: 0; }
 
-.bryter, .skyver {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  font-size: 1rem;
+.lukkekryss {
+  border: none;
+  background: var(--flate-2);
+  color: var(--blekk-svak);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
   cursor: pointer;
 }
-.bryter input { width: 22px; height: 22px; }
-.skyver input { flex: 1; }
+.lukkekryss:hover { background: var(--kant); color: var(--blekk); }
 
-.merknad { margin: 6px 0 0; font-size: .88rem; color: var(--dempet); }
-.merknad.advarsel { color: #a8501a; }
+.panel-del { border-top: 2px solid var(--flate-2); padding-top: 14px; }
+.panel-del:first-of-type { border-top: none; padding-top: 0; }
+.panel-del--bunn { display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+
+/* Egen bryter i stedet for standard avkrysningsboks. */
+.bryter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+.bryter input { position: absolute; opacity: 0; width: 0; height: 0; }
+.bryter-spor {
+  flex: 0 0 auto;
+  width: 50px; height: 29px;
+  border-radius: 999px;
+  background: var(--flate-2);
+  box-shadow: inset 0 0 0 2px var(--kant);
+  position: relative;
+  transition: background var(--mykt);
+}
+.bryter-spor::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 23px; height: 23px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--sk-1);
+  transition: transform var(--mykt);
+}
+.bryter input:checked + .bryter-spor { background: var(--god); box-shadow: none; }
+.bryter input:checked + .bryter-spor::after { transform: translateX(21px); }
+.bryter input:focus-visible + .bryter-spor { outline: 3px solid var(--blekk); outline-offset: 2px; }
+
+.skyver { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-weight: 600; }
+.skyver input { flex: 1; accent-color: var(--aksent); }
+.skyver output { font-weight: 700; color: var(--blekk-svak); min-width: 92px; }
+
+.merknad { margin: 4px 0 0; font-size: .87rem; color: var(--blekk-svak); font-weight: 500; }
+.merknad.advarsel { color: #9a5116; }
 
 .bokstavvelger {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(46px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
   gap: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .bokstavvelger button {
-  font: inherit;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
   padding: 9px 0;
-  border: 2px solid var(--kant);
-  border-radius: 9px;
-  background: var(--kort);
-  color: var(--dempet);
+  border: none;
+  border-radius: 10px;
+  background: var(--flate-2);
+  color: var(--blekk-svak);
   cursor: pointer;
+  transition: transform 120ms ease;
 }
-.bokstavvelger button.valgt {
-  background: var(--aksent);
-  border-color: var(--aksent);
-  color: #fff;
-}
+.bokstavvelger button:hover { transform: translateY(-2px); }
+.bokstavvelger button.valgt { background: var(--aksent); color: #fff; }
 
 .statuslinje { display: flex; flex-wrap: wrap; gap: 5px; }
 .status-bokstav {
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: .95rem;
-  font-weight: 600;
-  padding: 5px 8px;
-  border-radius: 7px;
-  border: 2px solid var(--kant);
-  color: var(--dempet);
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: var(--flate-2);
+  color: rgba(35, 38, 45, .35);
 }
-.status-bokstav.mestret { background: var(--god-lys); border-color: var(--god); color: var(--god); }
-.status-bokstav.pa-vei { border-color: var(--kant-sterk); color: var(--ink); }
+.status-bokstav.pa-vei { color: var(--blekk); }
+.status-bokstav.mestret { background: var(--god); color: #fff; }
 
 .navnrad { display: flex; gap: 16px; flex-wrap: wrap; }
-.navnrad label { display: flex; flex-direction: column; gap: 5px; font-size: .9rem; color: var(--dempet); }
-
-.navn-felt, .navnrad input {
-  font: inherit;
-  font-size: 1.1rem;
-  padding: 11px 14px;
-  border: 2px solid var(--kant-sterk);
+.navnrad label {
+  display: flex; flex-direction: column; gap: 5px;
+  font-size: .85rem; font-weight: 700; color: var(--blekk-svak);
+}
+.navnrad input {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  padding: 10px 14px;
+  border: none;
   border-radius: 12px;
-  background: var(--kort);
-  color: var(--ink);
-}
-.navn-felt { font-size: 1.5rem; text-align: center; width: min(360px, 80vw); }
-
-.start-figur svg, .navn-figur svg { width: 220px; height: auto; }
-
-/* ---------- mindre skjermer ---------- */
-
-@media (max-width: 760px) {
-  body { font-size: 17px; }
-  .tavle-bokstav { font-size: 4rem; min-width: 84px; }
-  .tavle-ord { font-size: 1.5rem; }
-  .skilt { width: 118px; height: 118px; font-size: 3.4rem; }
-  .kort { width: 100%; max-width: 320px; }
-  .bane { height: 74px; }
-  .figur { width: 104px; }
+  background: var(--flate-2);
+  color: var(--blekk);
 }
 
-/* Respekterer systemets valg om mindre bevegelse. */
+/* ============================================================
+   14. Mindre skjermer og mindre bevegelse
+   ============================================================ */
+
+@media (max-width: 900px) {
+  :root { --grunn-h: 132px; }
+  body { font-size: 16px; }
+  .ordkort { gap: 16px; padding: 12px 18px; }
+  .ordkort-bokstav { font-size: 3.6rem; width: 84px; min-width: 84px; height: 84px; }
+  .ordkort-ikon { font-size: 2.6rem; }
+  .ordkort-ord { font-size: 1.6rem; }
+  .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
+  .figur { width: 158px; bottom: 30px; }
+  .ikonknapp-tekst { display: none; }
+  .verdenkort { width: min(320px, 86vw); }
+}
+
+@media (max-height: 720px) {
+  :root { --grunn-h: 128px; }
+  .oppdrag-mal { font-size: 3.2rem; }
+  .skilt { width: 118px; height: 118px; font-size: 3.2rem; }
+  .figur { width: 160px; bottom: 28px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 60ms !important;
+  }
 }

@@ -17,6 +17,7 @@ var Lagring = (function () {
       lyd: true,
       talefart: 0.75,
       visMal: true,     /* vis bokstaven i oppdraget, ikke bare si den */
+      bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null   /* null = alle bokstaver er med */
     }
   };

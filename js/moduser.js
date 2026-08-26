@@ -1,7 +1,7 @@
 /* Bokstavløpet – de tre modusene
  *
- * Alle tre deler den samme regelen: ingenting skjer av seg selv. Barnet
- * trykker, spillet svarer, og så står skjermen stille til neste trykk.
+ * Alle tre deler samme regel: ingenting skjer av seg selv. Barnet trykker,
+ * spillet svarer i under ett sekund, og så står skjermen stille igjen.
  */
 
 var Moduser = (function () {
@@ -30,63 +30,176 @@ var Moduser = (function () {
     return deler.slice(0, -1).join(', ') + ' og ' + deler[deler.length - 1];
   }
 
-  /* Kjørelyden hører til verdenen. */
-  function beveglyd(verdenId) {
+  /* Kort animasjon som kan spilles om igjen: klassen må fjernes først. */
+  function spillOm(element, klasse, ms) {
+    element.classList.remove(klasse);
+    void element.offsetWidth;
+    element.classList.add(klasse);
+    window.setTimeout(function () { element.classList.remove(klasse); }, ms);
+  }
+
+  /* ================= figuren på bakken ================= */
+
+  var kjoreTimer = null;
+
+  function naVaerendeX(figur) {
+    var m = /translateX\((-?[\d.]+)px\)/.exec(figur.style.transform || '');
+    return m ? parseFloat(m[1]) : 24;
+  }
+
+  function stovSky(fraX, tilX) {
+    var stov = el('stov');
+    var bakover = tilX < fraX;
+    for (var i = 0; i < 5; i++) {
+      (function (n) {
+        window.setTimeout(function () {
+          var s = document.createElement('span');
+          s.style.left = (fraX + (bakover ? 150 : 40) + n * 9) + 'px';
+          stov.appendChild(s);
+          window.setTimeout(function () { if (s.parentNode) s.parentNode.removeChild(s); }, 850);
+        }, n * 70);
+      })(i);
+    }
+  }
+
+  /* Flytter figuren dit noe står, og lar hjulene rulle mens den er i fart. */
+  function kjorTil(verdenId, andelEllerElement) {
+    var bane = el('figurbane');
+    var figur = el('figur');
+    var rB = bane.getBoundingClientRect();
+    var bredde = figur.offsetWidth || 200;
+    var maks = Math.max(24, rB.width - bredde - 24);
+    var x;
+
+    if (typeof andelEllerElement === 'number') {
+      x = 24 + andelEllerElement * (maks - 24);
+    } else {
+      var rM = andelEllerElement.getBoundingClientRect();
+      x = (rM.left + rM.width / 2) - rB.left - bredde / 2;
+      x = Math.max(24, Math.min(maks, x));
+    }
+
+    var fra = naVaerendeX(figur);
+    figur.classList.toggle('speilet', x < fra - 4);
+    figur.classList.add('kjorer');
+    stovSky(fra, x);
+    figur.style.transform = 'translateX(' + x + 'px)';
+
     if (verdenId === 'oy') Lyd.bolge(); else Lyd.motor();
+
+    window.clearTimeout(kjoreTimer);
+    kjoreTimer = window.setTimeout(function () {
+      figur.classList.remove('kjorer');
+    }, 1000);
   }
 
-  /* Flytter figuren vannrett til midten av et element, innenfor banen. */
-  function flyttFigurTil(baneEl, figurEl, malEl) {
-    var bane = baneEl.getBoundingClientRect();
-    var figur = figurEl.getBoundingClientRect();
-    var mal = malEl.getBoundingClientRect();
-    var x = (mal.left + mal.width / 2) - bane.left - figur.width / 2;
-    var maks = bane.width - figur.width - 8;
-    figurEl.style.transform = 'translateX(' + Math.max(8, Math.min(maks, x)) + 'px)';
+  function stillFigurTilStart() {
+    var figur = el('figur');
+    figur.classList.remove('speilet', 'kjorer');
+    figur.style.transform = 'translateX(24px)';
   }
 
-  function flyttFigurTilAndel(baneEl, figurEl, andel) {
-    var bane = baneEl.getBoundingClientRect();
-    var figur = figurEl.getBoundingClientRect();
-    var maks = Math.max(8, bane.width - figur.width - 8);
-    figurEl.style.transform = 'translateX(' + (8 + andel * (maks - 8)) + 'px)';
-  }
+  /* ================= belønninger ================= */
 
-  function slippStjerne(vertEl) {
+  /* Vanlig riktig svar: en stjerne lander på skiltet og blir borte igjen. */
+  function stjerneLander(vertEl) {
+    var r = vertEl.getBoundingClientRect();
     var s = document.createElement('span');
-    s.className = 'stjerne-lander';
+    s.className = 'flystjerne';
     s.textContent = '★';
-    s.style.left = '50%';
-    s.style.top = '8px';
-    vertEl.appendChild(s);
+    s.style.left = (r.left + r.width / 2) + 'px';
+    s.style.top = (r.top + 14) + 'px';
+    s.style.transform = 'translate(-50%, -50%) scale(.3)';
+    s.style.opacity = '0';
+    document.body.appendChild(s);
+    requestAnimationFrame(function () {
+      s.style.transform = 'translate(-50%, -50%) scale(1)';
+      s.style.opacity = '1';
+    });
+    window.setTimeout(function () {
+      s.style.opacity = '0';
+      s.style.transform = 'translate(-50%, -140%) scale(.8)';
+    }, 620);
+    window.setTimeout(function () { if (s.parentNode) s.parentNode.removeChild(s); }, 1400);
+  }
+
+  /* Ny mestret bokstav er den sjeldne hendelsen, og den eneste som får
+   * fanfare: stjerna flyr opp i telleren, og det kommer litt konfetti. */
+  function feirMestret(vertEl) {
+    var teller = el('stjerneteller');
+    var r = vertEl.getBoundingClientRect();
+    var fraX = r.left + r.width / 2;
+    var fraY = r.top + r.height / 2;
+
+    var s = document.createElement('span');
+    s.className = 'flystjerne';
+    s.textContent = '★';
+    s.style.left = fraX + 'px';
+    s.style.top = fraY + 'px';
+    document.body.appendChild(s);
+
+    var mal = teller && !teller.hidden ? teller.getBoundingClientRect() : null;
+    var dx = mal ? (mal.left + mal.width / 2) - fraX : 0;
+    var dy = mal ? (mal.top + mal.height / 2) - fraY : -180;
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        s.style.transform = 'translate(-50%, -50%) translate(' + dx + 'px, ' + dy + 'px) scale(.45)';
+        s.style.opacity = '.25';
+      });
+    });
+
     window.setTimeout(function () {
       if (s.parentNode) s.parentNode.removeChild(s);
-    }, 1400);
+      Spill.oppdaterTeller(true);
+    }, 740);
+
+    konfetti(fraX, fraY);
+  }
+
+  function konfetti(x, y) {
+    var farger = ['#e2a017', '#dc3327', '#2e8055', '#3f8fc4', '#f2c33d'];
+    for (var i = 0; i < 14; i++) {
+      var k = document.createElement('span');
+      k.className = 'konfetti';
+      k.style.left = x + 'px';
+      k.style.top = y + 'px';
+      k.style.background = farger[i % farger.length];
+      k.style.setProperty('--dx', (Math.random() * 260 - 130).toFixed(0) + 'px');
+      k.style.setProperty('--dy', (Math.random() * 150 + 90).toFixed(0) + 'px');
+      k.style.setProperty('--dr', (Math.random() * 720 - 360).toFixed(0) + 'deg');
+      document.body.appendChild(k);
+      (function (node) {
+        window.setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 1200);
+      })(k);
+    }
   }
 
   /* ================= 1. Utforsk ================= */
 
   var Utforsk = (function () {
     var verdenId = null;
+    var sisteBokstav = null;
 
     function tegn() {
       var rutenett = el('utforsk-rutenett');
       rutenett.innerHTML = '';
-      Lagring.aktiveBokstaver().forEach(function (bokstav) {
+      Lagring.aktiveBokstaver().forEach(function (bokstav, i) {
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'bokstav' + (Lagring.erMestret(bokstav) ? ' mestret' : '');
         b.textContent = bokstav;
         b.dataset.bokstav = bokstav;
+        b.style.animation = 'trinn-inn 320ms cubic-bezier(.2,.8,.3,1) ' + (i * 12) + 'ms backwards';
         b.addEventListener('click', function () { velg(bokstav); });
         rutenett.appendChild(b);
       });
 
-      el('utforsk-figur').innerHTML = Spill.figurMerke(verdenId);
-      el('utforsk-figur').style.transform = 'translateX(8px)';
       el('utforsk-bokstav').textContent = '?';
       el('utforsk-ikon').textContent = VERDENER[verdenId].ikon;
       el('utforsk-ord').textContent = 'Trykk på en bokstav';
+      el('utforsk-lytt').hidden = true;
+      sisteBokstav = null;
     }
 
     function velg(bokstav) {
@@ -94,6 +207,7 @@ var Moduser = (function () {
       if (aktive.indexOf(bokstav) === -1) return;
 
       var oppslag = ordFor(verdenId, bokstav);
+      sisteBokstav = bokstav;
 
       var knapper = el('utforsk-rutenett').querySelectorAll('.bokstav');
       for (var i = 0; i < knapper.length; i++) {
@@ -103,11 +217,18 @@ var Moduser = (function () {
       el('utforsk-bokstav').textContent = bokstav;
       el('utforsk-ikon').textContent = oppslag.ikon;
       el('utforsk-ord').textContent = oppslag.ord;
+      el('utforsk-lytt').hidden = false;
+      spillOm(el('utforsk-bokstav'), 'bytter', 460);
+      spillOm(el('utforsk-kort').querySelector('.ordkort-innhold'), 'bytter', 420);
 
+      /* Figuren kjører dit bokstaven står i alfabetet. */
       var andel = aktive.length > 1 ? aktive.indexOf(bokstav) / (aktive.length - 1) : 0;
-      flyttFigurTilAndel(el('utforsk-bane'), el('utforsk-figur'), andel);
-      beveglyd(verdenId);
+      kjorTil(verdenId, andel);
 
+      si(bokstav, oppslag);
+    }
+
+    function si(bokstav, oppslag) {
       Tale.stopp();
       Tale.rekke([bokstav, 250, lydFor(verdenId, bokstav), 250, 'som i ' + oppslag.ord]);
     }
@@ -116,11 +237,15 @@ var Moduser = (function () {
       start: function (id) {
         verdenId = id;
         Spill.visSkjerm('skjerm-utforsk');
-        Spill.settTopp(VERDENER[id].samling === 'Skattekartet' ? 'Skattekartet' : 'Garasjen', true);
+        Spill.settTopp(VERDENER[id].utforsk, true);
+        stillFigurTilStart();
         tegn();
         Spill.settTastLytter(velg);
       },
-      stopp: function () { Spill.settTastLytter(null); }
+      gjenta: function () {
+        if (sisteBokstav) si(sisteBokstav, ordFor(verdenId, sisteBokstav));
+      },
+      stopp: function () { Spill.settTastLytter(null); Tale.stopp(); }
     };
   })();
 
@@ -131,7 +256,8 @@ var Moduser = (function () {
   var Oppgave = (function () {
     var okt = null;
 
-    /* Bygger køen: bokstavene han kan minst kommer først i utvalget. */
+    /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
+     * noen kjente blandes inn som hvilepunkter. */
     function byggKo() {
       var aktive = Lagring.aktiveBokstaver();
       var sortert = aktive.slice().sort(function (a, b) {
@@ -139,8 +265,6 @@ var Moduser = (function () {
         if (da !== db) return da - db;
         return Lagring.riktigeFor(a) - Lagring.riktigeFor(b);
       });
-      /* Trekk fra den halvdelen han trenger mest, men ikke bare de aller
-       * vanskeligste – noen kjente bokstaver innimellom gir hvilepunkter. */
       var trengsMest = sortert.slice(0, Math.max(4, Math.ceil(sortert.length / 2)));
       var resten = sortert.slice(trengsMest.length);
 
@@ -174,11 +298,8 @@ var Moduser = (function () {
 
     function sporsmalstale() {
       var v = VERDENER[okt.verden];
-      var bokstav = okt.fasit;
-      if (okt.type === 'finn') {
-        return [v.oppdrag, 200, bokstav];
-      }
-      var oppslag = ordFor(okt.verden, bokstav);
+      if (okt.type === 'finn') return [v.oppdrag, 200, okt.fasit];
+      var oppslag = ordFor(okt.verden, okt.fasit);
       return [oppslag.ord, 350, 'Hvilken bokstav begynner ' + oppslag.ord.toLowerCase() + ' på?'];
     }
 
@@ -190,6 +311,8 @@ var Moduser = (function () {
       tegnPrikker();
 
       var mal = el('oppgave-mal');
+      mal.className = 'oppdrag-mal ' +
+        (okt.type === 'finn' ? 'oppdrag-mal--bokstav' : 'oppdrag-mal--ord');
       if (okt.type === 'finn') {
         el('oppgave-tekst').textContent = v.oppdrag;
         mal.textContent = Lagring.innstilling('visMal') ? okt.fasit : '?';
@@ -199,6 +322,7 @@ var Moduser = (function () {
         mal.innerHTML = '<span class="mal-ikon">' + oppslag.ikon + '</span>' +
                         '<span class="mal-ord">' + oppslag.ord + '</span>';
       }
+      spillOm(mal, 'bytter', 460);
 
       var valgfelt = el('oppgave-valg');
       valgfelt.innerHTML = '';
@@ -213,7 +337,6 @@ var Moduser = (function () {
         valgfelt.appendChild(b);
       });
 
-      el('oppgave-figur').style.transform = 'translateX(8px)';
       el('oppgave-videre').hidden = true;
 
       Tale.stopp();
@@ -233,19 +356,16 @@ var Moduser = (function () {
     function svar(bokstav, knapp) {
       if (knapp.disabled) return;
 
-      if (bokstav === okt.fasit) {
-        riktig(knapp);
-        return;
-      }
+      if (bokstav === okt.fasit) { riktig(knapp); return; }
 
       /* Feil: skiltet vugger, tonen er lav og vennlig, og han prøver igjen. */
       okt.forsokPaDenne += 1;
       okt.paRad = 0;
       Lagring.registrerFeil(okt.fasit);
-      knapp.classList.add('feil', 'vugg');
+      knapp.classList.add('feil');
+      spillOm(knapp, 'vugg', 500);
       knapp.disabled = true;
       Lyd.proveIgjen();
-      window.setTimeout(function () { knapp.classList.remove('vugg'); }, 450);
 
       if (okt.forsokPaDenne >= 2) {
         hjelp();
@@ -264,9 +384,9 @@ var Moduser = (function () {
         okt.bomPaRad = 0;
       }
       var riktigKnapp = knappFor(okt.fasit);
-      var andre = el('oppgave-valg').querySelectorAll('.skilt');
-      for (var i = 0; i < andre.length; i++) {
-        if (andre[i] !== riktigKnapp) { andre[i].disabled = true; andre[i].classList.add('feil'); }
+      var alle = el('oppgave-valg').querySelectorAll('.skilt');
+      for (var i = 0; i < alle.length; i++) {
+        if (alle[i] !== riktigKnapp) { alle[i].disabled = true; alle[i].classList.add('feil'); }
       }
       riktigKnapp.classList.add('pekes');
       Tale.stopp();
@@ -281,8 +401,7 @@ var Moduser = (function () {
       knapp.classList.remove('pekes');
       knapp.classList.add('riktig');
 
-      flyttFigurTil(el('oppgave-bane'), el('oppgave-figur'), knapp);
-      beveglyd(okt.verden);
+      kjorTil(okt.verden, knapp);
 
       if (forsteForsok) {
         okt.riktigForste += 1;
@@ -290,9 +409,14 @@ var Moduser = (function () {
         okt.bomPaRad = 0;
         var forMestret = Lagring.erMestret(okt.fasit);
         Lagring.registrerRiktig(okt.fasit);
-        if (!forMestret && Lagring.erMestret(okt.fasit)) okt.nyeMestrede.push(okt.fasit);
+        var bleMestret = !forMestret && Lagring.erMestret(okt.fasit);
+        if (bleMestret) okt.nyeMestrede.push(okt.fasit);
         okt.telling[okt.fasit] = (okt.telling[okt.fasit] || 0) + 1;
-        window.setTimeout(function () { Lyd.stjerne(); slippStjerne(knapp); }, 380);
+
+        window.setTimeout(function () {
+          Lyd.stjerne();
+          if (bleMestret) feirMestret(knapp); else stjerneLander(knapp);
+        }, 380);
       }
 
       var opp = okt.paRad >= 5 && okt.antallValg < 4;
@@ -305,10 +429,11 @@ var Moduser = (function () {
       Tale.stopp();
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
 
-      el('oppgave-videre').hidden = false;
-      el('oppgave-videre').textContent =
+      var videre = el('oppgave-videre');
+      videre.hidden = false;
+      videre.querySelector('span').textContent =
         okt.indeks + 1 >= OPPGAVER_I_RUNDEN ? 'Se hvordan det gikk' : 'Videre';
-      el('oppgave-videre').focus();
+      videre.focus();
     }
 
     function videre() {
@@ -366,7 +491,7 @@ var Moduser = (function () {
         : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
       window.setTimeout(function () { Tale.rekke([hilsen]); }, 900);
 
-      Spill.settOppsummering(okt.type, okt.verden);
+      Spill.settOppsummering(okt.type);
     }
 
     return {
@@ -386,8 +511,8 @@ var Moduser = (function () {
         };
 
         Spill.visSkjerm('skjerm-oppgave');
-        Spill.settTopp(type === 'finn' ? 'Finn bokstaven' : 'Førstelyd', true);
-        el('oppgave-figur').innerHTML = Spill.figurMerke(verdenId);
+        Spill.settTopp(type === 'finn' ? 'Finn bokstaven' : 'Første lyd', true);
+        stillFigurTilStart();
         Spill.settTastLytter(tastesvar);
         visOppgave();
       },
@@ -408,6 +533,6 @@ var Moduser = (function () {
     Utforsk: Utforsk,
     Oppgave: Oppgave,
     OPPGAVER_I_RUNDEN: OPPGAVER_I_RUNDEN,
-    bland: bland
+    kjorTil: kjorTil
   };
 })();

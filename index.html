@@ -4,178 +4,173 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bokstavløpet</title>
+<link rel="stylesheet" href="css/fonter.css">
 <link rel="stylesheet" href="css/stil.css">
 </head>
 <body>
 
-<!-- Figurene. Tegnet her én gang, brukes med <use> der de trengs. -->
-<svg class="svg-kilde" aria-hidden="true">
-  <defs>
-    <symbol id="fig-bil" viewBox="0 0 140 70">
-      <ellipse cx="70" cy="62" rx="56" ry="5" fill="rgba(0,0,0,.13)"/>
-      <path d="M8 46c0-6 4-9 10-10l14-2 12-13c3-3 7-5 11-5h24c5 0 9 2 12 6l9 12 24 4c5 1 8 4 8 9v6c0 3-2 5-5 5H13c-3 0-5-2-5-5z"
-            fill="var(--figur-farge,#d92b1f)"/>
-      <path d="M52 24h20c3 0 5 1 7 4l6 8H45z" fill="#bfe4f5"/>
-      <path d="M43 36h-6l9-10c2-2 4-3 6-3h4z" fill="#bfe4f5"/>
-      <rect x="112" y="22" width="7" height="22" fill="var(--figur-mork,#9c1a11)"/>
-      <rect x="99" y="16" width="30" height="7" rx="3.5" fill="var(--figur-mork,#9c1a11)"/>
-      <circle cx="122" cy="42" r="4" fill="#ffe9a8"/>
-      <g fill="#2f3033">
-        <circle cx="40" cy="55" r="13"/><circle cx="104" cy="55" r="13"/>
-      </g>
-      <g fill="#c8ccd2">
-        <circle cx="40" cy="55" r="6"/><circle cx="104" cy="55" r="6"/>
-      </g>
-    </symbol>
-
-    <symbol id="fig-skip" viewBox="0 0 140 90">
-      <ellipse cx="70" cy="82" rx="56" ry="5" fill="rgba(0,0,0,.13)"/>
-      <rect x="66" y="12" width="4" height="48" rx="2" fill="#7a5230"/>
-      <path d="M64 16h-30c-2 0-3 2-2 4l10 20c1 2 0 4-2 4h24z" fill="#f4f1e8"/>
-      <path d="M72 14h22c3 0 4 3 2 5l-24 22z" fill="var(--figur-farge,#d92b1f)"/>
-      <path d="M72 10h16l-4 4 4 4H72z" fill="#22242a"/>
-      <path d="M20 58h100l-10 18c-2 3-5 5-9 5H39c-4 0-7-2-9-5z"
-            fill="#8a5a33"/>
-      <rect x="20" y="54" width="100" height="7" rx="3" fill="var(--figur-mork,#9c1a11)"/>
-      <g fill="#ffe9a8">
-        <circle cx="46" cy="68" r="4"/><circle cx="70" cy="68" r="4"/><circle cx="94" cy="68" r="4"/>
-      </g>
-    </symbol>
-
-    <symbol id="ikon-stjerne" viewBox="0 0 24 24">
-      <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/>
-    </symbol>
-  </defs>
-</svg>
+<!-- Scenen ligger bakerst og bytter når man bytter verden.
+     Den er stille: skyene driver så sakte at det knapt merkes. -->
+<div id="scene" aria-hidden="true">
+  <div class="scene-himmel"></div>
+  <div class="scene-sol"></div>
+  <div class="scene-skyer" id="scene-skyer"></div>
+  <div class="scene-landskap" id="scene-landskap"></div>
+  <div class="scene-grunn"><span class="grunn-stripe"></span></div>
+</div>
 
 <header id="topp">
-  <button id="tilbake" class="topp-knapp" type="button" hidden>
-    <span aria-hidden="true">←</span> Tilbake
+  <button id="tilbake" class="ikonknapp" type="button" hidden>
+    <span class="pil" aria-hidden="true">←</span><span class="ikonknapp-tekst">Tilbake</span>
   </button>
-  <h1 id="topp-tittel">Bokstavløpet</h1>
-  <button id="tannhjul" class="topp-knapp topp-knapp--stille" type="button"
-          title="For voksne – hold inne i to sekunder">
-    <span aria-hidden="true">⚙</span>
-    <span class="skjult-visuelt">Innstillinger for voksne</span>
-    <span class="tannhjul-ring"></span>
-  </button>
+
+  <div id="topp-midt">
+    <span id="topp-tittel">Bokstavløpet</span>
+  </div>
+
+  <div class="topp-hoyre">
+    <div id="stjerneteller" class="teller" title="Bokstaver du har klart">
+      <span class="teller-stjerne" aria-hidden="true">★</span>
+      <span id="teller-tall">0</span><span class="teller-av" id="teller-av">/29</span>
+    </div>
+    <button id="tannhjul" class="ikonknapp ikonknapp--stille" type="button"
+            title="For voksne – hold inne i to sekunder">
+      <span aria-hidden="true">⚙</span>
+      <span class="skjult-visuelt">Innstillinger for voksne</span>
+      <svg class="hold-ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="19"></circle>
+      </svg>
+    </button>
+  </div>
 </header>
 
 <main id="app">
 
-  <!-- 1. Startskjerm. Det første trykket er også det som låser opp lyden. -->
-  <section class="skjerm" id="skjerm-start">
-    <div class="midtstilt">
-      <div class="start-figur">
-        <svg viewBox="0 0 140 70"><use href="#fig-bil"></use></svg>
-      </div>
-      <h2 class="stor-tittel">Bokstavløpet</h2>
-      <p class="undertekst">Et rolig alfabetspill</p>
-      <button class="hovedknapp" id="knapp-start" type="button">Start</button>
+  <!-- 1. Start -->
+  <section class="skjerm skjerm--midt" id="skjerm-start">
+    <div class="stabel">
+      <div class="helt" id="start-figur"></div>
+      <h1 class="titteltekst trinn">Bokstavløpet</h1>
+      <p class="ingress trinn">Bokstaver, biler og sjørøvere</p>
+      <button class="knapp knapp--stor trinn" id="knapp-start" type="button">
+        <span>Start</span>
+      </button>
     </div>
   </section>
 
   <!-- 2. Velg verden -->
   <section class="skjerm" id="skjerm-verden" hidden>
-    <h2 class="skjerm-tittel">Hvor vil du leke?</h2>
-    <div class="valgrad" id="verden-valg"></div>
+    <h2 class="skjermtittel trinn">Hvor vil du leke?</h2>
+    <div class="verdenrad" id="verden-valg"></div>
   </section>
 
-  <!-- 3. Gi figuren navn (bare første gang i hver verden) -->
-  <section class="skjerm" id="skjerm-navn" hidden>
-    <div class="midtstilt">
-      <div class="navn-figur" id="navn-figur"></div>
-      <h2 class="skjerm-tittel" id="navn-sporsmal">Hva skal den hete?</h2>
-      <input id="navn-felt" class="navn-felt" type="text" maxlength="20"
+  <!-- 3. Gi figuren navn -->
+  <section class="skjerm skjerm--midt" id="skjerm-navn" hidden>
+    <div class="stabel">
+      <div class="helt helt--liten" id="navn-figur"></div>
+      <h2 class="skjermtittel trinn" id="navn-sporsmal">Hva skal den hete?</h2>
+      <input id="navn-felt" class="tekstfelt trinn" type="text" maxlength="20"
              autocomplete="off" spellcheck="false">
-      <div class="knapperad">
-        <button class="hovedknapp" id="navn-ok" type="button">Ferdig</button>
-        <button class="flatknapp" id="navn-hopp" type="button">Bruk vanlig navn</button>
+      <div class="knapperad trinn">
+        <button class="knapp" id="navn-ok" type="button"><span>Ferdig</span></button>
+        <button class="knapp knapp--flat" id="navn-hopp" type="button">Bruk vanlig navn</button>
       </div>
     </div>
   </section>
 
-  <!-- 4. Meny: de tre modusene -->
+  <!-- 4. Meny -->
   <section class="skjerm" id="skjerm-meny" hidden>
-    <h2 class="skjerm-tittel" id="meny-tittel">Hva vil du gjøre?</h2>
-    <div class="valgrad" id="meny-valg"></div>
+    <h2 class="skjermtittel trinn" id="meny-tittel">Hva vil du gjøre?</h2>
+    <div class="menyrad" id="meny-valg"></div>
   </section>
 
-  <!-- 5. Utforsk: alle bokstavene -->
+  <!-- 5. Utforsk -->
   <section class="skjerm" id="skjerm-utforsk" hidden>
-    <div class="utforsk-tavle" id="utforsk-tavle" aria-live="polite">
-      <div class="tavle-bokstav" id="utforsk-bokstav">?</div>
-      <div class="tavle-hoyre">
-        <div class="tavle-ikon" id="utforsk-ikon">🚗</div>
-        <div class="tavle-ord" id="utforsk-ord">Trykk på en bokstav</div>
+    <div class="ordkort" id="utforsk-kort" aria-live="polite">
+      <div class="ordkort-bokstav" id="utforsk-bokstav">?</div>
+      <div class="ordkort-innhold">
+        <div class="ordkort-ikon" id="utforsk-ikon">🏁</div>
+        <div class="ordkort-ord" id="utforsk-ord">Trykk på en bokstav</div>
       </div>
-    </div>
-    <div class="bane" id="utforsk-bane">
-      <div class="figur" id="utforsk-figur"></div>
+      <button class="lyttknapp" id="utforsk-lytt" type="button" hidden>
+        <span aria-hidden="true">🔊</span> Hør igjen
+      </button>
     </div>
     <div class="bokstavrutenett" id="utforsk-rutenett"></div>
   </section>
 
-  <!-- 6. Oppgave: brukes av både «Finn bokstaven» og «Førstelyd» -->
+  <!-- 6. Oppgave (både «Finn bokstaven» og «Første lyd») -->
   <section class="skjerm" id="skjerm-oppgave" hidden>
     <div class="prikker" id="oppgave-prikker" aria-hidden="true"></div>
 
     <div class="oppdrag" id="oppgave-oppdrag">
       <p class="oppdrag-tekst" id="oppgave-tekst">Kjør til</p>
       <div class="oppdrag-mal" id="oppgave-mal"></div>
-      <button class="lytt-knapp" id="oppgave-lytt" type="button">
+      <button class="lyttknapp" id="oppgave-lytt" type="button">
         <span aria-hidden="true">🔊</span> Hør igjen
       </button>
     </div>
 
     <div class="valg" id="oppgave-valg"></div>
 
-    <div class="bane" id="oppgave-bane">
-      <div class="figur" id="oppgave-figur"></div>
-    </div>
-
     <div class="videre-felt">
-      <button class="hovedknapp" id="oppgave-videre" type="button" hidden>Videre</button>
+      <button class="knapp knapp--stor" id="oppgave-videre" type="button" hidden>
+        <span>Videre</span>
+      </button>
     </div>
   </section>
 
-  <!-- 7. Oppsummering etter runden -->
-  <section class="skjerm" id="skjerm-oppsummering" hidden>
-    <div class="midtstilt">
+  <!-- 7. Oppsummering -->
+  <section class="skjerm skjerm--midt" id="skjerm-oppsummering" hidden>
+    <div class="stabel panelkort">
       <div class="malflagg" id="oppsum-flagg">🏁</div>
-      <h2 class="skjerm-tittel" id="oppsum-tittel">Runden er ferdig</h2>
+      <h2 class="skjermtittel" id="oppsum-tittel">Runden er ferdig</h2>
       <ul class="oppsum-liste" id="oppsum-liste"></ul>
       <div class="knapperad">
-        <button class="hovedknapp" id="oppsum-igjen" type="button">En runde til</button>
-        <button class="flatknapp" id="oppsum-tilbake" type="button">Tilbake</button>
+        <button class="knapp" id="oppsum-igjen" type="button"><span>En runde til</span></button>
+        <button class="knapp knapp--flat" id="oppsum-tilbake" type="button">Tilbake</button>
       </div>
     </div>
   </section>
 
   <!-- 8. Samlingen -->
   <section class="skjerm" id="skjerm-samling" hidden>
-    <h2 class="skjerm-tittel" id="samling-tittel">Samlingen din</h2>
-    <p class="undertekst" id="samling-undertekst"></p>
+    <h2 class="skjermtittel trinn" id="samling-tittel">Samlingen din</h2>
+    <p class="ingress trinn" id="samling-undertekst"></p>
+    <div class="framdrift trinn"><span id="framdrift-fyll"></span></div>
     <div class="samling-rutenett" id="samling-rutenett"></div>
   </section>
 
 </main>
 
+<!-- Figuren kjører på bakken nederst, uansett hvilken skjerm som vises. -->
+<div id="figurbane" hidden>
+  <div class="stov" id="stov"></div>
+  <div class="figur" id="figur"></div>
+</div>
+
 <!-- Foreldremeny -->
 <div class="overlegg" id="foreldre" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="foreldre-tittel">
-    <h2 id="foreldre-tittel">For voksne</h2>
+    <header class="panel-topp">
+      <h2 id="foreldre-tittel">For voksne</h2>
+      <button class="lukkekryss" id="foreldre-lukk-x" type="button" aria-label="Lukk">×</button>
+    </header>
 
     <section class="panel-del">
       <h3>Lyd</h3>
       <label class="bryter">
-        <input type="checkbox" id="inn-stemme"> Stemme som leser bokstavene
+        <input type="checkbox" id="inn-stemme">
+        <span class="bryter-spor"></span>
+        <span>Stemme som leser bokstavene</span>
       </label>
       <label class="bryter">
-        <input type="checkbox" id="inn-lyd"> Lydeffekter
+        <input type="checkbox" id="inn-lyd">
+        <span class="bryter-spor"></span>
+        <span>Lydeffekter</span>
       </label>
       <label class="skyver">
-        Hvor fort stemmen snakker
+        <span>Hvor fort stemmen snakker</span>
         <input type="range" id="inn-fart" min="0.5" max="1.1" step="0.05">
         <output id="ut-fart"></output>
       </label>
@@ -183,13 +178,22 @@
     </section>
 
     <section class="panel-del">
-      <h3>Oppgavene</h3>
+      <h3>Ro på skjermen</h3>
       <label class="bryter">
-        <input type="checkbox" id="inn-vis-mal"> Vis bokstaven i oppdraget
+        <input type="checkbox" id="inn-vis-mal">
+        <span class="bryter-spor"></span>
+        <span>Vis bokstaven i oppdraget</span>
       </label>
       <p class="merknad">
         Slås denne av, må barnet kjenne igjen bokstaven kun på lyden.
-        Et vanskeligere, men mer lærerikt steg når han begynner å sitte trygt.
+      </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-bevegelse">
+        <span class="bryter-spor"></span>
+        <span>La skyer og bølger drive sakte</span>
+      </label>
+      <p class="merknad">
+        Skru av om barnet lettest holder fokus på en helt stille skjerm.
       </p>
     </section>
 
@@ -200,35 +204,38 @@
         eller de dere leser om denne uka.
       </p>
       <div class="bokstavvelger" id="inn-bokstaver"></div>
-      <button class="flatknapp" id="inn-alle" type="button">Ta med alle</button>
+      <button class="knapp knapp--flat knapp--liten" id="inn-alle" type="button">Ta med alle</button>
     </section>
 
     <section class="panel-del">
       <h3>Slik ligger han an</h3>
       <div class="statuslinje" id="foreldre-status"></div>
       <p class="merknad">
-        En bokstav regnes som mestret når han har truffet den på tre ulike dager.
+        Fylt = mestret. En bokstav regnes som mestret når han har truffet den
+        på tre ulike dager.
       </p>
     </section>
 
     <section class="panel-del">
       <h3>Navn på figurene</h3>
       <div class="navnrad">
-        <label>Racerbilen <input type="text" id="inn-navn-bane" maxlength="20"></label>
-        <label>Kapteinen <input type="text" id="inn-navn-oy" maxlength="20"></label>
+        <label>Racerbilen<input type="text" id="inn-navn-bane" maxlength="20"></label>
+        <label>Kapteinen<input type="text" id="inn-navn-oy" maxlength="20"></label>
       </div>
     </section>
 
-    <section class="panel-del">
-      <button class="farlig-knapp" id="inn-nullstill" type="button">Nullstill all framgang</button>
+    <section class="panel-del panel-del--bunn">
+      <button class="knapp knapp--fare knapp--liten" id="inn-nullstill" type="button">
+        Nullstill all framgang
+      </button>
+      <button class="knapp" id="foreldre-lukk" type="button"><span>Lukk</span></button>
     </section>
-
-    <button class="hovedknapp" id="foreldre-lukk" type="button">Lukk</button>
   </div>
 </div>
 
 <script src="js/data.js"></script>
 <script src="js/lagring.js"></script>
+<script src="js/figurer.js"></script>
 <script src="js/tale.js"></script>
 <script src="js/lyd.js"></script>
 <script src="js/moduser.js"></script>
