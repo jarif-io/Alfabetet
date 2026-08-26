@@ -1,0 +1,597 @@
+/* Bokstavløpet – utseende
+ *
+ * To regler styrer alt her:
+ *   1. Bokstaven skal alltid være det største og tydeligste på skjermen.
+ *   2. Ingenting beveger seg med mindre barnet gjorde noe. Ingen løkker,
+ *      ingen bakgrunnsanimasjon, ingen blink.
+ */
+
+:root {
+  --bg: #f4efe6;
+  --kort: #ffffff;
+  --ink: #22252b;
+  --dempet: #6c7178;
+  --kant: #ddd4c4;
+  --kant-sterk: #c3b8a4;
+
+  --aksent: #c62d20;
+  --aksent-mork: #93190f;
+  --aksent-lys: #fbe9e6;
+
+  --god: #2f7d54;
+  --god-lys: #e6f2ea;
+
+  --radius: 18px;
+  --skygge: 0 2px 0 var(--kant), 0 6px 14px rgba(40, 30, 15, .07);
+  --rolig: 320ms cubic-bezier(.32, .72, .35, 1);
+}
+
+/* Fargene bytter med verden. Bare disse linjene skiller de to. */
+body[data-verden="oy"] {
+  --aksent: #1a6b87;
+  --aksent-mork: #0d4457;
+  --aksent-lys: #e4f0f4;
+  --bg: #eef1ee;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+.svg-kilde { position: absolute; width: 0; height: 0; }
+
+.skjult-visuelt {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ---------- topplinje ---------- */
+
+#topp {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border-bottom: 2px solid var(--kant);
+  background: var(--kort);
+}
+
+#topp-tittel {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dempet);
+  text-align: center;
+  letter-spacing: .02em;
+}
+
+.topp-knapp {
+  font: inherit;
+  font-size: 1rem;
+  border: 2px solid var(--kant);
+  background: var(--kort);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  min-width: 116px;
+}
+.topp-knapp:hover { background: var(--aksent-lys); border-color: var(--aksent); }
+.topp-knapp[hidden] { visibility: hidden; display: block; }
+
+/* Tannhjulet er med vilje diskret, og krever at man holder inne. */
+.topp-knapp--stille {
+  position: relative;
+  min-width: 0;
+  padding: 8px 12px;
+  color: var(--dempet);
+  border-color: transparent;
+  opacity: .5;
+  overflow: hidden;
+}
+.topp-knapp--stille:hover { opacity: 1; background: transparent; border-color: var(--kant); }
+.tannhjul-ring {
+  position: absolute; inset: auto 0 0 0; height: 3px;
+  background: var(--aksent); width: 0;
+}
+.topp-knapp--stille.holdes .tannhjul-ring {
+  width: 100%;
+  transition: width 2s linear;
+}
+
+/* ---------- skjermer ---------- */
+
+#app {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  padding: 20px;
+}
+
+.skjerm {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+}
+.skjerm[hidden] { display: none; }
+
+.midtstilt {
+  margin: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.skjerm-tittel {
+  margin: 0;
+  text-align: center;
+  font-size: 1.7rem;
+  font-weight: 600;
+}
+
+.stor-tittel {
+  margin: 0;
+  font-size: 3rem;
+  letter-spacing: -.01em;
+}
+
+.undertekst {
+  margin: 0;
+  color: var(--dempet);
+  text-align: center;
+}
+
+/* ---------- knapper ---------- */
+
+.hovedknapp {
+  font: inherit;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 16px 40px;
+  border: none;
+  border-radius: 999px;
+  background: var(--aksent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--aksent-mork);
+}
+.hovedknapp:hover { filter: brightness(1.07); }
+.hovedknapp:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--aksent-mork); }
+
+.flatknapp {
+  font: inherit;
+  padding: 14px 26px;
+  border: 2px solid var(--kant-sterk);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--dempet);
+  cursor: pointer;
+}
+.flatknapp:hover { color: var(--ink); border-color: var(--ink); }
+
+.farlig-knapp {
+  font: inherit;
+  padding: 12px 20px;
+  border: 2px solid #c0392b;
+  border-radius: 12px;
+  background: transparent;
+  color: #c0392b;
+  cursor: pointer;
+}
+
+.knapperad { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+button:focus-visible, input:focus-visible, .kort:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- store valgkort (verden og meny) ---------- */
+
+.valgrad {
+  margin: auto;
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1000px;
+}
+
+.kort {
+  font: inherit;
+  cursor: pointer;
+  background: var(--kort);
+  border: 3px solid var(--kant);
+  border-radius: 24px;
+  box-shadow: var(--skygge);
+  padding: 26px 22px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: border-color var(--rolig), transform var(--rolig);
+}
+.kort:hover { border-color: var(--aksent); transform: translateY(-3px); }
+.kort-ikon { font-size: 3.4rem; line-height: 1; }
+.kort-tittel { font-size: 1.35rem; font-weight: 600; }
+.kort-tekst { font-size: .95rem; color: var(--dempet); text-align: center; }
+
+/* ---------- figuren og banen ---------- */
+
+.bane {
+  position: relative;
+  height: 92px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--kant), var(--kant)) center / 100% 3px no-repeat,
+    var(--kort);
+  border: 2px solid var(--kant);
+  overflow: hidden;
+}
+
+.figur {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 132px;
+  transform: translateX(10px);
+  transition: transform 900ms cubic-bezier(.4, .1, .2, 1);
+}
+.figur svg { display: block; width: 100%; height: auto; }
+
+/* ---------- utforsk ---------- */
+
+.utforsk-tavle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: var(--kort);
+  border: 3px solid var(--kant);
+  border-radius: var(--radius);
+  padding: 16px 30px;
+  box-shadow: var(--skygge);
+}
+
+.tavle-bokstav {
+  font-size: 5.6rem;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 120px;
+  text-align: center;
+  color: var(--aksent);
+}
+
+.tavle-hoyre { display: flex; align-items: center; gap: 20px; }
+.tavle-ikon { font-size: 3.4rem; line-height: 1; }
+.tavle-ord { font-size: 2rem; font-weight: 600; }
+
+.bokstavrutenett {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(76px, 104px));
+  justify-content: center;
+  gap: 12px;
+  align-content: start;
+  padding-bottom: 4px;
+}
+
+.bokstav {
+  font: inherit;
+  cursor: pointer;
+  background: var(--kort);
+  border: 3px solid var(--kant);
+  border-radius: 14px;
+  box-shadow: 0 2px 0 var(--kant);
+  aspect-ratio: 1 / 1;
+  min-height: 64px;
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: var(--ink);
+  position: relative;
+  transition: border-color var(--rolig), background var(--rolig);
+}
+.bokstav:hover { border-color: var(--aksent); }
+.bokstav.aktiv { background: var(--aksent-lys); border-color: var(--aksent); color: var(--aksent-mork); }
+.bokstav.mestret::after {
+  content: "★";
+  position: absolute;
+  right: 6px; bottom: 2px;
+  font-size: .95rem;
+  color: var(--god);
+}
+
+/* ---------- oppgave ---------- */
+
+.prikker {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 9px;
+  justify-content: center;
+}
+.prikk {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--kant-sterk);
+  background: transparent;
+}
+.prikk.tatt { background: var(--god); border-color: var(--god); }
+.prikk.na { border-color: var(--aksent); border-width: 3px; }
+
+.oppdrag {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.oppdrag-tekst { margin: 0; font-size: 1.5rem; color: var(--dempet); }
+
+.oppdrag-mal {
+  font-size: 4.4rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--aksent);
+  min-height: 1.05em;
+  text-align: center;
+}
+.oppdrag-mal .mal-ikon { font-size: 4rem; }
+.oppdrag-mal .mal-ord { display: block; font-size: 2.1rem; color: var(--ink); }
+
+.lytt-knapp {
+  font: inherit;
+  border: 2px solid var(--kant-sterk);
+  background: var(--kort);
+  color: var(--dempet);
+  border-radius: 999px;
+  padding: 8px 20px;
+  cursor: pointer;
+}
+.lytt-knapp:hover { color: var(--ink); border-color: var(--ink); }
+
+.valg {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.skilt {
+  font: inherit;
+  cursor: pointer;
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 20px;
+  border: 4px solid var(--kant-sterk);
+  background: var(--kort);
+  box-shadow: var(--skygge);
+  font-size: 4.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  transition: border-color var(--rolig), background var(--rolig), transform var(--rolig);
+}
+.skilt:hover { border-color: var(--aksent); }
+.skilt.riktig { background: var(--god-lys); border-color: var(--god); color: var(--god); }
+.skilt.feil { opacity: .4; }
+.skilt.pekes { border-color: var(--aksent); border-width: 6px; }
+.skilt[disabled] { cursor: default; }
+.skilt.vugg { animation: vugg 420ms ease-in-out; }
+
+@keyframes vugg {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-7px); }
+  75% { transform: translateX(7px); }
+}
+
+/* Stjernen som lander når svaret er riktig. */
+.stjerne-lander {
+  position: absolute;
+  font-size: 2.4rem;
+  color: #e0a107;
+  pointer-events: none;
+  animation: land 900ms ease-out forwards;
+}
+@keyframes land {
+  0%   { transform: translate(-50%, -40px) scale(.3); opacity: 0; }
+  35%  { opacity: 1; }
+  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+}
+
+.videre-felt {
+  flex: 0 0 auto;
+  min-height: 68px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ---------- oppsummering ---------- */
+
+.malflagg { font-size: 4.5rem; line-height: 1; }
+
+.oppsum-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+.oppsum-liste li { color: var(--dempet); }
+.oppsum-liste b { color: var(--ink); font-size: 1.4rem; }
+.oppsum-liste .ny-mestret { color: var(--god); font-weight: 600; }
+
+/* ---------- samlingen ---------- */
+
+.samling-rutenett {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 130px));
+  justify-content: center;
+  gap: 14px;
+  align-content: start;
+}
+
+.samling-rute {
+  background: var(--kort);
+  border: 3px dashed var(--kant);
+  border-radius: 16px;
+  padding: 10px 6px 8px;
+  text-align: center;
+  color: var(--kant-sterk);
+}
+.samling-rute .stor { font-size: 2.6rem; font-weight: 700; line-height: 1.1; }
+.samling-rute .liten { font-size: .82rem; }
+
+.samling-rute.tatt {
+  border-style: solid;
+  border-color: var(--god);
+  background: var(--god-lys);
+  color: var(--god);
+}
+.samling-rute.tatt .stor { color: var(--ink); }
+.samling-rute.pa-vei { border-color: var(--kant-sterk); color: var(--dempet); }
+.samling-rute.pa-vei .stor { color: var(--ink); }
+
+/* ---------- foreldremeny ---------- */
+
+.overlegg {
+  position: fixed;
+  inset: 0;
+  background: rgba(25, 22, 16, .55);
+  display: flex;
+  padding: 24px;
+  overflow-y: auto;
+  z-index: 50;
+}
+.overlegg[hidden] { display: none; }
+
+.panel {
+  margin: auto;
+  background: var(--kort);
+  border-radius: 20px;
+  padding: 26px 30px;
+  width: min(640px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.panel h2 { margin: 0; font-size: 1.5rem; }
+.panel h3 { margin: 0 0 8px; font-size: 1.05rem; }
+
+.panel-del {
+  border-top: 2px solid var(--kant);
+  padding-top: 14px;
+}
+.panel-del:first-of-type { border-top: none; padding-top: 0; }
+
+.bryter, .skyver {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.bryter input { width: 22px; height: 22px; }
+.skyver input { flex: 1; }
+
+.merknad { margin: 6px 0 0; font-size: .88rem; color: var(--dempet); }
+.merknad.advarsel { color: #a8501a; }
+
+.bokstavvelger {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(46px, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.bokstavvelger button {
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 9px 0;
+  border: 2px solid var(--kant);
+  border-radius: 9px;
+  background: var(--kort);
+  color: var(--dempet);
+  cursor: pointer;
+}
+.bokstavvelger button.valgt {
+  background: var(--aksent);
+  border-color: var(--aksent);
+  color: #fff;
+}
+
+.statuslinje { display: flex; flex-wrap: wrap; gap: 5px; }
+.status-bokstav {
+  font-size: .95rem;
+  font-weight: 600;
+  padding: 5px 8px;
+  border-radius: 7px;
+  border: 2px solid var(--kant);
+  color: var(--dempet);
+}
+.status-bokstav.mestret { background: var(--god-lys); border-color: var(--god); color: var(--god); }
+.status-bokstav.pa-vei { border-color: var(--kant-sterk); color: var(--ink); }
+
+.navnrad { display: flex; gap: 16px; flex-wrap: wrap; }
+.navnrad label { display: flex; flex-direction: column; gap: 5px; font-size: .9rem; color: var(--dempet); }
+
+.navn-felt, .navnrad input {
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 11px 14px;
+  border: 2px solid var(--kant-sterk);
+  border-radius: 12px;
+  background: var(--kort);
+  color: var(--ink);
+}
+.navn-felt { font-size: 1.5rem; text-align: center; width: min(360px, 80vw); }
+
+.start-figur svg, .navn-figur svg { width: 220px; height: auto; }
+
+/* ---------- mindre skjermer ---------- */
+
+@media (max-width: 760px) {
+  body { font-size: 17px; }
+  .tavle-bokstav { font-size: 4rem; min-width: 84px; }
+  .tavle-ord { font-size: 1.5rem; }
+  .skilt { width: 118px; height: 118px; font-size: 3.4rem; }
+  .kort { width: 100%; max-width: 320px; }
+  .bane { height: 74px; }
+  .figur { width: 104px; }
+}
+
+/* Respekterer systemets valg om mindre bevegelse. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
