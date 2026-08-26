@@ -21,6 +21,7 @@ var Spill = (function () {
   var tastLytter = null;
   var tilbakeHandling = null;
   var sisteModus = null;
+  var sisteTast = 0;
 
   /* ---------- skjermbytte ---------- */
 
@@ -55,7 +56,8 @@ var Spill = (function () {
     if (verdenId) document.body.setAttribute('data-verden', verdenId);
     else document.body.removeAttribute('data-verden');
     el('scene-landskap').innerHTML = Figurer.landskapFor(verdenId || 'bane');
-    el('figur').innerHTML = Figurer.figurFor(verdenId || 'bane');
+    el('figur').innerHTML = '<div class="figur-vipp">' +
+      Figurer.figurFor(verdenId || 'bane') + '</div>';
     el('figur').style.transform = 'translateX(24px)';
   }
 
@@ -126,19 +128,35 @@ var Spill = (function () {
 
     el('navn-figur').innerHTML = Figurer.figurFor(naVerden);
     el('navn-sporsmal').textContent = v.navnesporsmal;
+
+    /* Barnet kan ikke skrive, så navnene ligger klare til å trykkes på.
+     * Skrivefeltet er der for den voksne som vil finne på noe eget. */
+    var forslag = el('navn-forslag');
+    forslag.innerHTML = '';
+    v.navneforslag.forEach(function (navn) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'navnbrikke';
+      b.textContent = navn;
+      b.addEventListener('click', function () { lagreNavn(navn); });
+      forslag.appendChild(b);
+    });
+
     var felt = el('navn-felt');
     felt.value = '';
     felt.placeholder = v.standardnavn;
-    felt.focus();
 
     Tale.stopp();
     Tale.rekke([v.navnesporsmal]);
   }
 
   function lagreNavn(navn) {
-    Lagring.settNavn(naVerden, navn || VERDENER[naVerden].standardnavn);
+    var valgt = navn || VERDENER[naVerden].standardnavn;
+    Lagring.settNavn(naVerden, valgt);
     Lyd.klikk();
     visMeny();
+    Tale.stopp();
+    Tale.rekke(['Hei, ' + valgt + '!']);
   }
 
   function visMeny() {
@@ -177,10 +195,11 @@ var Spill = (function () {
       startOppgave('finn');
     });
 
-    flis('👂', 'Første lyd', 'Hvilken bokstav begynner ordet på?', function () {
-      Lyd.klikk();
-      startOppgave('forstelyd');
-    });
+    flis('👂', 'Første lyd', 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
+      function () {
+        Lyd.klikk();
+        startOppgave('forstelyd');
+      });
 
     var antall = Lagring.mestrede().length;
     flis('⭐', 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
@@ -270,8 +289,17 @@ var Spill = (function () {
     el('inn-navn-oy').value = Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '';
     el('inn-navn-oy').placeholder = VERDENER.oy.standardnavn;
 
+    tegnNiva();
     tegnBokstavvelger();
     tegnStatus();
+  }
+
+  function tegnNiva() {
+    var na = Lagring.innstilling('niva') === 'storre' ? 'storre' : 'liten';
+    var knapper = el('inn-niva').querySelectorAll('button');
+    for (var i = 0; i < knapper.length; i++) {
+      knapper[i].classList.toggle('valgt', knapper[i].dataset.niva === na);
+    }
   }
 
   function visFart() {
@@ -297,6 +325,9 @@ var Spill = (function () {
       });
       felt.appendChild(b);
     });
+    /* Med bare én bokstav valgt finnes det ingen alternativer å velge mellom,
+     * og spillet faller tilbake til alle. Det skal ikke skje i stillhet. */
+    el('bokstav-merknad').hidden = valgt.length !== 1;
   }
 
   function tegnStatus() {
@@ -326,43 +357,55 @@ var Spill = (function () {
 
   /* ---------- oppstart ---------- */
 
+  /* Kobler en hendelse til et element. Mangler elementet, sier vi fra i
+   * konsollen i stedet for å kaste – ellers stopper resten av oppkoblingen,
+   * og da virker plutselig ingenting. */
+  function pa(id, hendelse, fn, valg) {
+    var e = el(id);
+    if (!e) {
+      if (window.console) window.console.warn('Bokstavløpet: fant ikke #' + id);
+      return null;
+    }
+    e.addEventListener(hendelse, fn, valg);
+    return e;
+  }
+
   function koble() {
     /* Det første trykket låser opp lyden i nettleseren. */
-    el('knapp-start').addEventListener('click', function () {
+    pa('knapp-start', 'click', function () {
       Lyd.lasOpp();
       Lyd.klikk();
       visVerden();
     });
 
-    el('tilbake').addEventListener('click', function () {
+    pa('tilbake', 'click', function () {
       Lyd.klikk();
       if (tilbakeHandling) tilbakeHandling();
     });
 
-    el('navn-ok').addEventListener('click', function () {
+    pa('navn-ok', 'click', function () {
       lagreNavn(el('navn-felt').value.trim());
     });
-    el('navn-hopp').addEventListener('click', function () { lagreNavn(''); });
-    el('navn-felt').addEventListener('keydown', function (e) {
+    pa('navn-felt', 'keydown', function (e) {
       if (e.key === 'Enter') lagreNavn(el('navn-felt').value.trim());
     });
 
-    el('oppgave-videre').addEventListener('click', function () {
+    pa('oppgave-videre', 'click', function () {
       Lyd.klikk();
       Moduser.Oppgave.videre();
     });
-    el('oppgave-lytt').addEventListener('click', function () {
+    pa('oppgave-lytt', 'click', function () {
       Moduser.Oppgave.gjentaSporsmal();
     });
-    el('utforsk-lytt').addEventListener('click', function () {
+    pa('utforsk-lytt', 'click', function () {
       Moduser.Utforsk.gjenta();
     });
 
-    el('oppsum-igjen').addEventListener('click', function () {
+    pa('oppsum-igjen', 'click', function () {
       Lyd.klikk();
       startOppgave(sisteModus || 'finn');
     });
-    el('oppsum-tilbake').addEventListener('click', function () {
+    pa('oppsum-tilbake', 'click', function () {
       Lyd.klikk();
       visMeny();
     });
@@ -388,32 +431,44 @@ var Spill = (function () {
       tannhjul.addEventListener(h, avbrytHold);
     });
 
-    el('foreldre-lukk').addEventListener('click', lukkForeldre);
-    el('foreldre-lukk-x').addEventListener('click', lukkForeldre);
+    pa('foreldre-lukk', 'click', lukkForeldre);
+    pa('foreldre-lukk-x', 'click', lukkForeldre);
 
-    el('inn-stemme').addEventListener('change', function () {
+    pa('inn-stemme', 'change', function () {
       Lagring.settInnstilling('stemme', this.checked);
       if (!this.checked) Tale.stopp();
     });
-    el('inn-lyd').addEventListener('change', function () {
+    pa('inn-lyd', 'change', function () {
       Lagring.settInnstilling('lyd', this.checked);
     });
-    el('inn-vis-mal').addEventListener('change', function () {
+    pa('inn-vis-mal', 'change', function () {
       Lagring.settInnstilling('visMal', this.checked);
     });
-    el('inn-bevegelse').addEventListener('change', function () {
+    pa('inn-bevegelse', 'change', function () {
       Lagring.settInnstilling('bevegelse', this.checked);
       settBevegelse();
     });
-    el('inn-fart').addEventListener('input', function () {
+    pa('inn-fart', 'input', function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));
       visFart();
     });
-    el('inn-alle').addEventListener('click', function () {
+    var nivaKnapper = el('inn-niva').querySelectorAll('button');
+    for (var n = 0; n < nivaKnapper.length; n++) {
+      nivaKnapper[n].addEventListener('click', function () {
+        Lagring.settInnstilling('niva', this.dataset.niva);
+        tegnNiva();
+      });
+    }
+
+    /* Trykk på bilen eller skipet: den tuter og hopper. Ingen læring i det,
+     * men det er det første en treåring prøver, og da skal noe skje. */
+    pa('figur', 'click', function () { Moduser.hopp(); });
+
+    pa('inn-alle', 'click', function () {
       Lagring.settInnstilling('bokstaver', null);
       tegnBokstavvelger();
     });
-    el('inn-nullstill').addEventListener('click', function () {
+    pa('inn-nullstill', 'click', function () {
       if (window.confirm('Slette all framgang og starte helt på nytt?')) {
         Lagring.nullstill();
         el('foreldre').hidden = true;
@@ -436,10 +491,17 @@ var Spill = (function () {
         return;
       }
       if (e.ctrlKey || e.altKey || e.metaKey) return;
+      /* En treåring holder tasten nede og hamrer på tastaturet. Uten dette
+       * blir det hundre svar i sekundet og stemmer som snakker i munnen
+       * på hverandre. */
+      if (e.repeat) return;
 
       var tegn = (e.key || '').toUpperCase();
       if (tegn.length === 1 && ALFABET.indexOf(tegn) !== -1 && tastLytter) {
         e.preventDefault();
+        var na = Date.now();
+        if (na - sisteTast < 400) return;
+        sisteTast = na;
         tastLytter(tegn);
       }
     });

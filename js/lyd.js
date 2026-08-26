@@ -115,6 +115,13 @@ var Lyd = (function () {
       tone(520, 0, 0.09, 'sine', 0.14);
     },
 
+    /* Tut. Bilen tuter, skipet svarer med skipsfløyte – begge deler er noe
+       en treåring trykker på figuren for å få til. */
+    tut: function () {
+      tone(392, 0, 0.16, 'triangle', 0.26);
+      tone(311, 0.13, 0.26, 'triangle', 0.24);
+    },
+
     /* Runden er ferdig: tre rolige toner. */
     ferdig: function () {
       tone(523, 0.00, 0.28, 'sine', 0.22);

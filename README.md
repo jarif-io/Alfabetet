@@ -1,8 +1,12 @@
 # Bokstavløpet
 
-Et rolig alfabetspill på norsk, laget for et barn som holder på å lære bokstavene og
-som liker biler og sjørøvere. Det kjører i nettleseren, virker uten internett, og
-lagrer framgangen lokalt på maskinen.
+Et rolig alfabetspill på norsk, laget for en treåring som holder på å bli kjent med
+bokstavene og som liker biler og sjørøvere. Det kjører i nettleseren, virker uten
+internett, og lagrer framgangen lokalt på maskinen.
+
+Alt er lagt opp for en som **ikke kan lese**: hver bokstav har et bilde han kan
+kjenne igjen og navngi, oppgavene sies høyt, og resultatet vises som stjerner han
+kan telle. Teksten på skjermen er der for den voksne som sitter ved siden av.
 
 ## Slik starter du
 
@@ -27,7 +31,11 @@ Så er det tre ting å gjøre:
 
 **På tastaturet** kan han trykke bokstaven direkte i alle tre. Det er ofte den
 sterkeste koblingen: tegnet på skjermen og tasten under fingeren er det samme.
-`Esc` går tilbake.
+`Esc` går tilbake. Spillet tåler at en treåring hamrer på tastaturet — taster som
+holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
+
+**Trykk på bilen eller skipet**, så tuter den og hopper. Det er det første han
+prøver, og da skal det skje noe.
 
 ## Slik er det bygget
 
@@ -44,9 +52,12 @@ Spillet er med vilje rolig. Det er ikke en innstilling, men måten det er laget 
 - **En runde er åtte oppgaver**, rundt tre minutter, og slutter av seg selv.
   Spillet maser aldri om «en runde til».
 
-Vanskegraden starter på to valg og stiger til tre og fire etter fem riktige på rad —
-og spillet sier fra når det blir vanskeligere, for det er den beskjeden som gjør at
-det kjennes ut som å klare noe.
+Fra start er alt stilt inn på de aller minste: **fem oppgaver i en runde**, to valg å
+se på, og hjelp allerede etter ett bom. Vanskegraden stiger til tre valg etter fire
+riktige på rad — og spillet sier fra når det blir vanskeligere, for det er den
+beskjeden som gjør at det kjennes ut som å klare noe. Blir han eldre, kan du sette
+nivået til «litt større» i foreldremenyen: åtte oppgaver, opp til fire valg, og to
+forsøk før spillet hjelper.
 
 En bokstav regnes som **mestret** først når han har truffet den på tre *ulike dager*.
 Tre på rad i én økt er gjenkjenning; tre ulike dager er læring. Mestrede bokstaver
@@ -62,9 +73,11 @@ barnet ikke havner der ved et uhell.) Der kan du:
 - Skru stemme og lydeffekter av og på, og **justere hvor fort stemmen snakker**.
   Standardstemmen snakker som regel for fort for en femåring, så den er satt tregere
   fra start.
+- **Velge nivå.** «Helt liten» (standard, fra ca. 3 år) eller «litt større».
 - **Velge hvilke bokstaver som er med** — for eksempel bare bokstavene i navnet hans,
   eller de dere leser om denne uka. Dette er funksjonen som knytter spillet til
-  lesestundene.
+  lesestundene, og for en treåring er det trolig den nyttigste: begynn med tre–fire
+  bokstaver i stedet for alle 29.
 - Skru av **«vis bokstaven i oppdraget»**. Da må han kjenne igjen bokstaven kun på
   lyden — et vanskeligere steg å ta når han begynner å sitte trygt.
 - Skru av **«la skyer og bølger drive sakte»**. Bakgrunnen er det eneste i spillet som
@@ -73,13 +86,19 @@ barnet ikke havner der ved et uhell.) Der kan du:
 - Se **hvilke bokstaver han sitter godt i** og hvilke som henger igjen.
 - Bytte navn på figurene, eller nullstille alt.
 
-## Bytte ut ordene
+## Ordene, og hvorfor de er som de er
 
-Ordene ligger i **`js/data.js`**, og filen er laget for å bli redigert. Vil dere at
-`H` skal være «Hjelm» i stedet for «Hjul», så endrer dere den ene linja:
+Ordene er valgt så en treåring kan **peke på bildet og si hva det er**. Derfor står
+det «Fly» og ikke «Fart», «Ost» og ikke «Olje», «Rakett» og ikke «Rødt lys». Et
+abstrakt begrep lærer ikke bort en bokstav, uansett hvor godt det passer temaet.
+Der et kjøretøy faktisk er konkret, er det beholdt — over halvparten av
+Racerbanen er biler, fly, traktorer og raketter.
+
+Listene ligger i **`js/data.js`**, og filen er laget for å bli redigert. Vil dere at
+`H` skal være «Hest» i stedet for «Hjul», så endrer dere den ene linja:
 
 ```js
-'H': { ord: 'Hjelm', ikon: '⛑️' },
+'H': { ord: 'Hest', ikon: '🐴' },
 ```
 
 Det er én ordliste per verden. Bytt gjerne til ordene fra alfabetboka dere leser —
@@ -110,7 +129,7 @@ samme ånd, og barnet gir dem navn selv.
 index.html        hele skjermen: scenen, de sju skjermbildene og foreldremenyen
 css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
-js/data.js        bokstavene og ordene  ← denne kan dere endre
+js/data.js        bokstavene, ordene og navneforslagene  ← denne kan dere endre
 js/figurer.js     bil, skip og landskap, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage)
 js/tale.js        norsk talesyntese

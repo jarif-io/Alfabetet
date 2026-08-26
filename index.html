@@ -69,12 +69,15 @@
     <div class="stabel">
       <div class="helt helt--liten" id="navn-figur"></div>
       <h2 class="skjermtittel trinn" id="navn-sporsmal">Hva skal den hete?</h2>
-      <input id="navn-felt" class="tekstfelt trinn" type="text" maxlength="20"
-             autocomplete="off" spellcheck="false">
-      <div class="knapperad trinn">
-        <button class="knapp" id="navn-ok" type="button"><span>Ferdig</span></button>
-        <button class="knapp knapp--flat" id="navn-hopp" type="button">Bruk vanlig navn</button>
-      </div>
+      <div class="navnforslag trinn" id="navn-forslag"></div>
+      <details class="navn-egen trinn">
+        <summary>… eller skriv et eget navn</summary>
+        <div class="navn-egen-rad">
+          <input id="navn-felt" class="tekstfelt" type="text" maxlength="20"
+                 autocomplete="off" spellcheck="false">
+          <button class="knapp" id="navn-ok" type="button"><span>Ferdig</span></button>
+        </div>
+      </details>
     </div>
   </section>
 
@@ -124,8 +127,11 @@
   <section class="skjerm skjerm--midt" id="skjerm-oppsummering" hidden>
     <div class="stabel panelkort">
       <div class="malflagg" id="oppsum-flagg">🏁</div>
-      <h2 class="skjermtittel" id="oppsum-tittel">Runden er ferdig</h2>
-      <ul class="oppsum-liste" id="oppsum-liste"></ul>
+      <h2 class="skjermtittel" id="oppsum-tittel">Bra kjørt!</h2>
+      <div class="oppsum-stjerner" id="oppsum-stjerner" aria-hidden="true"></div>
+      <div class="oppsum-brikker" id="oppsum-brikker"></div>
+      <div class="oppsum-ny" id="oppsum-ny" hidden></div>
+      <p class="oppsum-tekst" id="oppsum-tekst"></p>
       <div class="knapperad">
         <button class="knapp" id="oppsum-igjen" type="button"><span>En runde til</span></button>
         <button class="knapp knapp--flat" id="oppsum-tilbake" type="button">Tilbake</button>
@@ -178,6 +184,20 @@
     </section>
 
     <section class="panel-del">
+      <h3>Hvor mye skal han få servert</h3>
+      <div class="nivavelger" id="inn-niva">
+        <button type="button" data-niva="liten">
+          <b>Helt liten</b>
+          <span>Fem oppgaver, to valg, hjelp med én gang. Passer fra ca. 3 år.</span>
+        </button>
+        <button type="button" data-niva="storre">
+          <b>Litt større</b>
+          <span>Åtte oppgaver, opp til fire valg, to forsøk før hjelp.</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel-del">
       <h3>Ro på skjermen</h3>
       <label class="bryter">
         <input type="checkbox" id="inn-vis-mal">
@@ -204,6 +224,10 @@
         eller de dere leser om denne uka.
       </p>
       <div class="bokstavvelger" id="inn-bokstaver"></div>
+      <p class="merknad advarsel" id="bokstav-merknad" hidden>
+        Med bare én bokstav valgt finnes det ingenting å velge mellom, så spillet
+        bruker alle 29. Velg minst to.
+      </p>
       <button class="knapp knapp--flat knapp--liten" id="inn-alle" type="button">Ta med alle</button>
     </section>
 

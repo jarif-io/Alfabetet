@@ -37,9 +37,9 @@ var Figurer = (function () {
 
       /* spoiler – bakerst, altså til venstre, siden bilen ser mot høyre.
          Tegnes etter karosseriet, ellers forsvinner staget bak det. */
-      '<path d="M20 46h9v14h-9z" fill="#8d1a0c"/>' +
-      '<path d="M44 46h9v14h-9z" fill="#8d1a0c"/>' +
-      '<path d="M10 38h54a4.5 4.5 0 0 1 0 9H10a4.5 4.5 0 0 1 0-9z" fill="#a4200f"/>' +
+      '<path d="M24 44h7v12h-7z" fill="#8d1a0c"/>' +
+      '<path d="M45 44h7v12h-7z" fill="#8d1a0c"/>' +
+      '<path d="M18 38h40a4 4 0 0 1 0 8H18a4 4 0 0 1 0-8z" fill="#a4200f"/>' +
 
       /* skulderlinje */
       '<path d="M20 58h158" stroke="rgba(255,255,255,.28)" stroke-width="3" stroke-linecap="round" fill="none"/>' +

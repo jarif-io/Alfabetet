@@ -10,6 +10,11 @@ var Tale = (function () {
   var stemme = null;
   var lette = false;
 
+  /* Hver gang noe avbrytes teller vi opp. En rekke som ble påbegynt før
+   * avbruddet stopper da av seg selv i stedet for å snakke oppå den nye.
+   * Uten dette snakker spillet i munnen på seg selv når barnet trykker fort. */
+  var generasjon = 0;
+
   function finnStemme() {
     if (!stotte) return null;
     var alle = window.speechSynthesis.getVoices();
@@ -93,9 +98,11 @@ var Tale = (function () {
     /* Sier en rekke tekster etter hverandre, med rolige pauser mellom.
      * Godtar strenger og tall (tall tolkes som pause i millisekunder). */
     rekke: function (deler) {
+      var min = generasjon;
       var kjede = Promise.resolve();
       deler.forEach(function (del) {
         kjede = kjede.then(function () {
+          if (min !== generasjon) return;
           return typeof del === 'number' ? vent(del) : si(del);
         });
       });
@@ -105,6 +112,7 @@ var Tale = (function () {
     si: si,
 
     stopp: function () {
+      generasjon += 1;
       if (stotte) {
         try { window.speechSynthesis.cancel(); } catch (e) {}
       }

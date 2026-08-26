@@ -99,6 +99,15 @@ var Moduser = (function () {
     figur.style.transform = 'translateX(24px)';
   }
 
+  /* Et lite hopp. Treåringer trykker på figuren fordi den er der, og da
+   * skal det skje noe. */
+  function hopp() {
+    var figur = el('figur');
+    if (!figur || el('figurbane').hidden) return;
+    spillOm(figur, 'hopper', 620);
+    Lyd.tut();
+  }
+
   /* ================= belønninger ================= */
 
   /* Vanlig riktig svar: en stjerne lander på skiltet og blir borte igjen. */
@@ -184,12 +193,18 @@ var Moduser = (function () {
     function tegn() {
       var rutenett = el('utforsk-rutenett');
       rutenett.innerHTML = '';
+      /* Bildet under bokstaven gjør veggen mulig å navigere for en som ikke
+       * kan lese: han finner traktoren, og lærer at den bor på T. */
       Lagring.aktiveBokstaver().forEach(function (bokstav, i) {
+        var oppslag = ordFor(verdenId, bokstav);
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'bokstav' + (Lagring.erMestret(bokstav) ? ' mestret' : '');
-        b.textContent = bokstav;
         b.dataset.bokstav = bokstav;
+        b.title = bokstav + ' som i ' + oppslag.ord;
+        b.innerHTML = '<span class="bokstav-tegn">' + bokstav + '</span>' +
+                      '<span class="bokstav-bilde" aria-hidden="true">' + oppslag.ikon + '</span>';
+        b.setAttribute('aria-label', bokstav + ' som i ' + oppslag.ord);
         b.style.animation = 'trinn-inn 320ms cubic-bezier(.2,.8,.3,1) ' + (i * 12) + 'ms backwards';
         b.addEventListener('click', function () { velg(bokstav); });
         rutenett.appendChild(b);
@@ -251,14 +266,22 @@ var Moduser = (function () {
 
   /* ================= 2. og 3. Oppgavemodusene ================= */
 
-  var OPPGAVER_I_RUNDEN = 8;
+  /* Alt som skiller en treåring fra en femåring ligger her. En treåring
+   * orker en kortere runde, trenger færre valg å se på, og skal ha hjelp
+   * med én gang i stedet for å bomme to ganger på rad. */
+  function oppsett() {
+    var liten = Lagring.innstilling('niva') !== 'storre';
+    return liten
+      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4 }
+      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5 };
+  }
 
   var Oppgave = (function () {
     var okt = null;
 
     /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
      * noen kjente blandes inn som hvilepunkter. */
-    function byggKo() {
+    function byggKo(antall) {
       var aktive = Lagring.aktiveBokstaver();
       var sortert = aktive.slice().sort(function (a, b) {
         var da = Lagring.dagerFor(a), db = Lagring.dagerFor(b);
@@ -271,20 +294,20 @@ var Moduser = (function () {
       var ko = [];
       var pott = bland(trengsMest);
       var lettePott = bland(resten);
-      while (ko.length < OPPGAVER_I_RUNDEN) {
+      while (ko.length < antall) {
         if (!pott.length) pott = bland(trengsMest);
         ko.push(pott.pop());
-        if (ko.length < OPPGAVER_I_RUNDEN && lettePott.length && ko.length % 3 === 2) {
+        if (ko.length < antall && lettePott.length && ko.length % 3 === 2) {
           ko.push(lettePott.pop());
         }
       }
-      return ko.slice(0, OPPGAVER_I_RUNDEN);
+      return ko.slice(0, antall);
     }
 
     function tegnPrikker() {
       var felt = el('oppgave-prikker');
       felt.innerHTML = '';
-      for (var i = 0; i < OPPGAVER_I_RUNDEN; i++) {
+      for (var i = 0; i < okt.oppsett.antall; i++) {
         var p = document.createElement('span');
         p.className = 'prikk' + (i < okt.indeks ? ' tatt' : (i === okt.indeks ? ' na' : ''));
         felt.appendChild(p);
@@ -367,7 +390,7 @@ var Moduser = (function () {
       knapp.disabled = true;
       Lyd.proveIgjen();
 
-      if (okt.forsokPaDenne >= 2) {
+      if (okt.forsokPaDenne >= okt.oppsett.bomForHjelp) {
         hjelp();
       } else {
         Tale.stopp();
@@ -419,7 +442,7 @@ var Moduser = (function () {
         }, 380);
       }
 
-      var opp = okt.paRad >= 5 && okt.antallValg < 4;
+      var opp = okt.paRad >= okt.oppsett.opprykk && okt.antallValg < okt.oppsett.maksValg;
       if (opp) { okt.antallValg += 1; okt.paRad = 0; }
 
       var ros = forsteForsok
@@ -432,13 +455,13 @@ var Moduser = (function () {
       var videre = el('oppgave-videre');
       videre.hidden = false;
       videre.querySelector('span').textContent =
-        okt.indeks + 1 >= OPPGAVER_I_RUNDEN ? 'Se hvordan det gikk' : 'Videre';
+        okt.indeks + 1 >= okt.oppsett.antall ? 'Se hvordan det gikk' : 'Videre';
       videre.focus();
     }
 
     function videre() {
       okt.indeks += 1;
-      if (okt.indeks >= OPPGAVER_I_RUNDEN) { avslutt(); return; }
+      if (okt.indeks >= okt.oppsett.antall) { avslutt(); return; }
       Spill.settTastLytter(tastesvar);
       visOppgave();
     }
@@ -455,51 +478,77 @@ var Moduser = (function () {
       Spill.settTopp('Ferdig', true);
 
       el('oppsum-flagg').textContent = okt.verden === 'oy' ? '🏝️' : '🏁';
+      el('oppsum-tittel').textContent = tilfeldig(VERDENER[okt.verden].ros) + '!';
 
-      var liste = el('oppsum-liste');
-      liste.innerHTML = '';
-
-      function linje(html, klasse) {
-        var li = document.createElement('li');
-        if (klasse) li.className = klasse;
-        li.innerHTML = html;
-        liste.appendChild(li);
+      /* En treåring kan ikke lese en resultatliste. Han kan telle stjerner
+       * og kjenne igjen bokstavene sine, så det er det oppsummeringen viser.
+       * Setningen nederst er til den voksne som sitter ved siden av. */
+      var stjerner = el('oppsum-stjerner');
+      stjerner.innerHTML = '';
+      for (var i = 0; i < okt.oppsett.antall; i++) {
+        var st = document.createElement('span');
+        st.className = 'oppsum-stjerne' + (i < okt.riktigForste ? ' tent' : '');
+        st.textContent = '★';
+        st.style.animationDelay = (140 + i * 130) + 'ms';
+        stjerner.appendChild(st);
       }
 
-      linje('Du klarte <b>' + okt.riktigForste + ' av ' + OPPGAVER_I_RUNDEN + '</b> med én gang');
+      var brikker = el('oppsum-brikker');
+      brikker.innerHTML = '';
+      var funnet = Object.keys(okt.telling).sort();
+      funnet.forEach(function (b, n) {
+        var brikke = document.createElement('span');
+        brikke.className = 'oppsum-brikke';
+        brikke.style.animationDelay = (okt.oppsett.antall * 130 + 160 + n * 90) + 'ms';
+        brikke.innerHTML = '<b>' + b + '</b><i>' + ordFor(okt.verden, b).ikon + '</i>';
+        brikker.appendChild(brikke);
+      });
 
-      /* Konkret er bedre enn et tall: si hvilke bokstaver han fant selv. */
-      var funnet = Object.keys(okt.telling).sort(function (a, b) {
-        return okt.telling[b] - okt.telling[a];
-      });
-      funnet.filter(function (b) { return okt.telling[b] >= 2; }).forEach(function (b) {
-        linje('Du fant <b>' + b + '</b> ' + tallord(okt.telling[b]) + ' ganger');
-      });
-      var enkle = funnet.filter(function (b) { return okt.telling[b] === 1; }).slice(0, 5);
-      if (enkle.length) {
-        linje('Du fant ' + listetekst(enkle.map(function (b) { return '<b>' + b + '</b>'; })) +
-              ' helt selv');
+      var ny = el('oppsum-ny');
+      if (okt.nyeMestrede.length) {
+        ny.hidden = false;
+        ny.innerHTML = okt.nyeMestrede.map(function (b) {
+          return '<span class="ny-bokstav">' + b + '</span>';
+        }).join('') +
+        '<span class="ny-tekst">' +
+          (okt.nyeMestrede.length === 1 ? 'er din nå!' : 'er dine nå!') +
+        '</span>';
+      } else {
+        ny.hidden = true;
+        ny.innerHTML = '';
       }
 
-      okt.nyeMestrede.forEach(function (b) {
-        linje('<b>' + b + '</b> har du nå klart tre ulike dager – den er din!', 'ny-mestret');
-      });
+      var tekst = 'Klarte ' + okt.riktigForste + ' av ' + okt.oppsett.antall +
+                  ' med én gang.';
+      if (funnet.length) {
+        tekst += ' Fant ' + listetekst(funnet) + ' selv.';
+      }
+      if (okt.nyeMestrede.length) {
+        tekst += ' ' + listetekst(okt.nyeMestrede) +
+                 (okt.nyeMestrede.length === 1 ? ' er nå truffet' : ' er nå truffet') +
+                 ' tre ulike dager.';
+      }
+      el('oppsum-tekst').textContent = tekst;
 
       Lyd.ferdig();
       var hilsen = okt.nyeMestrede.length
-        ? 'Bra jobbet! ' + okt.nyeMestrede[0] + ' kan du nå.'
+        ? 'Se her! ' + okt.nyeMestrede[0] + ' kan du nå.'
         : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
-      window.setTimeout(function () { Tale.rekke([hilsen]); }, 900);
+      window.setTimeout(function () { Tale.rekke([hilsen]); }, 700);
+      /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
+      window.setTimeout(function () { hopp(); }, 400);
 
       Spill.settOppsummering(okt.type);
     }
 
     return {
       start: function (type, verdenId) {
+        var opps = oppsett();
         okt = {
           type: type,
           verden: verdenId,
-          ko: byggKo(),
+          oppsett: opps,
+          ko: byggKo(opps.antall),
           indeks: 0,
           antallValg: 2,
           paRad: 0,
@@ -532,7 +581,7 @@ var Moduser = (function () {
   return {
     Utforsk: Utforsk,
     Oppgave: Oppgave,
-    OPPGAVER_I_RUNDEN: OPPGAVER_I_RUNDEN,
-    kjorTil: kjorTil
+    kjorTil: kjorTil,
+    hopp: hopp
   };
 })();

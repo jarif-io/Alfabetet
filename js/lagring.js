@@ -15,7 +15,10 @@ var Lagring = (function () {
     innstillinger: {
       stemme: true,
       lyd: true,
-      talefart: 0.75,
+      /* Standard er innstilt på de aller minste: kort runde, få valg,
+       * hjelp med én gang, og en stemme som snakker rolig. */
+      niva: 'liten',
+      talefart: 0.7,
       visMal: true,     /* vis bokstaven i oppdraget, ikke bare si den */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null   /* null = alle bokstaver er med */

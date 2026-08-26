@@ -349,7 +349,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.1rem;
-  padding: 13px 30px;
+  padding: 15px 30px 12px;
   border: none;
   border-radius: 999px;
   background: linear-gradient(to bottom, var(--aksent) 0%, var(--aksent-mork) 100%);
@@ -379,8 +379,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   box-shadow: 0 0 0 rgba(0, 0, 0, .22), var(--sk-1);
 }
 
-.knapp--stor { font-size: 1.45rem; padding: 17px 52px; }
-.knapp--liten { font-size: .95rem; padding: 10px 20px; }
+.knapp--stor { font-size: 1.45rem; padding: 19px 52px 16px; }
+.knapp--liten { font-size: .95rem; padding: 11px 20px 9px; }
 
 .knapp--flat {
   background: rgba(255, 253, 248, .9);
@@ -696,19 +696,26 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .bokstav {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 2.2rem;
   cursor: pointer;
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   flex: 0 0 auto;
-  width: 92px;
-  height: 92px;
+  width: 96px;
+  height: 96px;
+  padding: 6px 4px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   color: var(--blekk);
   background: rgba(255, 253, 248, .94);
   box-shadow: 0 3px 0 rgba(40, 30, 15, .16), var(--sk-1);
   position: relative;
   transition: transform 130ms ease, box-shadow 130ms ease, background var(--mykt), color var(--mykt);
 }
+.bokstav-tegn { font-size: 2.1rem; line-height: 1; }
+.bokstav-bilde { font-size: 1.25rem; line-height: 1; }
 .bokstav:hover { transform: translateY(-4px); box-shadow: 0 7px 0 rgba(40, 30, 15, .16), var(--sk-2); }
 .bokstav:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(40, 30, 15, .16); }
 .bokstav.aktiv {
@@ -855,7 +862,7 @@ body[data-verden="oy"] .skilt::after {
   background: var(--god-svak);
   color: var(--god-mork);
   box-shadow: inset 0 0 0 6px var(--god), 0 5px 0 var(--god-mork), var(--sk-3);
-  animation: sprett 560ms cubic-bezier(.3, 1.5, .45, 1);
+  animation: sprett 560ms cubic-bezier(.3, 1.5, .45, 1) forwards;
 }
 @keyframes sprett {
   0% { transform: rotate(0) scale(1); }
@@ -945,9 +952,20 @@ body[data-verden="oy"] .skilt::after {
   transition: transform 980ms cubic-bezier(.42, .05, .18, 1);
   filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .3));
 }
-.figur svg { display: block; width: 100%; height: auto; transition: transform 200ms ease; }
+.figur { pointer-events: auto; cursor: pointer; }
+.figur-vipp { width: 100%; transition: transform 200ms ease; }
+.figur svg { display: block; width: 100%; height: auto; }
 /* Kjører den mot venstre, snur den seg. */
-.figur.speilet svg { transform: scaleX(-1); }
+.figur.speilet .figur-vipp { transform: scaleX(-1); }
+
+/* Et hopp – når barnet trykker på figuren, og når runden er i havn. */
+.figur.hopper svg { animation: hopp 620ms cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes hopp {
+  0%, 100% { transform: translateY(0); }
+  35% { transform: translateY(-26px) rotate(-3deg); }
+  60% { transform: translateY(0) rotate(1deg); }
+  78% { transform: translateY(-8px); }
+}
 .fig-skygge { fill: rgba(0, 0, 0, .22); }
 
 /* Hjulene ruller mens bilen kjører. */
@@ -983,35 +1001,73 @@ body[data-verden="oy"] .skilt::after {
 
 .malflagg { font-size: 4.2rem; line-height: 1; }
 
-.oppsum-liste {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* Stjernene teller han selv. De tennes én etter én. */
+.oppsum-stjerner { display: flex; gap: 8px; justify-content: center; }
+.oppsum-stjerne {
+  font-size: 2.6rem;
+  line-height: 1;
+  color: rgba(40, 30, 15, .16);
+  animation: stjerne-tenn 460ms cubic-bezier(.3, 1.5, .5, 1) backwards;
+}
+.oppsum-stjerne.tent { color: var(--gull); text-shadow: 0 2px 5px rgba(200, 150, 20, .4); }
+@keyframes stjerne-tenn {
+  from { opacity: 0; transform: scale(.3) rotate(-40deg); }
+}
+
+/* Bokstavene han fant, med bildet sitt – gjenkjennelig uten å kunne lese. */
+.oppsum-brikker { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.oppsum-brikke {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 58px;
+  padding: 7px 10px 6px;
+  border-radius: 14px;
+  background: var(--flate-2);
+  animation: trinn-inn 380ms cubic-bezier(.2, .8, .3, 1) backwards;
+}
+.oppsum-brikke b {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.65rem;
+  line-height: 1;
+  color: var(--blekk);
+}
+.oppsum-brikke i { font-style: normal; font-size: 1rem; line-height: 1; }
+
+.oppsum-ny {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  font-size: 1.1rem;
+  padding: 10px 22px 10px 14px;
+  border-radius: 999px;
+  background: var(--god-svak);
+  box-shadow: inset 0 0 0 3px var(--god);
+  animation: sprett 620ms cubic-bezier(.3, 1.5, .45, 1) 700ms backwards;
+}
+.oppsum-ny[hidden] { display: none; }
+.ny-bokstav {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: #fff;
+  background: var(--god);
+  border-radius: 12px;
+  padding: 6px 13px;
+}
+.ny-tekst { font-weight: 700; color: var(--god-mork); font-size: 1.05rem; }
+
+/* Denne linja er til den voksne, ikke til barnet. */
+.oppsum-tekst {
+  margin: 0;
+  font-size: .92rem;
   font-weight: 600;
   color: var(--blekk-svak);
   text-align: center;
+  max-width: 34em;
 }
-.oppsum-liste li { animation: trinn-inn 400ms cubic-bezier(.2, .8, .3, 1) backwards; }
-.oppsum-liste li:nth-child(2) { animation-delay: 120ms; }
-.oppsum-liste li:nth-child(3) { animation-delay: 240ms; }
-.oppsum-liste li:nth-child(4) { animation-delay: 360ms; }
-.oppsum-liste b {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.35rem;
-  color: var(--blekk);
-}
-.oppsum-liste .ny-mestret {
-  color: var(--god-mork);
-  background: var(--god-svak);
-  border-radius: 999px;
-  padding: 8px 18px;
-}
-.oppsum-liste .ny-mestret b { color: var(--god-mork); }
 
 /* ============================================================
    12. Samlingen
@@ -1221,6 +1277,83 @@ body[data-verden="oy"] .skilt::after {
   border-radius: 12px;
   background: var(--flate-2);
   color: var(--blekk);
+}
+
+/* ============================================================
+   13b. Navnevalg og nivåvalg
+   ============================================================ */
+
+/* Navnene ligger klare til å trykkes på – barnet kan ikke skrive.
+   Skrivefeltet er gjemt bak en utvidbar linje, for den voksne. */
+.navnforslag { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+.navnbrikke {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--flate);
+  color: var(--blekk);
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--kant-sterk, rgba(40,30,15,.18)), var(--sk-2);
+  transition: transform 130ms ease, box-shadow 130ms ease, background var(--mykt);
+}
+.navnbrikke:hover { transform: translateY(-4px); box-shadow: 0 8px 0 rgba(40,30,15,.18), var(--sk-3); background: #fff; }
+.navnbrikke:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(40,30,15,.18); }
+
+.navn-egen { text-align: center; }
+.navn-egen summary {
+  cursor: pointer;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--blekk-svak);
+  padding: 10px;
+  list-style: none;
+}
+.navn-egen summary::-webkit-details-marker { display: none; }
+.navn-egen summary::before { content: "✎ "; opacity: .7; }
+.navn-egen-rad {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  padding-top: 10px;
+}
+
+/* Nivåvalget i foreldremenyen */
+.nivavelger { display: flex; gap: 12px; flex-wrap: wrap; }
+.nivavelger button {
+  flex: 1 1 210px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: var(--flate-2);
+  color: var(--blekk-svak);
+  box-shadow: inset 0 0 0 3px transparent;
+  transition: box-shadow var(--mykt), background var(--mykt);
+}
+.nivavelger button b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--blekk);
+  margin-bottom: 3px;
+}
+.nivavelger button span { font-size: .85rem; line-height: 1.35; display: block; }
+.nivavelger button.valgt {
+  background: var(--aksent-svak);
+  box-shadow: inset 0 0 0 3px var(--aksent);
+}
+
+/* Hintet til den voksne på menyflisene */
+.flis-tekst em {
+  display: block;
+  font-style: normal;
+  opacity: .7;
+  font-size: .85rem;
+  margin-top: 4px;
 }
 
 /* ============================================================
