@@ -1539,6 +1539,14 @@ body[data-verden="oy"] .skilt::after {
   .verdenkort { width: min(320px, 86vw); }
 }
 
+/* På telefon blir tittelen kuttet til «Bokstavlø…», som ikke sier noe.
+   Da er den bedre borte: tilbakeknappen og skjermens egen overskrift
+   forteller uansett hvor man er. */
+@media (max-width: 560px) {
+  #topp-midt { display: none; }
+  #topp { gap: 8px; }
+}
+
 @media (max-height: 720px) {
   :root { --grunn-h: 128px; }
   .oppdrag-mal { font-size: 3.2rem; }

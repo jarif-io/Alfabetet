@@ -10,7 +10,10 @@ kan telle. Teksten på skjermen er der for den voksne som sitter ved siden av.
 
 ## Slik starter du
 
-Dobbeltklikk på **`index.html`**. Det er alt — ingen installasjon, ingen server,
+Spillet ligger på **https://jarif-io.github.io/Alfabetet/** — åpne det i en
+nettleser på hvilken som helst maskin, telefon eller iPad.
+
+Vil du heller kjøre det lokalt: dobbeltklikk på **`index.html`**. Det er alt — ingen installasjon, ingen server,
 ingen konto. Spillet fungerer i Chrome, Edge, Safari og Firefox.
 
 Første trykk på **Start** er også det som slår på lyden. Det er nettleseren som
@@ -171,15 +174,18 @@ mapper som må følge med, virker uten nett.
 
 Kjør kommandoen på nytt hver gang du har endret ordene i `js/data.js`.
 
-### GitHub Pages (fast adresse du styrer selv)
+### GitHub Pages — spillet ligger her
 
-Gå til **Settings → Pages** i repoet og velg grenen som kilde. Da får du en
-adresse som oppdaterer seg hver gang du pusher.
+**https://jarif-io.github.io/Alfabetet/**
 
-Én ting å vite: **repoet er privat, og GitHub Pages er bare gratis for
-offentlige repoer.** Du må enten gjøre repoet offentlig (Settings → General →
-Change visibility) eller ha GitHub Pro. Spillet inneholder ingenting følsomt, så
-å gjøre det offentlig er uproblematisk — men det er ditt valg.
+Adressen oppdaterer seg av seg selv noen minutter etter hver push. Du trenger
+ikke gjøre noe mer.
+
+Er du nysgjerrig på om en endring har kommet ut, ser du byggene under
+**Actions → pages build and deployment** i repoet.
+
+Merk at GitHub Pages bare er gratis for offentlige repoer. Gjør du repoet privat
+igjen, slutter adressen å virke.
 
 ### Slippe filen et sted uten å gjøre repoet offentlig
 
