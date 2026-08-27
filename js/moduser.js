@@ -30,6 +30,12 @@ var Moduser = (function () {
     return deler.slice(0, -1).join(', ') + ' og ' + deler[deler.length - 1];
   }
 
+  /* Ord som «WC» er forkortelser. Gjøres de om til småbokstaver, mister
+   * talesyntesen sporet og staver dem feil – de skal stå som de står. */
+  function tilTale(ord) {
+    return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
+  }
+
   /* Kort animasjon som kan spilles om igjen: klassen må fjernes først. */
   function spillOm(element, klasse, ms) {
     element.classList.remove(klasse);
@@ -255,7 +261,7 @@ var Moduser = (function () {
       var navn = bokstavnavnFor(bokstav);
       Tale.rekke([
         navn + '.', 450,
-        navn + ' for ' + oppslag.ord.toLowerCase() + '.'
+        navn + ' for ' + tilTale(oppslag.ord) + '.'
       ]);
     }
 
@@ -346,7 +352,7 @@ var Moduser = (function () {
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
         oppslag.ord + '.', 420,
-        'Hvilken bokstav begynner ' + oppslag.ord.toLowerCase() + ' på?'
+        'Hvilken bokstav begynner ' + tilTale(oppslag.ord) + ' på?'
       ];
     }
 

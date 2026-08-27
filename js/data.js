@@ -4,9 +4,19 @@
  * dere leser, så bytt bare "ord" og "ikon" på riktig bokstav. Ingenting annet
  * trenger å endres.
  *
- * Ordene er valgt så en treåring kan peke på dem og si hva de er. Derfor
- * står det «Fly» og ikke «Fart», og «Ost» og ikke «Olje»: et bilde av noe
- * han kjenner igjen lærer bort bokstaven, et abstrakt begrep gjør det ikke.
+ * To regler styrer ordvalget:
+ *
+ *   1. Ordet skal være noe en treåring kan peke på og si. Derfor «Fly» og
+ *      ikke «Fart», «Ost» og ikke «Olje».
+ *   2. Bildet må passe til ordet han faktisk ville brukt. Ser han 🍦 sier
+ *      han «is», ikke «isbil» – da ville han lært feil bokstav. Derfor er
+ *      det «Is», «Kran» og «Lastebil», ikke «Isbil», «Kranbil» og «Dumper».
+ *
+ * Noen bokstaver finnes nesten ikke i norske ord et lite barn kjenner:
+ * Q, W, X, Y, Z, Æ og Å. Der står det samme ord i begge verdener, rett og
+ * slett fordi det ikke finnes noe bedre å velge mellom. «Åre» ble vraket
+ * til fordel for «Åtte» av samme grunn som over: bildet av en kano leser
+ * han som «båt».
  *
  * Hvert felt betyr:
  *   ord   – ordet som sies og vises
@@ -52,32 +62,32 @@ var VERDENER = {
       'A': { ord: 'Ambulanse',    ikon: '🚑' },
       'B': { ord: 'Bil',          ikon: '🚗' },
       'C': { ord: 'Campingbil',   ikon: '🚐' },
-      'D': { ord: 'Dumper',       ikon: '🚛' },
+      'D': { ord: 'Dinosaur',     ikon: '🦕' },
       'E': { ord: 'Elefant',      ikon: '🐘' },
       'F': { ord: 'Fly',          ikon: '✈️' },
-      'G': { ord: 'Gås',          ikon: '🦢' },
+      'G': { ord: 'Gris',         ikon: '🐷' },
       'H': { ord: 'Hjul',         ikon: '🛞' },
-      'I': { ord: 'Isbil',        ikon: '🍦' },
+      'I': { ord: 'Is',           ikon: '🍦' },
       'J': { ord: 'Jordbær',      ikon: '🍓' },
-      'K': { ord: 'Kranbil',      ikon: '🏗️' },
+      'K': { ord: 'Kran',         ikon: '🏗️' },
       'L': { ord: 'Lastebil',     ikon: '🚚' },
       'M': { ord: 'Motorsykkel',  ikon: '🏍️' },
       'N': { ord: 'Nøkkel',       ikon: '🔑' },
       'O': { ord: 'Ost',          ikon: '🧀' },
       'P': { ord: 'Politibil',    ikon: '🚓' },
-      'Q': { ord: 'Quad',         ikon: '🛺' },
+      'Q': { ord: 'Quiz',         ikon: '❔' },
       'R': { ord: 'Rakett',       ikon: '🚀' },
       'S': { ord: 'Sykkel',       ikon: '🚲' },
       'T': { ord: 'Traktor',      ikon: '🚜' },
       'U': { ord: 'Ugle',         ikon: '🦉' },
-      'V': { ord: 'Vott',         ikon: '🧤' },
-      'W': { ord: 'Wienerpølse',  ikon: '🌭' },
-      'X': { ord: 'Xylofon',      ikon: '🎹' },
-      'Y': { ord: 'Yoghurt',      ikon: '🥛' },
+      'V': { ord: 'Vaffel',       ikon: '🧇' },
+      'W': { ord: 'WC',           ikon: '🚽' },
+      'X': { ord: 'Xylofon',      ikon: '🎵' },
+      'Y': { ord: 'Yoghurt',      ikon: '🥣' },
       'Z': { ord: 'Zebra',        ikon: '🦓' },
-      'Æ': { ord: 'Ært',          ikon: '🫛' },
-      'Ø': { ord: 'Øy',           ikon: '🏝️' },
-      'Å': { ord: 'Åre',          ikon: '🛶' }
+      'Æ': { ord: 'Æsj',          ikon: '🤢' },
+      'Ø': { ord: 'Øye',          ikon: '👁️' },
+      'Å': { ord: 'Åtte',         ikon: '8️⃣' }
     }
   },
 
@@ -97,33 +107,33 @@ var VERDENER = {
     ord: {
       'A': { ord: 'Anker',        ikon: '⚓' },
       'B': { ord: 'Båt',          ikon: '⛵' },
-      'C': { ord: 'Cowboyhatt',   ikon: '🤠' },
+      'C': { ord: 'Cowboy',       ikon: '🤠' },
       'D': { ord: 'Delfin',       ikon: '🐬' },
-      'E': { ord: 'Edelsten',     ikon: '💎' },
+      'E': { ord: 'Eple',         ikon: '🍎' },
       'F': { ord: 'Flagg',        ikon: '🏴‍☠️' },
       'G': { ord: 'Gull',         ikon: '🪙' },
       'H': { ord: 'Hai',          ikon: '🦈' },
-      'I': { ord: 'Is',           ikon: '🍦' },
-      'J': { ord: 'Jolle',        ikon: '🚣' },
+      'I': { ord: 'Isbjørn',      ikon: '🐻‍❄️' },
+      'J': { ord: 'Juice',        ikon: '🧃' },
       'K': { ord: 'Kart',         ikon: '🗺️' },
       'L': { ord: 'Løve',         ikon: '🦁' },
       'M': { ord: 'Måne',         ikon: '🌙' },
-      'N': { ord: 'Nøkkel',       ikon: '🔑' },
+      'N': { ord: 'Nese',         ikon: '👃' },
       'O': { ord: 'Oter',         ikon: '🦦' },
       'P': { ord: 'Papegøye',     ikon: '🦜' },
-      'Q': { ord: 'Quiz',         ikon: '❓' },
+      'Q': { ord: 'Quiz',         ikon: '❔' },
       'R': { ord: 'Rev',          ikon: '🦊' },
       'S': { ord: 'Skip',         ikon: '🚢' },
-      'T': { ord: 'Tønne',        ikon: '🛢️' },
+      'T': { ord: 'Tiger',        ikon: '🐯' },
       'U': { ord: 'Ulv',          ikon: '🐺' },
       'V': { ord: 'Vulkan',       ikon: '🌋' },
-      'W': { ord: 'Wok',          ikon: '🍳' },
-      'X': { ord: 'Xylofon',      ikon: '🎹' },
-      'Y': { ord: 'Yoghurt',      ikon: '🥛' },
+      'W': { ord: 'WC',           ikon: '🚽' },
+      'X': { ord: 'Xylofon',      ikon: '🎵' },
+      'Y': { ord: 'Yoghurt',      ikon: '🥣' },
       'Z': { ord: 'Zebra',        ikon: '🦓' },
-      'Æ': { ord: 'Ært',          ikon: '🫛' },
+      'Æ': { ord: 'Æsj',          ikon: '🤢' },
       'Ø': { ord: 'Øy',           ikon: '🏝️' },
-      'Å': { ord: 'Åre',          ikon: '🛶' }
+      'Å': { ord: 'Åtte',         ikon: '8️⃣' }
     }
   }
 };
