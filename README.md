@@ -127,7 +127,7 @@ ikke finnes noe bedre å velge mellom. Æ er «Æsj», som er det eneste Æ-orde
 treåring bruker selv, og W er «WC», som han både kjenner og synes er morsomt.
 
 Listene ligger i **`js/data.js`**, og filen er laget for å bli redigert. Vil dere
-at `H` skal være «Hest» i stedet for «Hjul», så endrer dere den ene linja:
+at `H` skal være «Hest» i stedet for «Hus», så endrer dere den ene linja:
 
 ```js
 'H': { ord: 'Hest', ikon: '🐴' },
