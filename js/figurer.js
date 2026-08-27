@@ -214,6 +214,20 @@ var Figurer = (function () {
           '<path d="M37 14c5 5 5 15 0 20"/>' +
         '</g>' +
       '</svg>',
+    stemmePa:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M4 12h5l7-6v20l-7-6H4z" fill="currentColor"/>' +
+        '<g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">' +
+          '<path d="M21 12.5c2 2 2 5 0 7"/><path d="M25 9c4 4 4 10 0 14"/>' +
+        '</g>' +
+      '</svg>',
+    stemmeAv:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M4 12h5l7-6v20l-7-6H4z" fill="currentColor"/>' +
+        '<g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">' +
+          '<path d="M21 11l8 10M29 11l-8 10"/>' +
+        '</g>' +
+      '</svg>',
     stjerne:
       '<svg viewBox="0 0 48 48" aria-hidden="true">' +
         '<path d="M24 5l5.6 11.6L42 18.4l-9 8.9 2.1 12.7L24 34l-11.1 6 2.1-12.7-9-8.9 12.4-1.8z" fill="#e2a017"/>' +

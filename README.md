@@ -13,6 +13,10 @@ kan telle. Teksten på skjermen er der for den voksne som sitter ved siden av.
 Spillet ligger på **https://jarif-io.github.io/Alfabetet/** — åpne det i en
 nettleser på hvilken som helst maskin, telefon eller iPad.
 
+På iPad og telefon er det verdt å legge det på hjemskjermen: åpne adressen i
+Safari, trykk Del → «Legg til på Hjem-skjerm». Da får han et ikon å trykke på, og
+spillet åpnes uten adresselinje.
+
 Vil du heller kjøre det lokalt: dobbeltklikk på **`index.html`**. Det er alt — ingen installasjon, ingen server,
 ingen konto. Spillet fungerer i Chrome, Edge, Safari og Firefox.
 
@@ -39,6 +43,12 @@ holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
 
 **Trykk på bilen eller skipet**, så tuter den og hopper. Det er det første han
 prøver, og da skal det skje noe.
+
+**Høyttalerknappen i toppen** slår stemmen av og på med ett trykk. Vil dere lese
+bokstavene selv i stedet for å høre på talesyntesen, er det den knappen dere
+bruker. Lydeffektene — motoren, stjernen, tutingen — fortsetter som før; de sier
+ingenting og er halve moroa. Når stemmen er av, blir knappen oransje, så dere ser
+med én gang hvorfor det er stille.
 
 ## Slik er det bygget
 

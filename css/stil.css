@@ -24,6 +24,7 @@
   --r-xl: 34px;
 
   --grunn-h: 170px;
+  --rute: 96px;      /* bokstavrutene i Garasjen/Skattekartet */
 
   /* Nøytral scene – brukes på start- og verdensskjermen */
   --himmel-topp: #b7e0f2;
@@ -337,6 +338,16 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 /* Knappen skal se ut som noe man holder på, mens man holder. */
 .ikonknapp--stille.holdes { background: #fff; opacity: 1; }
 
+/* Stemmeknappen: ett trykk slår av robotstemmen så den voksne kan lese
+   selv. Lydeffektene fortsetter – de sier ingenting. */
+.ikonknapp--stemme { padding: 9px 12px; color: var(--blekk); }
+.ikonknapp--stemme .stemmeikon svg { width: 22px; height: 22px; display: block; }
+.ikonknapp--stemme.av {
+  background: #fdf0e2;
+  color: #9a5116;
+  box-shadow: inset 0 0 0 2px rgba(154, 81, 22, .3);
+}
+
 /* Stjernetelleren gjør framgangen synlig hele tiden. */
 .teller {
   display: inline-flex;
@@ -434,7 +445,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   cursor: pointer;
   transition: transform var(--mykt), color var(--mykt);
 }
+.lyttknapp { flex: 0 0 auto; }
+.lyttknapp .lytt-ikon { display: block; }
+.lyttknapp .lytt-ikon svg { width: 17px; height: 17px; display: block; }
 .lyttknapp:hover { color: var(--blekk); transform: translateY(-2px); }
+/* «Hør igjen» har ingen jobb når stemmen er slått av. */
+.lyttknapp.borte { display: none; }
 .lyttknapp:active { transform: translateY(1px); }
 
 /* ============================================================
@@ -693,8 +709,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   font-weight: 800;
   font-size: 5.2rem;
   line-height: 1;
+  flex: 0 0 auto;
   width: 118px;
-  min-width: 118px;
   height: 118px;
   display: grid;
   place-items: center;
@@ -711,10 +727,11 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   100% { transform: none; }
 }
 
-.ordkort-innhold { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
+.ordkort-innhold { display: flex; align-items: center; gap: 20px; flex: 1 1 auto; min-width: 0; }
 .ordkort-ikon {
   font-size: 2.9rem;
   line-height: 1;
+  flex: 0 0 auto;
   width: 92px; height: 92px;
   display: grid;
   place-items: center;
@@ -727,6 +744,10 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   font-weight: 700;
   font-size: 2.2rem;
   line-height: 1.1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ordkort-innhold.bytter { animation: trinn-inn 380ms cubic-bezier(.2, .8, .3, 1); }
 
@@ -748,8 +769,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   border: none;
   border-radius: 18px;
   flex: 0 0 auto;
-  width: 96px;
-  height: 96px;
+  width: var(--rute);
+  height: var(--rute);
   padding: 6px 4px 4px;
   display: flex;
   flex-direction: column;
@@ -1527,27 +1548,122 @@ body[data-verden="oy"] .skilt::after {
    ============================================================ */
 
 @media (max-width: 900px) {
-  :root { --grunn-h: 132px; }
+  :root { --grunn-h: 132px; --rute: 78px; }
   body { font-size: 16px; }
-  .ordkort { gap: 16px; padding: 12px 18px; }
-  .ordkort-bokstav { font-size: 3.6rem; width: 84px; min-width: 84px; height: 84px; }
-  .ordkort-ikon { font-size: 2.6rem; }
-  .ordkort-ord { font-size: 1.6rem; }
+  #app { padding: 8px 14px calc(var(--grunn-h) + 2px); }
+  .ordkort { gap: 14px; padding: 10px 14px; }
+  .ordkort-bokstav { font-size: 3rem; width: 72px; height: 72px; border-radius: 18px; }
+  .ordkort-ikon { font-size: 2.1rem; width: 62px; height: 62px; border-radius: 16px; }
+  .ordkort-innhold { gap: 12px; }
+  .ordkort-ord { font-size: 1.5rem; }
   .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
   .verdenkort { width: min(320px, 86vw); }
+  .bokstavrutenett { gap: 8px; }
 }
 
-/* På telefon blir tittelen kuttet til «Bokstavlø…», som ikke sier noe.
-   Da er den bedre borte: tilbakeknappen og skjermens egen overskrift
-   forteller uansett hvor man er. */
+/* Telefon på høykant. Her var alt for stort før: ordkortet rant ut over
+   skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får alle
+   29 plass uten å rulle. */
 @media (max-width: 560px) {
+  :root { --grunn-h: 104px; --rute: 62px; }
+  #topp { gap: 8px; padding: 8px 10px; }
   #topp-midt { display: none; }
-  #topp { gap: 8px; }
+  #app { padding: 6px 8px calc(var(--grunn-h) + 2px); }
+  .skjerm { gap: 10px; }
+
+  .ordkort { gap: 10px; padding: 8px 10px; border-radius: 22px; }
+  .ordkort-bokstav { font-size: 2.2rem; width: 52px; height: 52px; border-radius: 14px; }
+  .ordkort-ikon { font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; }
+  .ordkort-innhold { gap: 10px; }
+  .ordkort-ord { font-size: 1.15rem; }
+  .lytt-tekst { display: none; }
+  .lyttknapp { padding: 9px 11px; }
+
+  .bokstavrutenett { gap: 7px; padding: 4px 0; }
+  .bokstav { border-radius: 13px; padding: 4px 2px 3px; }
+  .bokstav-tegn { font-size: 1.45rem; }
+  .bokstav-bilde { font-size: .95rem; }
+  .bokstav.mestret::after { right: 3px; top: 2px; font-size: .6rem; }
+
+  .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: 20px; }
+  .skilt::after { height: 22px; width: 12px; }
+  .oppdrag-mal--bokstav { width: 78px; height: 78px; font-size: 3rem; border-radius: 18px; }
+  .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: 18px; }
+  .oppdrag-mal .mal-ord { font-size: 1.5rem; }
+  .oppdrag-tekst { font-size: 1.1rem; }
+  /* På en telefon er det ikke bredde nok til at «Videre» kan stå i hjørnet
+     uten å dekke et skilt. Den flyttes inn i det tomme feltet over
+     skiltene i stedet – der er den både klar av alt og lett å treffe. */
+  .videre-felt {
+    position: static;
+    order: 1;
+    justify-content: center;
+    padding: 2px 0 6px;
+  }
+  .valg { order: 2; }
+  .knapp--stor { font-size: 1.15rem; padding: 14px 28px 11px; }
+
+  .figur { width: 120px; bottom: 20px; }
+  .samling-rute { width: 88px; }
+  .samling-rute .stor { font-size: 1.9rem; }
+  .menyrad { gap: 12px; }
+  .flis { padding: 16px 16px 14px; }
+  .flis-merke { width: 48px; height: 48px; border-radius: 15px; }
+  .flis-merke svg { width: 30px; height: 30px; }
+  .panel { padding: 18px 18px 20px; }
+  .panel-topp { margin: -18px -18px 0; padding: 18px 18px 10px; }
+  .panel-del--bunn { margin: 0 -18px -20px; padding: 12px 18px 20px; }
 }
 
-@media (max-height: 720px) {
+/* Lav skjerm – typisk telefon som holdes på tvers. Bakken må vike,
+   ellers blir det ikke plass til bokstavene i det hele tatt. */
+@media (max-height: 520px) {
+  :root { --grunn-h: 64px; --rute: 48px; }
+  .bokstavrutenett { gap: 5px; }
+  .bokstav-tegn { font-size: 1.2rem; }
+  .bokstav-bilde { font-size: .8rem; }
+  .ordkort { padding: 5px 10px; gap: 8px; }
+  .ordkort-bokstav { width: 42px; height: 42px; font-size: 1.8rem; border-radius: 12px; }
+  .ordkort-ikon { width: 38px; height: 38px; font-size: 1.3rem; border-radius: 11px; }
+  .ordkort-ord { font-size: 1.05rem; }
+  .figur { width: 96px; bottom: 10px; }
+
+  /* Oppdragsblokka må krympe kraftig, ellers renner den ut over skiltene.
+     På en lav skjerm legges merket og lytteknappen ved siden av hverandre
+     i stedet for oppå hverandre – det er der høyden spares. */
+  .oppdrag {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 0;
+  }
+  .oppdrag-tekst { width: 100%; text-align: center; }
+  .oppdrag-tekst { font-size: .95rem; }
+  .oppdrag-mal--bokstav { width: 62px; height: 62px; font-size: 2.4rem; border-radius: 16px; }
+  .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }
+  .oppdrag-mal .mal-ord { font-size: 1.1rem; }
+  .lytt-tekst { display: none; }
+  .lyttknapp { padding: 7px 10px; }
+  .prikker { gap: 6px; padding-top: 0; }
+  .prikk { width: 10px; height: 10px; }
+
+  .skilt { width: 74px; height: 74px; font-size: 2.2rem; border-radius: 16px; }
+  .skilt::after { height: 18px; width: 10px; }
+  .valg { gap: 14px; }
+  .knapp--stor { font-size: 1.05rem; padding: 12px 24px 10px; }
+  .helt { width: min(240px, 34vw); }
+  .titteltekst { font-size: clamp(2rem, 6vw, 3rem); }
+  .malflagg { font-size: 2.6rem; }
+  .panelkort { padding: 18px 26px; }
+}
+
+/* Merk nedre grense: uten den overstyrer denne blokka den for lave
+   skjermer lenger opp, siden den står senere i filen. */
+@media (max-height: 720px) and (min-height: 521px) and (min-width: 561px) {
   :root { --grunn-h: 128px; }
   .oppdrag-mal { font-size: 3.2rem; }
   .skilt { width: 118px; height: 118px; font-size: 3.2rem; }

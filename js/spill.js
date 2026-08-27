@@ -29,6 +29,7 @@ var Spill = (function () {
     var alle = document.querySelectorAll('.skjerm');
     for (var i = 0; i < alle.length; i++) alle[i].hidden = (alle[i].id !== id);
     el('figurbane').hidden = !MED_FIGUR[id];
+    visStemmeknapp();
   }
 
   function settTopp(tittel, visTilbake) {
@@ -49,6 +50,30 @@ var Spill = (function () {
       void teller.offsetWidth;
       teller.classList.add('smell');
     }
+  }
+
+  /* Stemmeknappen i toppen. Den voksne skal kunne slå av robotstemmen med
+   * ett trykk og lese selv i stedet. Lydeffektene – motor, stjerne, tut –
+   * fortsetter, for de sier ingenting og er halve moroa. */
+  function visStemmeknapp() {
+    var pa = !!Lagring.innstilling('stemme');
+    var knapp = el('stemmeknapp');
+    el('stemmeikon').innerHTML = Figurer.ikon(pa ? 'stemmePa' : 'stemmeAv');
+    knapp.classList.toggle('av', !pa);
+    knapp.setAttribute('aria-pressed', pa ? 'true' : 'false');
+    knapp.title = pa ? 'Slå av stemmen – les selv i stedet' : 'Slå på stemmen';
+    el('stemmetekst').textContent = knapp.title;
+    /* «Hør igjen» har ingen jobb når stemmen er av. */
+    var lytt = document.querySelectorAll('.lyttknapp');
+    for (var i = 0; i < lytt.length; i++) {
+      if (lytt[i].id !== 'inn-prov') lytt[i].classList.toggle('borte', !pa);
+    }
+  }
+
+  function settStemme(pa) {
+    Lagring.settInnstilling('stemme', pa);
+    if (!pa) Tale.stopp();
+    visStemmeknapp();
   }
 
   /* Bytter himmel, landskap og bakke. */
@@ -458,6 +483,13 @@ var Spill = (function () {
   }
 
   function koble() {
+    /* Samme høyttalerikon som i toppen, i stedet for en emoji som ser
+     * forskjellig ut på hver maskin. */
+    var lyttIkoner = document.querySelectorAll('.lytt-ikon');
+    for (var i = 0; i < lyttIkoner.length; i++) {
+      lyttIkoner[i].innerHTML = Figurer.ikon('stemmePa');
+    }
+
     /* Det første trykket låser opp lyden i nettleseren. */
     pa('knapp-start', 'click', function () {
       Lyd.lasOpp();
@@ -555,10 +587,12 @@ var Spill = (function () {
     pa('foreldre-lukk', 'click', lukkForeldre);
     pa('foreldre-lukk-x', 'click', lukkForeldre);
 
-    pa('inn-stemme', 'change', function () {
-      Lagring.settInnstilling('stemme', this.checked);
-      if (!this.checked) Tale.stopp();
+    pa('stemmeknapp', 'click', function () {
+      Lyd.klikk();
+      settStemme(!Lagring.innstilling('stemme'));
     });
+
+    pa('inn-stemme', 'change', function () { settStemme(this.checked); });
     pa('inn-lyd', 'change', function () {
       Lagring.settInnstilling('lyd', this.checked);
     });
@@ -649,6 +683,7 @@ var Spill = (function () {
     start: function () {
       koble();
       settBevegelse();
+      visStemmeknapp();
       visStart();
     }
   };

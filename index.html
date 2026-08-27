@@ -33,6 +33,11 @@
       <span class="teller-stjerne" aria-hidden="true">★</span>
       <span id="teller-tall">0</span><span class="teller-av" id="teller-av">/29</span>
     </div>
+    <button id="stemmeknapp" class="ikonknapp ikonknapp--stemme" type="button"
+            aria-pressed="true">
+      <span class="stemmeikon" id="stemmeikon"></span>
+      <span class="skjult-visuelt" id="stemmetekst">Slå av stemmen</span>
+    </button>
     <button id="tannhjul" class="ikonknapp ikonknapp--stille" type="button"
             title="For voksne – hold inne i to sekunder">
       <span aria-hidden="true">⚙</span>
@@ -99,7 +104,7 @@
         <div class="ordkort-ord" id="utforsk-ord">Trykk på en bokstav</div>
       </div>
       <button class="lyttknapp" id="utforsk-lytt" type="button" hidden>
-        <span aria-hidden="true">🔊</span> Hør igjen
+        <span class="lytt-ikon" aria-hidden="true"></span><span class="lytt-tekst">Hør igjen</span>
       </button>
     </div>
     <div class="bokstavrutenett" id="utforsk-rutenett"></div>
@@ -113,7 +118,7 @@
       <p class="oppdrag-tekst" id="oppgave-tekst">Kjør til</p>
       <div class="oppdrag-mal" id="oppgave-mal"></div>
       <button class="lyttknapp" id="oppgave-lytt" type="button">
-        <span aria-hidden="true">🔊</span> Hør igjen
+        <span class="lytt-ikon" aria-hidden="true"></span><span class="lytt-tekst">Hør igjen</span>
       </button>
     </div>
 
@@ -184,7 +189,7 @@
       </label>
       <div class="provrad">
         <button class="lyttknapp" id="inn-prov" type="button">
-          <span aria-hidden="true">🔊</span> Hør stemmen
+          <span class="lytt-ikon" aria-hidden="true"></span><span>Hør stemmen</span>
         </button>
         <span class="ibruk" id="stemme-ibruk"></span>
       </div>
