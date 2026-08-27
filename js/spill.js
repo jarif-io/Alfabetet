@@ -289,6 +289,7 @@ var Spill = (function () {
 
   function apneForeldre() {
     el('foreldre').hidden = false;
+    el('panel-innhold').scrollTop = 0;
 
     el('inn-stemme').checked = Lagring.innstilling('stemme');
     el('inn-lyd').checked = Lagring.innstilling('lyd');
@@ -529,60 +530,32 @@ var Spill = (function () {
       visMeny();
     });
 
-    /* Tannhjulet må holdes inne, så barnet ikke havner her ved et uhell.
-     * Et vanlig klikk gjorde tidligere ingenting og sa ingenting – nå sier
-     * knappen fra hva den vil ha. */
-    var HOLDETID = 1200;
-    var holdTimer = null;
-    var holdStart = 0;
-    var hintTimer = null;
-    var tannhjul = el('tannhjul');
+    /* Tannhjulet: ett trykk viser en liten bekreftelse, og trykk nummer to
+     * åpner. To bevisste trykk holder barnet ute ved et uhell – og til
+     * forskjell fra å holde inne utløser det ikke tekstmarkering og
+     * hurtigmeny på telefon. */
+    var bobleTimer = null;
 
-    function visHint() {
-      var hint = el('tannhjul-hint');
-      hint.hidden = false;
-      window.clearTimeout(hintTimer);
-      hintTimer = window.setTimeout(function () { hint.hidden = true; }, 2600);
+    function visBoble(vis) {
+      var boble = el('voksenboble');
+      boble.hidden = !vis;
+      window.clearTimeout(bobleTimer);
+      if (vis) bobleTimer = window.setTimeout(function () { boble.hidden = true; }, 4000);
     }
 
-    function startHold(e) {
-      if (e.button && e.button !== 0) return;
-      e.preventDefault();
-      holdStart = Date.now();
-      el('tannhjul-hint').hidden = true;
-      tannhjul.classList.add('holdes');
-      window.clearTimeout(holdTimer);
-      holdTimer = window.setTimeout(function () {
-        tannhjul.classList.remove('holdes');
-        holdStart = 0;
-        apneForeldre();
-      }, HOLDETID);
-    }
-
-    function avbrytHold() {
-      tannhjul.classList.remove('holdes');
-      if (holdTimer) { window.clearTimeout(holdTimer); holdTimer = null; }
-      /* Slapp taket for tidlig: da har den voksne prøvd, og fortjener beskjed. */
-      if (holdStart && Date.now() - holdStart < HOLDETID) visHint();
-      holdStart = 0;
-    }
-
-    if (window.PointerEvent) {
-      tannhjul.addEventListener('pointerdown', startHold);
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (h) {
-        tannhjul.addEventListener(h, avbrytHold);
-      });
-    } else {
-      tannhjul.addEventListener('mousedown', startHold);
-      tannhjul.addEventListener('touchstart', startHold, { passive: false });
-      ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(function (h) {
-        tannhjul.addEventListener(h, avbrytHold);
-      });
-    }
-    /* Tastatur: knappen skal også kunne nås uten å holde musa nede. */
-    tannhjul.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apneForeldre(); }
+    pa('tannhjul', 'click', function (e) {
+      e.stopPropagation();
+      visBoble(el('voksenboble').hidden);
     });
+
+    pa('voksenboble-apne', 'click', function (e) {
+      e.stopPropagation();
+      visBoble(false);
+      apneForeldre();
+    });
+
+    /* Trykk hvor som helst ellers lukker bekreftelsen igjen. */
+    document.addEventListener('click', function () { visBoble(false); });
 
     pa('foreldre-lukk', 'click', lukkForeldre);
     pa('foreldre-lukk-x', 'click', lukkForeldre);

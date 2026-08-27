@@ -148,6 +148,15 @@ body[data-verden="oy"] {
 
 * { box-sizing: border-box; }
 
+/* Uten dette markerer iOS tekst og åpner hurtigmeny når man trykker litt
+   for lenge på en knapp. */
+button, .teller, .bokstav, .skilt, .kort, .flis, .verdenkort, .navnbrikke {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
 html, body { height: 100%; margin: 0; }
 
 body {
@@ -346,7 +355,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .ikonknapp[hidden] { visibility: hidden; display: inline-flex; }
 .ikonknapp .pil { font-size: 1.15rem; line-height: 1; }
 
-/* Tannhjulet må holdes inne. Ringen tegner seg rundt mens man holder. */
+/* Tannhjulet er diskret. Ett trykk viser bekreftelsen under. */
 .ikonknapp--stille {
   position: relative;
   padding: 9px 12px;
@@ -355,28 +364,6 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   box-shadow: none;
 }
 .ikonknapp--stille:hover { background: rgba(255, 253, 248, .9); }
-
-.hold-ring {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  transform: rotate(-90deg);
-  pointer-events: none;
-}
-.hold-ring circle {
-  fill: none;
-  stroke: var(--aksent);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-dasharray: 120;
-  stroke-dashoffset: 120;
-}
-.ikonknapp--stille.holdes .hold-ring circle {
-  transition: stroke-dashoffset 1.2s linear;
-  stroke-dashoffset: 0;
-}
-/* Knappen skal se ut som noe man holder på, mens man holder. */
-.ikonknapp--stille.holdes { background: #fff; opacity: 1; }
 
 /* Stemmeknappen: ett trykk slår av robotstemmen så den voksne kan lese
    selv. Lydeffektene fortsetter – de sier ingenting. */
@@ -1261,7 +1248,9 @@ body[data-verden="oy"] .skilt::after {
   backdrop-filter: blur(3px);
   display: flex;
   padding: 24px;
-  overflow-y: auto;
+  /* Overlegget ruller ikke selv. Det er midtdelen i panelet som ruller –
+     to rullefelt inni hverandre blir umulig å treffe på en telefon. */
+  overflow: hidden;
 }
 .overlegg[hidden] { display: none; }
 
@@ -1269,29 +1258,36 @@ body[data-verden="oy"] .skilt::after {
   margin: auto;
   background: var(--flate);
   border-radius: var(--r-xl);
-  padding: 24px 30px 26px;
   width: min(620px, 100%);
-  /* Menyen er blitt lang. Den ruller inni seg selv, med tittel og
-     lukkeknapp låst fast, så man aldri må lete etter veien ut. */
+  /* dvh tar høyde for adresselinja på telefon; vh gjør ikke det. */
   max-height: calc(100vh - 48px);
-  overflow-y: auto;
+  max-height: calc(100dvh - 48px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  overflow: hidden;
   box-shadow: var(--sk-3);
   animation: trinn-inn 300ms cubic-bezier(.2, .8, .3, 1);
 }
 
+.panel-innhold {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .panel-topp {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: -24px;
-  z-index: 3;
   background: var(--flate);
-  margin: -24px -30px 0;
-  padding: 24px 30px 12px;
+  padding: 20px 30px 14px;
   border-radius: var(--r-xl) var(--r-xl) 0 0;
 }
 .panel h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; }
@@ -1316,19 +1312,17 @@ body[data-verden="oy"] .skilt::after {
 .lukkekryss:hover { background: var(--kant); color: var(--blekk); }
 
 .panel-del { border-top: 2px solid var(--flate-2); padding-top: 14px; }
-.panel-del:first-of-type { border-top: none; padding-top: 0; }
-.panel-del--bunn {
+.panel-innhold > .panel-del:first-child { border-top: none; padding-top: 4px; }
+.panel-innhold > .panel-del:last-child { padding-bottom: 8px; }
+.panel-bunn {
+  flex: 0 0 auto;
   display: flex;
   gap: 12px;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  position: sticky;
-  bottom: -26px;
-  z-index: 3;
   background: var(--flate);
-  margin: 0 -30px -26px;
-  padding: 14px 30px 26px;
+  padding: 14px 30px 20px;
   border-radius: 0 0 var(--r-xl) var(--r-xl);
   box-shadow: 0 -8px 16px -8px rgba(40, 30, 15, .18);
 }
@@ -1500,31 +1494,37 @@ body[data-verden="oy"] .skilt::after {
 }
 
 /* Hintet som dukker opp når noen bare klikker på tannhjulet */
-.holdhint {
+/* Bekreftelsen under tannhjulet. To bevisste trykk i stedet for å holde
+   inne – holding utløste tekstmarkering og hurtigmeny på telefon. */
+.voksenboble {
   position: absolute;
   top: 100%;
   right: 0;
   margin-top: 8px;
-  padding: 9px 16px;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  border-radius: 14px;
   background: var(--blekk);
   color: #fff;
   font-size: .9rem;
   font-weight: 700;
   white-space: nowrap;
   box-shadow: var(--sk-2);
-  animation: trinn-inn 240ms cubic-bezier(.2, .9, .3, 1);
-  z-index: 40;
+  animation: trinn-inn 200ms cubic-bezier(.2, .9, .3, 1);
+  z-index: 60;
 }
-.holdhint[hidden] { display: none; }
-.holdhint::before {
+.voksenboble[hidden] { display: none; }
+.voksenboble::before {
   content: "";
   position: absolute;
-  top: -5px; right: 16px;
+  top: -5px; right: 18px;
   width: 10px; height: 10px;
   background: var(--blekk);
   transform: rotate(45deg);
 }
+.voksenboble .knapp { box-shadow: 0 3px 0 rgba(0, 0, 0, .3); }
 
 /* Stemmevelger og prøveknapp i foreldremenyen */
 .velgerrad {
@@ -1652,9 +1652,36 @@ body[data-verden="oy"] .skilt::after {
   .flis { padding: 16px 16px 14px; }
   .flis-merke { width: 48px; height: 48px; border-radius: 15px; }
   .flis-merke svg { width: 30px; height: 30px; }
-  .panel { padding: 18px 18px 20px; }
-  .panel-topp { margin: -18px -18px 0; padding: 18px 18px 10px; }
-  .panel-del--bunn { margin: 0 -18px -20px; padding: 12px 18px 20px; }
+  /* På telefon fyller innstillingene hele skjermen. Da er det aldri tvil om
+     hva som ruller, og bunnknappene ligger alltid der de skal. */
+  .overlegg { padding: 0; }
+  .panel {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+  .panel-topp { padding: 14px 16px 10px; border-radius: 0; }
+  .panel-innhold { padding: 0 16px; gap: 14px; }
+  .panel-bunn {
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
+  }
+  .panel h2 { font-size: 1.3rem; }
+  .panel-innhold { font-size: .95rem; }
+  .bokstavvelger { grid-template-columns: repeat(auto-fit, minmax(38px, 1fr)); }
+
+  /* Rader med etikett + kontroll får ikke plass side om side på en telefon.
+     Etiketten legger seg over kontrollen i stedet for å brekke i tre. */
+  .skyver, .velgerrad { flex-wrap: wrap; gap: 8px; }
+  .skyver > span:first-child,
+  .velgerrad > span:first-child { width: 100%; }
+  .skyver input[type="range"] { flex: 1 1 60%; }
+  .skyver output { min-width: 0; }
+  .velgerrad select { width: 100%; }
+  .provrad { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .ibruk { max-width: 100%; white-space: normal; }
 }
 
 /* Lav skjerm – typisk telefon som holdes på tvers. Bakken må vike,
@@ -1752,15 +1779,15 @@ body[data-verden="oy"] .skilt::after {
       <span class="skjult-visuelt" id="stemmetekst">Slå av stemmen</span>
     </button>
     <button id="tannhjul" class="ikonknapp ikonknapp--stille" type="button"
-            title="For voksne – hold inne i to sekunder">
+            title="Innstillinger for voksne">
       <span aria-hidden="true">⚙</span>
       <span class="skjult-visuelt">Innstillinger for voksne</span>
-      <svg class="hold-ring" viewBox="0 0 44 44" aria-hidden="true">
-        <circle cx="22" cy="22" r="19"></circle>
-      </svg>
     </button>
-    <div class="holdhint" id="tannhjul-hint" role="status" hidden>
-      Hold knappen inne et øyeblikk
+    <div class="voksenboble" id="voksenboble" hidden>
+      <span>For voksne</span>
+      <button class="knapp knapp--liten" id="voksenboble-apne" type="button">
+        <span>Åpne</span>
+      </button>
     </div>
   </div>
 </header>
@@ -1883,6 +1910,7 @@ body[data-verden="oy"] .skilt::after {
       <h2 id="foreldre-tittel">For voksne</h2>
       <button class="lukkekryss" id="foreldre-lukk-x" type="button" aria-label="Lukk">×</button>
     </header>
+    <div class="panel-innhold" id="panel-innhold">
 
     <section class="panel-del">
       <h3>Lyd</h3>
@@ -2005,12 +2033,14 @@ body[data-verden="oy"] .skilt::after {
       </div>
     </section>
 
-    <section class="panel-del panel-del--bunn">
+    </div>
+
+    <footer class="panel-bunn">
       <button class="knapp knapp--fare knapp--liten" id="inn-nullstill" type="button">
         Nullstill all framgang
       </button>
       <button class="knapp" id="foreldre-lukk" type="button"><span>Lukk</span></button>
-    </section>
+    </footer>
   </div>
 </div>
 
@@ -3829,6 +3859,7 @@ var Spill = (function () {
 
   function apneForeldre() {
     el('foreldre').hidden = false;
+    el('panel-innhold').scrollTop = 0;
 
     el('inn-stemme').checked = Lagring.innstilling('stemme');
     el('inn-lyd').checked = Lagring.innstilling('lyd');
@@ -4069,60 +4100,32 @@ var Spill = (function () {
       visMeny();
     });
 
-    /* Tannhjulet må holdes inne, så barnet ikke havner her ved et uhell.
-     * Et vanlig klikk gjorde tidligere ingenting og sa ingenting – nå sier
-     * knappen fra hva den vil ha. */
-    var HOLDETID = 1200;
-    var holdTimer = null;
-    var holdStart = 0;
-    var hintTimer = null;
-    var tannhjul = el('tannhjul');
+    /* Tannhjulet: ett trykk viser en liten bekreftelse, og trykk nummer to
+     * åpner. To bevisste trykk holder barnet ute ved et uhell – og til
+     * forskjell fra å holde inne utløser det ikke tekstmarkering og
+     * hurtigmeny på telefon. */
+    var bobleTimer = null;
 
-    function visHint() {
-      var hint = el('tannhjul-hint');
-      hint.hidden = false;
-      window.clearTimeout(hintTimer);
-      hintTimer = window.setTimeout(function () { hint.hidden = true; }, 2600);
+    function visBoble(vis) {
+      var boble = el('voksenboble');
+      boble.hidden = !vis;
+      window.clearTimeout(bobleTimer);
+      if (vis) bobleTimer = window.setTimeout(function () { boble.hidden = true; }, 4000);
     }
 
-    function startHold(e) {
-      if (e.button && e.button !== 0) return;
-      e.preventDefault();
-      holdStart = Date.now();
-      el('tannhjul-hint').hidden = true;
-      tannhjul.classList.add('holdes');
-      window.clearTimeout(holdTimer);
-      holdTimer = window.setTimeout(function () {
-        tannhjul.classList.remove('holdes');
-        holdStart = 0;
-        apneForeldre();
-      }, HOLDETID);
-    }
-
-    function avbrytHold() {
-      tannhjul.classList.remove('holdes');
-      if (holdTimer) { window.clearTimeout(holdTimer); holdTimer = null; }
-      /* Slapp taket for tidlig: da har den voksne prøvd, og fortjener beskjed. */
-      if (holdStart && Date.now() - holdStart < HOLDETID) visHint();
-      holdStart = 0;
-    }
-
-    if (window.PointerEvent) {
-      tannhjul.addEventListener('pointerdown', startHold);
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (h) {
-        tannhjul.addEventListener(h, avbrytHold);
-      });
-    } else {
-      tannhjul.addEventListener('mousedown', startHold);
-      tannhjul.addEventListener('touchstart', startHold, { passive: false });
-      ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(function (h) {
-        tannhjul.addEventListener(h, avbrytHold);
-      });
-    }
-    /* Tastatur: knappen skal også kunne nås uten å holde musa nede. */
-    tannhjul.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apneForeldre(); }
+    pa('tannhjul', 'click', function (e) {
+      e.stopPropagation();
+      visBoble(el('voksenboble').hidden);
     });
+
+    pa('voksenboble-apne', 'click', function (e) {
+      e.stopPropagation();
+      visBoble(false);
+      apneForeldre();
+    });
+
+    /* Trykk hvor som helst ellers lukker bekreftelsen igjen. */
+    document.addEventListener('click', function () { visBoble(false); });
 
     pa('foreldre-lukk', 'click', lukkForeldre);
     pa('foreldre-lukk-x', 'click', lukkForeldre);

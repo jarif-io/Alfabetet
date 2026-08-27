@@ -80,9 +80,13 @@ tingen i spillet som får en liten fanfare når den øker.
 
 ## For voksne
 
-**Hold inne tannhjulet** oppe til høyre i ett sekund — det må holdes, slik at barnet
-ikke havner der ved et uhell. Trykker du bare kort, sier knappen fra hva den vil ha.
-Er du på tastaturet, går det an å gå dit med `Tab` og trykke `Enter`. Der kan du:
+**Trykk på tannhjulet** oppe til høyre. Det kommer opp en liten bekreftelse, og et
+trykk til på **Åpne** tar deg inn. To bevisste trykk holder barnet ute ved et uhell,
+uten at du må holde knappen inne — det utløste tekstmarkering og hurtigmeny på
+telefon. Bekreftelsen forsvinner av seg selv etter noen sekunder.
+
+På telefon fyller innstillingene hele skjermen, med tittelen øverst og **Lukk**
+nederst hele tiden, så du aldri mister veien ut. Der kan du:
 
 - Skru stemme og lydeffekter av og på, og **justere hvor fort stemmen snakker**.
   Standardstemmen snakker som regel for fort for en femåring, så den er satt tregere

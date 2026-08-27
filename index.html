@@ -39,15 +39,15 @@
       <span class="skjult-visuelt" id="stemmetekst">Slå av stemmen</span>
     </button>
     <button id="tannhjul" class="ikonknapp ikonknapp--stille" type="button"
-            title="For voksne – hold inne i to sekunder">
+            title="Innstillinger for voksne">
       <span aria-hidden="true">⚙</span>
       <span class="skjult-visuelt">Innstillinger for voksne</span>
-      <svg class="hold-ring" viewBox="0 0 44 44" aria-hidden="true">
-        <circle cx="22" cy="22" r="19"></circle>
-      </svg>
     </button>
-    <div class="holdhint" id="tannhjul-hint" role="status" hidden>
-      Hold knappen inne et øyeblikk
+    <div class="voksenboble" id="voksenboble" hidden>
+      <span>For voksne</span>
+      <button class="knapp knapp--liten" id="voksenboble-apne" type="button">
+        <span>Åpne</span>
+      </button>
     </div>
   </div>
 </header>
@@ -170,6 +170,7 @@
       <h2 id="foreldre-tittel">For voksne</h2>
       <button class="lukkekryss" id="foreldre-lukk-x" type="button" aria-label="Lukk">×</button>
     </header>
+    <div class="panel-innhold" id="panel-innhold">
 
     <section class="panel-del">
       <h3>Lyd</h3>
@@ -292,12 +293,14 @@
       </div>
     </section>
 
-    <section class="panel-del panel-del--bunn">
+    </div>
+
+    <footer class="panel-bunn">
       <button class="knapp knapp--fare knapp--liten" id="inn-nullstill" type="button">
         Nullstill all framgang
       </button>
       <button class="knapp" id="foreldre-lukk" type="button"><span>Lukk</span></button>
-    </section>
+    </footer>
   </div>
 </div>
 
