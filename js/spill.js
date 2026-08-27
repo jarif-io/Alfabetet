@@ -304,12 +304,34 @@ var Spill = (function () {
   }
 
   /* Lister stemmene maskinen faktisk har. Norske først, resten under, slik at
-   * den voksne kan høre seg fram til den minst robotaktige. */
+   * den voksne kan høre seg fram til den minst robotaktige.
+   *
+   * Valget lagres på voiceURI, ikke på navn: en Mac har gjerne flere stemmer
+   * som alle heter «Nora», og bare URI-en skiller dem fra hverandre. */
+  function stemmeEtikett(v, erDuplikat) {
+    var tekst = v.name;
+    if (erDuplikat) {
+      var uri = (v.voiceURI || '').toLowerCase();
+      var art = uri.indexOf('premium') !== -1 ? 'premium'
+              : uri.indexOf('enhanced') !== -1 ? 'forbedret'
+              : uri.indexOf('compact') !== -1 ? 'enkel'
+              : null;
+      if (art) tekst += ' – ' + art;
+    }
+    return tekst + '  (' + v.lang + ')';
+  }
+
   function tegnStemmevalg() {
     var velger = el('inn-stemmevalg');
     var norske = Tale.norskeStemmer();
     var alle = Tale.alleStemmer();
     var valgt = Lagring.innstilling('stemmenavn');
+
+    /* Navn som går igjen må merkes, ellers ser lista ut som en feil. */
+    var antallPerNavn = {};
+    alle.forEach(function (v) {
+      antallPerNavn[v.name] = (antallPerNavn[v.name] || 0) + 1;
+    });
 
     velger.innerHTML = '';
     var auto = document.createElement('option');
@@ -319,14 +341,16 @@ var Spill = (function () {
       : 'Velg automatisk';
     velger.appendChild(auto);
 
+    var norskeNokler = norske.map(Tale.nokkelFor);
+
     function gruppe(tittel, stemmer) {
       if (!stemmer.length) return;
       var g = document.createElement('optgroup');
       g.label = tittel;
       stemmer.forEach(function (v) {
         var o = document.createElement('option');
-        o.value = v.name;
-        o.textContent = v.name + ' (' + v.lang + ')';
+        o.value = Tale.nokkelFor(v);
+        o.textContent = stemmeEtikett(v, antallPerNavn[v.name] > 1);
         g.appendChild(o);
       });
       velger.appendChild(g);
@@ -334,11 +358,31 @@ var Spill = (function () {
 
     gruppe('Norske stemmer', norske);
     gruppe('Andre stemmer', alle.filter(function (v) {
-      return norske.indexOf(v) === -1;
+      return norskeNokler.indexOf(Tale.nokkelFor(v)) === -1;
     }));
 
     velger.value = valgt || '';
+    /* Den lagrede stemmen finnes ikke lenger – da skal det ikke se ut som
+     * om den er i bruk. */
     if (velger.value !== (valgt || '')) velger.value = '';
+
+    visIBruk();
+  }
+
+  /* Viser hvilken stemme som faktisk brukes akkurat nå. Uten dette er det
+   * umulig å se om et valg har slått inn. */
+  function visIBruk() {
+    var felt = el('stemme-ibruk');
+    var na = Tale.naStemme();
+    if (!na) {
+      felt.className = 'ibruk ibruk--advarsel';
+      felt.textContent = Tale.stottes()
+        ? 'Ingen stemme valgt — nettleseren bruker sin egen standard'
+        : 'Nettleseren har ikke talesyntese';
+      return;
+    }
+    felt.className = 'ibruk';
+    felt.textContent = 'I bruk nå: ' + na.name + ' (' + na.lang + ')';
   }
 
   function visFart() {
@@ -523,9 +567,10 @@ var Spill = (function () {
     });
     pa('inn-stemmevalg', 'change', function () {
       Tale.velgStemme(this.value || null);
+      visIBruk();
       Tale.prov();
     });
-    pa('inn-prov', 'click', function () { Tale.prov(); });
+    pa('inn-prov', 'click', function () { visIBruk(); Tale.prov(); });
 
     pa('inn-fart', 'input', function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));

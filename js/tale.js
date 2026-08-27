@@ -49,6 +49,11 @@ var Tale = (function () {
     return alle.filter(erNorsk).sort(function (a, b) { return poeng(b) - poeng(a); });
   }
 
+  /* Nøkkelen vi lagrer på. Flere stemmer kan hete det samme – en Mac har
+   * gjerne både «Nora», «Nora (Enhanced)» og «Nora (Premium)», og to av dem
+   * kan rapportere nøyaktig samme navn. voiceURI skiller dem. */
+  function nokkel(v) { return v.voiceURI || v.name; }
+
   function finnStemme() {
     if (!stotte) return null;
     var alle = window.speechSynthesis.getVoices();
@@ -59,12 +64,28 @@ var Tale = (function () {
     var valgt = Lagring.innstilling('stemmenavn');
     if (valgt) {
       for (var i = 0; i < alle.length; i++) {
-        if (alle[i].name === valgt) return alle[i];
+        if (nokkel(alle[i]) === valgt) return alle[i];
+      }
+      /* Navn som nøkkel var det vi lagret i en tidligere utgave. */
+      for (var j = 0; j < alle.length; j++) {
+        if (alle[j].name === valgt) return alle[j];
       }
     }
 
     var norske = norskeStemmer();
     return norske.length ? norske[0] : null;
+  }
+
+  function oppdater() { stemme = finnStemme(); }
+
+  if (stotte) {
+    oppdater();
+    /* Stemmelista lastes asynkront, og på Mac kommer de nedlastede
+     * premiumstemmene ofte et lite øyeblikk etter de innebygde. */
+    window.speechSynthesis.onvoiceschanged = oppdater;
+    window.setTimeout(oppdater, 300);
+    window.setTimeout(oppdater, 1200);
+    window.setTimeout(oppdater, 3000);
   }
 
   function pa() {
@@ -78,8 +99,23 @@ var Tale = (function () {
       if (!pa() || !tekst) { ferdig(); return; }
 
       var ytring = new window.SpeechSynthesisUtterance(tekst);
-      ytring.lang = 'nb-NO';
-      if (stemme) ytring.voice = stemme;
+      /* Rekkefølgen er ikke likegyldig: setter man lang etterpå, eller til
+       * noe annet enn stemmens eget språk, ignorerer Safari på Mac stemmen
+       * og bruker systemets standard i stedet. */
+      if (stemme) {
+        try {
+          ytring.voice = stemme;
+          ytring.lang = stemme.lang || 'nb-NO';
+        } catch (e) {
+          /* Stemmelista kan ha blitt byttet ut under føttene på oss. Da er
+           * det bedre å snakke med standardstemmen enn å tie helt. */
+          stemme = null;
+          ytring.lang = 'nb-NO';
+          oppdater();
+        }
+      } else {
+        ytring.lang = 'nb-NO';
+      }
       /* Under ca. 0,8 begynner de fleste talesynteser å slure og høres mer
        * robotaktige ut, ikke roligere. Roen kommer fra pausene mellom
        * setningene i stedet – se Tale.rekke. */
@@ -144,10 +180,12 @@ var Tale = (function () {
       return stotte ? (window.speechSynthesis.getVoices() || []) : [];
     },
     naStemme: function () { return stemme; },
-    velgStemme: function (navn) {
-      Lagring.settInnstilling('stemmenavn', navn || null);
+    velgStemme: function (nokkelverdi) {
+      Lagring.settInnstilling('stemmenavn', nokkelverdi || null);
       oppdater();
+      return stemme;
     },
+    nokkelFor: nokkel,
     /* Prøvesetning, så den voksne kan høre forskjell mellom stemmene. */
     prov: function () {
       this.stopp();

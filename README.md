@@ -119,7 +119,17 @@ stemmene er metalliske; de nyere nevrale stemmene er langt bedre, og gratis:
 
 Spillet plukker den beste norske stemmen det finner av seg selv, men i foreldremenyen
 ligger det en liste over alle stemmene maskinen har, med en **Hør stemmen**-knapp så
-du kan sammenligne og velge selv.
+du kan sammenligne og velge selv. Ved siden av knappen står det hvilken stemme som
+**faktisk er i bruk akkurat nå** — sjekk den hvis du er i tvil om et valg slo inn.
+
+Et par ting som er greie å vite på Mac:
+
+- Etter at du har lastet ned en ny stemme, må nettleseren startes på nytt før den
+  dukker opp i lista. Chrome er tregest til å oppdage nye stemmer; **Safari viser som
+  regel premiumstemmene først**.
+- Mac har ofte flere stemmer som alle heter «Nora». Lista merker dem som *enkel*,
+  *forbedret* og *premium* så du ser hvilken du velger, og valget lagres på stemmens
+  egen id — ikke på navnet.
 
 To ting til om lyden:
 

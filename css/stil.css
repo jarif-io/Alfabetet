@@ -1434,7 +1434,22 @@ body[data-verden="oy"] .skilt::after {
   color: var(--blekk);
   cursor: pointer;
 }
-.provrad { padding-bottom: 4px; }
+.provrad {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+.ibruk {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--god-mork);
+  background: var(--god-svak);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+.ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
 
 .hjelpetekst {
   margin-top: 10px;
