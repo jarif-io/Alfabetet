@@ -12,6 +12,7 @@ var Spill = (function () {
   var MED_FIGUR = {
     'skjerm-meny': true,
     'skjerm-utforsk': true,
+    'skjerm-loype': true,
     'skjerm-oppgave': true,
     'skjerm-oppsummering': true,
     'skjerm-samling': true
@@ -212,33 +213,96 @@ var Spill = (function () {
       felt.appendChild(b);
     }
 
-    flis(Figurer.ikon(naVerden === 'oy' ? 'kart' : 'garasje'), v.utforsk,
-      'Trykk på en bokstav og hør den', function () {
-      Lyd.klikk();
-      tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
-      Moduser.Utforsk.start(naVerden);
+    /* Menyen slipper til én modus om gangen, i stigende vanskegrad. Åtte
+     * fliser på én gang er en vegg av valg for en treåring.
+     *
+     * Låsingen går bare én vei: så snart en modus har vist seg, låses den
+     * opp for godt. At noe han fant i går er borte i dag, kan han ikke lese
+     * seg til forklaringen på – da er det bare vekk. */
+    moduser().forEach(function (m) {
+      /* En modus som ikke kan kjøres i det hele tatt – «Navnet mitt» uten et
+       * navn – skal ikke stå der som en flis som ikke gjør noe. */
+      if (m.mulig && !m.mulig()) return;
+      if (m.apen()) Lagring.laasOpp(m.id);
+      if (!Lagring.erLaastOpp(m.id) && !Lagring.innstilling('visAlleModuser')) return;
+      flis(Figurer.ikon(m.ikon), m.navn, m.tekst, m.start);
     });
-
-    flis(Figurer.ikon('finn'), 'Finn bokstaven', 'Hør bokstaven, og velg riktig skilt', function () {
-      Lyd.klikk();
-      startOppgave('finn');
-    });
-
-    flis(Figurer.ikon('lyd'), 'Første lyd', 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
-      function () {
-        Lyd.klikk();
-        startOppgave('forstelyd');
-      });
 
     var antall = Lagring.mestrede().length;
     flis(Figurer.ikon('stjerne'), 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
       function () { Lyd.klikk(); visSamling(); });
   }
 
+  /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
+   * dem slipper til. */
+  function moduser() {
+    var v = VERDENER[naVerden];
+    return [
+      {
+        id: 'utforsk',
+        ikon: naVerden === 'oy' ? 'kart' : 'garasje',
+        navn: v.utforsk,
+        tekst: 'Trykk på en bokstav og hør den',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
+          Moduser.Utforsk.start(naVerden);
+        }
+      },
+      {
+        id: 'loype',
+        ikon: 'loype',
+        navn: 'Alfabetløypa',
+        tekst: 'Hele alfabetet, ett trykk om gangen',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Loype.stopp(); visMeny(); };
+          Moduser.Loype.start(naVerden, function () {
+            Moduser.Loype.stopp();
+            visMeny();
+          });
+        }
+      },
+      {
+        id: 'navn',
+        ikon: 'navn',
+        navn: 'Navnet mitt',
+        tekst: 'Bygg navnet ditt, bokstav for bokstav',
+        /* Uten et navn i foreldremenyen finnes det ingenting å bygge. */
+        mulig: function () { return navnBokstaver(Lagring.barnenavn()).length > 0; },
+        apen: function () { return true; },
+        start: function () { Lyd.klikk(); startOppgave('navn'); }
+      },
+      {
+        id: 'finn',
+        ikon: 'finn',
+        navn: 'Finn bokstaven',
+        tekst: 'Hør bokstaven, og velg riktig skilt',
+        apen: function () { return true; },
+        start: function () { Lyd.klikk(); startOppgave('finn'); }
+      },
+      {
+        id: 'forstelyd',
+        ikon: 'lyd',
+        navn: 'Første lyd',
+        tekst: 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
+        /* Lydanalyse krever at bokstavene sitter først. */
+        apen: function () { return Lagring.mestrede().length >= 8; },
+        start: function () { Lyd.klikk(); startOppgave('forstelyd'); }
+      }
+    ];
+  }
+
   function startOppgave(type) {
+    var navnkoe = type === 'navn' ? navnBokstaver(Lagring.barnenavn()) : null;
+    /* Er navnet tatt bort igjen i foreldremenyen, finnes det ingen runde å
+     * starte. Da blir vi stående i menyen framfor å vise en tom skjerm. */
+    if (type === 'navn' && !navnkoe.length) { visMeny(); return; }
     sisteModus = type;
     tilbakeHandling = function () { Moduser.Oppgave.stopp(); visMeny(); };
-    Moduser.Oppgave.start(type, naVerden);
+    Moduser.Oppgave.start(type, naVerden, navnkoe);
   }
 
   function settOppsummering(type) {
@@ -295,6 +359,7 @@ var Spill = (function () {
     el('inn-lyd').checked = Lagring.innstilling('lyd');
     el('inn-vis-mal').checked = Lagring.innstilling('visMal');
     el('inn-bevegelse').checked = Lagring.innstilling('bevegelse');
+    el('inn-alle-moduser').checked = Lagring.innstilling('visAlleModuser');
     el('inn-fart').value = Lagring.innstilling('talefart');
     visFart();
 
@@ -313,6 +378,9 @@ var Spill = (function () {
     } else {
       merknad.hidden = true;
     }
+
+    el('inn-barnenavn').value = Lagring.barnenavn();
+    visBarnenavn();
 
     el('inn-navn-bane').value = Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '';
     el('inn-navn-bane').placeholder = VERDENER.bane.standardnavn;
@@ -474,11 +542,29 @@ var Spill = (function () {
     });
   }
 
+  /* Viser hvilke bokstaver spillet faktisk kommer til å bruke, så den voksne
+   * ser resultatet med én gang: «Ida Marie» blir I·D·A. */
+  function visBarnenavn() {
+    var bokstaver = navnBokstaver(el('inn-barnenavn').value);
+    var linje = el('barnenavn-vis');
+    if (!el('inn-barnenavn').value.trim()) {
+      linje.textContent = '';
+    } else if (!bokstaver.length) {
+      linje.textContent = 'Fant ingen bokstaver spillet kjenner igjen her.';
+    } else {
+      linje.textContent = 'Spiller med: ' + bokstaver.join('·') +
+        ' (' + bokstaver.length + ' oppgaver)';
+    }
+  }
+
   function lukkForeldre() {
     var navnBane = el('inn-navn-bane').value.trim();
     var navnOy = el('inn-navn-oy').value.trim();
     if (navnBane) Lagring.settNavn('bane', navnBane);
     if (navnOy) Lagring.settNavn('oy', navnOy);
+    /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
+     * bort «Navnet mitt» igjen. */
+    Lagring.settBarnenavn(el('inn-barnenavn').value);
     el('foreldre').hidden = true;
     /* Tilbake til et trygt sted – innstillingene kan ha endret bokstavutvalget. */
     if (naVerden) visMeny(); else visVerden();
@@ -541,6 +627,14 @@ var Spill = (function () {
       Moduser.Utforsk.gjenta();
     });
 
+    pa('loype-videre', 'click', function () {
+      Lyd.klikk();
+      Moduser.Loype.videre();
+    });
+    pa('loype-lytt', 'click', function () {
+      Moduser.Loype.gjenta();
+    });
+
     pa('oppsum-igjen', 'click', function () {
       Lyd.klikk();
       startOppgave(sisteModus || 'finn');
@@ -596,6 +690,10 @@ var Spill = (function () {
       Lagring.settInnstilling('bevegelse', this.checked);
       settBevegelse();
     });
+    pa('inn-alle-moduser', 'change', function () {
+      Lagring.settInnstilling('visAlleModuser', this.checked);
+    });
+    pa('inn-barnenavn', 'input', visBarnenavn);
     pa('inn-stemmevalg', 'change', function () {
       Tale.velgStemme(this.value || null);
       visIBruk();

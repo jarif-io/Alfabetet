@@ -28,15 +28,28 @@ krever det, og det er derfor knappen er der.
 Han velger først en verden — **Racerbanen** eller **Sjørøverøya** — og gir figuren
 sin et navn. Navnet brukes gjennom hele spillet.
 
-Så er det tre ting å gjøre:
+Så er det fem ting å gjøre, ordnet fra lettest til vanskeligst:
 
 | | Hva det er |
 | --- | --- |
 | **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «L … L for Løve» — samme formel som alfabetbøkene bruker. Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil, fint å slå opp i mens dere leser. |
+| **Alfabetløypa** | Hele alfabetet fra A til Å, én bokstav per trykk, med bilde og ord. Figuren kommer litt lenger bortover veien for hvert trykk. Ingen oppgaver og ingen stjerner — han blir lest for, slik dere leser alfabetboka sammen. |
+| **Navnet mitt** | Han bygger sitt eget navn, bokstav for bokstav. Rutene fylles fra venstre, og runden er akkurat så lang som navnet. Skriv inn fornavnet under **For voksne** for å få den fram. |
 | **Finn bokstaven** | Spillet sier en bokstav, og han velger blant skiltene. Bokstaven er skjult bak et spørsmålstegn han kan trykke på hvis han trenger å se den — ellers ville oppgaven bare vært å finne to like. Hovedøvelsen. |
-| **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? |
+| **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? Dette er den vanskeligste, og den kommer ofte først rundt fire år. |
 
-**På tastaturet** kan han trykke bokstaven direkte i alle tre. Det er ofte den
+**Hvorfor navnet hans?** Barn lærer bokstavene i sitt eget navn først, raskest og
+mest varig — de betyr noe. Et navn på fire–seks bokstaver er dessuten akkurat én
+runde, med en slutt han skjønner uten å kunne telle.
+
+**Menyen vokser med ham.** Alle fem står ikke framme fra dag én; det ville vært en
+vegg av valg. Han begynner med Garasjen, Alfabetløypa og Finn bokstaven. «Navnet
+mitt» kommer så snart dere har skrevet inn navnet, og «Første lyd» når åtte
+bokstaver sitter. En modus som først har dukket opp, blir stående for godt — at noe
+han fant i går er borte i dag, kan han ikke lese seg til forklaringen på. Vil dere
+se alt med én gang, er det en bryter under **For voksne**.
+
+**På tastaturet** kan han trykke bokstaven direkte i alle modusene. Det er ofte den
 sterkeste koblingen: tegnet på skjermen og tasten under fingeren er det samme.
 `Esc` går tilbake. Spillet tåler at en treåring hamrer på tastaturet — taster som
 holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
@@ -105,6 +118,11 @@ nederst hele tiden, så du aldri mister veien ut. Der kan du:
 - Skru av **«la skyer og bølger drive sakte»**. Bakgrunnen er det eneste i spillet som
   beveger seg av seg selv, og den bruker over to minutter på en runde. Holder han
   lettest fokus på en helt stille skjerm, så slå den av.
+- Skrive inn **barnets fornavn**. Det er dette som låser opp «Navnet mitt». Feltet
+  viser med én gang hvilke bokstaver spillet kommer til å bruke — «Ida Marie» blir
+  I·D·A, for bare fornavnet brukes og runden skal være kort nok.
+- Slå på **«vis alle modusene på menyen»** hvis du heller vil ha alt framme enn å la
+  spillet slippe til én om gangen.
 - Se **hvilke bokstaver han sitter godt i** og hvilke som henger igjen.
 - Bytte navn på figurene, eller nullstille alt.
 
@@ -230,7 +248,7 @@ samme ånd, og barnet gir dem navn selv.
 ## Filene
 
 ```
-index.html        hele skjermen: scenen, de sju skjermbildene og foreldremenyen
+index.html        hele skjermen: scenen, de ni skjermbildene og foreldremenyen
 css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
 js/data.js        bokstavene, ordene og navneforslagene  ← denne kan dere endre
@@ -238,7 +256,7 @@ js/figurer.js     bil, skip og landskap, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        norsk talesyntese
 js/lyd.js         lydeffekter, laget av nettleseren selv
-js/moduser.js     de tre modusene
+js/moduser.js     de fem modusene
 js/spill.js       navigasjon, scene, tastatur og foreldremeny
 bygg-enfil.js     limer alt sammen til én fil du kan flytte rundt
 ```

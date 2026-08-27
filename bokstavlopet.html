@@ -686,6 +686,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
   gap: 20px;
   justify-content: center;
+  /* Fliser kan komme til etter hvert som han vokser. Får de ikke plass,
+     skal de kunne rulles til – ikke havne under bakken der de verken er
+     synlige eller mulige å trykke på. Målet er likevel at det aldri
+     trengs; derfor krymper flisene på små skjermer lenger nede. */
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .flis {
@@ -708,6 +714,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .flis:nth-child(2) { animation-delay: 70ms; }
 .flis:nth-child(3) { animation-delay: 140ms; }
 .flis:nth-child(4) { animation-delay: 210ms; }
+.flis:nth-child(5) { animation-delay: 280ms; }
+.flis:nth-child(6) { animation-delay: 350ms; }
 .flis:hover { transform: translateY(-7px); box-shadow: var(--sk-3); }
 .flis:active { transform: translateY(-1px); }
 
@@ -950,6 +958,43 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   color: var(--blekk);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
 }
+/* «Navnet mitt»: navnet som ruter. Det han har bygd står ferdig, ruten han
+   holder på med er et spørsmålstegn å trykke på, og resten er tomme – ser han
+   hele navnet ferdig skrevet, er oppgaven å avskrive og ikke å kjenne igjen. */
+.oppdrag-mal--navn {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  cursor: pointer;
+  max-width: 100%;
+}
+.navnrute {
+  width: 72px; height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  font-size: 2.9rem;
+  line-height: 1;
+  color: var(--aksent);
+  background: rgba(255, 253, 248, .7);
+  box-shadow: inset 0 0 0 3px rgba(40, 30, 15, .12);
+  text-shadow: none;
+}
+.navnrute.full {
+  color: #fff;
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+  box-shadow: var(--sk-1);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+}
+.navnrute.na {
+  background: rgba(255, 253, 248, .96);
+  box-shadow: inset 0 0 0 5px var(--aksent), var(--sk-2);
+}
+.oppdrag-mal--navn:hover .navnrute.na { transform: translateY(-3px); }
+.oppdrag-mal--navn:active .navnrute.na { transform: translateY(1px) scale(.98); }
+.navnrute.lander { animation: kort-bytt 500ms cubic-bezier(.3, 1.4, .5, 1); }
+
 .oppdrag-mal.bytter { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
 
 .valg {
@@ -1180,6 +1225,20 @@ body[data-verden="oy"] .skilt::after {
 }
 .oppsum-brikke i { font-style: normal; font-size: 1rem; line-height: 1; }
 
+/* «Navnet mitt» ender med navnet hans, ikke med en alfabetisk liste. Da skal
+   brikkene stå tett nok til at det leses som ett ord. */
+.oppsum-brikker--navn { gap: 5px; }
+.oppsum-brikker--navn .oppsum-brikke {
+  min-width: 46px;
+  padding: 9px 8px;
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+}
+.oppsum-brikker--navn .oppsum-brikke b {
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+}
+
 .oppsum-ny {
   display: flex;
   align-items: center;
@@ -1212,6 +1271,38 @@ body[data-verden="oy"] .skilt::after {
   text-align: center;
   max-width: 34em;
 }
+
+/* ============================================================
+   11b. Alfabetløypa
+   ============================================================ */
+
+/* En bokstav om gangen, midt på skjermen, med sporet under. Ingen valg og
+   ingen fasit – han blir lest for, slik dere leser alfabetboka sammen. */
+#skjerm-loype { justify-content: center; gap: 22px; }
+
+/* I Garasjen står ordkortet over rutenettet med 29 bokstaver, og da skal det
+   være bredt. Her er kortet det eneste på skjermen, så innholdet samles på
+   midten i stedet for å ligge klint mot venstre kant. */
+.loype-kort {
+  width: min(560px, 100%);
+  justify-content: center;
+}
+.loype-kort .ordkort-innhold { flex: 0 1 auto; }
+
+.loype-spor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.loype-teller {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--blekk-svak);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+}
+/* «A–Å» på slutten er bredere enn én bokstav og må få plass i merket. */
+.ordkort-bokstav.smal { font-size: 2.6rem; letter-spacing: -.02em; }
 
 /* ============================================================
    12. Samlingen
@@ -1665,6 +1756,10 @@ body[data-verden="oy"] .skilt::after {
   .lytt-tekst { display: none; }
   .lyttknapp { padding: 9px 11px; }
 
+  /* Navnet skal helst stå på én linje, ellers leses det ikke som et navn. */
+  .navnrute { width: 48px; height: 58px; font-size: 2rem; border-radius: 13px; }
+  .oppdrag-mal--navn { gap: 6px; }
+
   .bokstavrutenett { gap: 7px; padding: 4px 0; }
   .bokstav { border-radius: 13px; padding: 4px 2px 3px; }
   .bokstav-tegn { font-size: 1.45rem; }
@@ -1692,10 +1787,40 @@ body[data-verden="oy"] .skilt::after {
   .figur { width: 120px; bottom: 20px; }
   .samling-rute { width: 88px; }
   .samling-rute .stor { font-size: 1.9rem; }
-  .menyrad { gap: 12px; }
-  .flis { padding: 16px 16px 14px; }
-  .flis-merke { width: 48px; height: 48px; border-radius: 15px; }
-  .flis-merke svg { width: 30px; height: 30px; }
+  /* Menyen kan komme opp i seks fliser. Stablet loddrett rant den ut av
+     skjermen på telefon, og en treåring som må rulle for å finne modusen
+     sin, finner den ikke. Liggende fliser tar under halve høyden. */
+  .menyrad { gap: 6px; grid-template-columns: 1fr; }
+  .flis {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "merke navn" "merke tekst";
+    align-items: center;
+    column-gap: 13px;
+    row-gap: 1px;
+    padding: 8px 12px 8px 16px;
+  }
+  .flis-merke {
+    grid-area: merke;
+    width: 42px; height: 42px;
+    border-radius: 13px;
+  }
+  .flis-merke svg { width: 26px; height: 26px; }
+  .flis-navn { grid-area: navn; align-self: end; font-size: 1.1rem; }
+  /* Forklaringen er til den voksne. To linjer er nok; resten er uansett
+     ikke det barnet navigerer etter. */
+  /* Forklaringen er til den voksne. Én linje holder flisene like høye, og
+     det er høyden som avgjør om seks moduser får plass uten rulling. */
+  .flis-tekst {
+    grid-area: tekst;
+    align-self: start;
+    font-size: .85rem;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   /* På telefon fyller innstillingene hele skjermen. Da er det aldri tvil om
      hva som ruller, og bunnknappene ligger alltid der de skal. */
   .overlegg { padding: 0; }
@@ -1761,6 +1886,32 @@ body[data-verden="oy"] .skilt::after {
   .lyttknapp { padding: 7px 10px; }
   .prikker { gap: 6px; padding-top: 0; }
   .prikk { width: 10px; height: 10px; }
+
+  /* Samme grep som på smal telefon: liggende fliser, ellers får ikke seks
+     moduser plass på en skjerm som bare er 360 piksler høy. */
+  .menyrad { gap: 10px; }
+  .flis {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "merke navn" "merke tekst";
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 1px;
+    padding: 9px 12px 9px 16px;
+  }
+  .flis-merke { grid-area: merke; width: 42px; height: 42px; border-radius: 13px; }
+  .flis-merke svg { width: 26px; height: 26px; }
+  .flis-navn { grid-area: navn; align-self: center; font-size: 1.05rem; }
+  /* På en telefon på tvers er det ikke høyde til forklaringene. De er
+     uansett til den voksne – barnet kjenner igjen merket og navnet. */
+  .flis { grid-template-areas: "merke navn"; row-gap: 0; }
+  .flis-tekst { display: none; }
+
+  /* Navnet må få plass på én linje – brekker det i to, leses det ikke
+     lenger som navnet hans. */
+  .navnrute { width: 46px; height: 54px; font-size: 1.9rem; border-radius: 12px; }
+  .oppdrag-mal--navn { gap: 6px; }
+  .loype-teller { font-size: .85rem; }
 
   .skilt { width: 74px; height: 74px; font-size: 2.2rem; border-radius: 16px; }
   .skilt::after { height: 18px; width: 10px; }
@@ -1894,7 +2045,33 @@ body[data-verden="oy"] .skilt::after {
     <div class="bokstavrutenett" id="utforsk-rutenett"></div>
   </section>
 
-  <!-- 6. Oppgave (både «Finn bokstaven» og «Første lyd») -->
+  <!-- 6. Alfabetløypa: A til Å, ett trykk per bokstav -->
+  <section class="skjerm" id="skjerm-loype" hidden>
+    <div class="ordkort loype-kort" id="loype-kort" aria-live="polite">
+      <div class="ordkort-bokstav" id="loype-bokstav">A</div>
+      <div class="ordkort-innhold">
+        <div class="ordkort-ikon" id="loype-ikon">🚑</div>
+        <div class="ordkort-ord" id="loype-ord">Ambulanse</div>
+      </div>
+      <button class="lyttknapp" id="loype-lytt" type="button">
+        <span class="lytt-ikon" aria-hidden="true"></span><span class="lytt-tekst">Hør igjen</span>
+      </button>
+    </div>
+
+    <div class="loype-spor">
+      <div class="framdrift"><span id="loype-fyll"></span></div>
+      <p class="loype-teller" id="loype-teller">1 av 29</p>
+    </div>
+
+    <div class="videre-felt">
+      <button class="knapp knapp--stor knapp--pil" id="loype-videre" type="button">
+        <span class="knapp-ikon" id="loype-videre-ikon" aria-hidden="true"></span>
+        <span class="knapp-tekst" id="loype-videre-tekst">Neste</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 7. Oppgave («Finn bokstaven», «Første lyd» og «Navnet mitt») -->
   <section class="skjerm" id="skjerm-oppgave" hidden>
     <div class="prikker" id="oppgave-prikker" aria-hidden="true"></div>
 
@@ -1916,7 +2093,7 @@ body[data-verden="oy"] .skilt::after {
     </div>
   </section>
 
-  <!-- 7. Oppsummering -->
+  <!-- 8. Oppsummering -->
   <section class="skjerm skjerm--midt" id="skjerm-oppsummering" hidden>
     <div class="stabel panelkort">
       <div class="malflagg" id="oppsum-flagg">🏁</div>
@@ -1932,7 +2109,7 @@ body[data-verden="oy"] .skilt::after {
     </div>
   </section>
 
-  <!-- 8. Samlingen -->
+  <!-- 9. Samlingen -->
   <section class="skjerm" id="skjerm-samling" hidden>
     <h2 class="skjermtittel trinn" id="samling-tittel">Samlingen din</h2>
     <p class="ingress trinn" id="samling-undertekst"></p>
@@ -2061,6 +2238,17 @@ body[data-verden="oy"] .skilt::after {
       <p class="merknad">
         Skru av om barnet lettest holder fokus på en helt stille skjerm.
       </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-alle-moduser">
+        <span class="bryter-spor"></span>
+        <span>Vis alle modusene på menyen</span>
+      </label>
+      <p class="merknad">
+        Normalt slipper spillet til én modus om gangen: de letteste fra start,
+        og «Første lyd» når åtte bokstaver sitter. En modus som først har
+        dukket opp, blir stående – noe som forsvinner igjen er uforståelig for
+        en som ikke kan lese seg til hvorfor.
+      </p>
     </section>
 
     <section class="panel-del">
@@ -2083,6 +2271,20 @@ body[data-verden="oy"] .skilt::after {
       <p class="merknad">
         Fylt = mestret. En bokstav regnes som mestret når han har truffet den
         på tre ulike dager.
+      </p>
+    </section>
+
+    <section class="panel-del">
+      <h3>Barnets navn</h3>
+      <div class="navnrad">
+        <label>Fornavn<input type="text" id="inn-barnenavn" maxlength="20"
+               autocomplete="off" spellcheck="false"></label>
+      </div>
+      <p class="merknad" id="barnenavn-vis"></p>
+      <p class="merknad">
+        Skriver du inn navnet, dukker <b>Navnet mitt</b> opp på menyen. Barn
+        lærer bokstavene i sitt eget navn først og best, fordi de betyr noe.
+        Bare fornavnet brukes, og runden blir like lang som navnet.
       </p>
     </section>
 
@@ -2152,6 +2354,26 @@ var BOKSTAVNAVN = {
 };
 
 function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
+
+/* Gjør barnets navn om til bokstavene «Navnet mitt» skal bygge.
+ *
+ * Bare det første leddet brukes: «Ida Marie» blir IDA og «Ole-Martin» blir
+ * OLE. Et helt dobbeltnavn er for langt for én runde, og fornavnet er uansett
+ * det barnet kjenner igjen først. Tegn spillet ikke har en bokstav for – som
+ * é i «Zoé» – faller bort, og lengre navn kuttes ved ti bokstaver.
+ *
+ * Blir resultatet tomt, finnes det ikke noe navn å bygge, og modusen holdes
+ * utenfor menyen.
+ */
+function navnBokstaver(navn) {
+  var forste = String(navn || '').trim().split(/[\s\-–—]+/)[0] || '';
+  var ut = [];
+  var store = forste.toUpperCase();
+  for (var i = 0; i < store.length && ut.length < 10; i++) {
+    if (ALFABET.indexOf(store[i]) !== -1) ut.push(store[i]);
+  }
+  return ut;
+}
 
 var VERDENER = {
   bane: {
@@ -2263,11 +2485,16 @@ function ordFor(verdenId, bokstav) {
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
-  var NA_VERSJON = 2;
+  var NA_VERSJON = 3;
 
   var standard = {
     versjon: NA_VERSJON,
     navn: { bane: '', oy: '' },
+    /* Barnets eget navn. Tomt = «Navnet mitt» er ikke tilgjengelig ennå. */
+    barnenavn: '',
+    /* Moduser som har dukket opp på menyen. Låsingen går bare én vei: en
+     * modus som forsvinner igjen er uforståelig for en som ikke kan lese. */
+    laasteOpp: [],
     /* framgang['B'] = { riktig: 4, feil: 1, dager: ['2026-08-26', ...] } */
     framgang: {},
     innstillinger: {
@@ -2280,7 +2507,8 @@ var Lagring = (function () {
       stemmenavn: null,   /* null = spillet velger den beste norske selv */
       visMal: false,    /* bokstaven er skjult til barnet trykker på merket */
       bevegelse: true,  /* la skyer og bølger drive sakte */
-      bokstaver: null   /* null = alle bokstaver er med */
+      bokstaver: null,  /* null = alle bokstaver er med */
+      visAlleModuser: false /* av = menyen slipper til én modus om gangen */
     }
   };
 
@@ -2289,14 +2517,18 @@ var Lagring = (function () {
    * Hver endring får derfor et steg her, som kjøres én gang på gammel lagring. */
   var MIGRERINGER = {
     /* 2: bokstaven i «Finn bokstaven» ble skjult som standard. */
-    2: function (d) { d.innstillinger.visMal = standard.innstillinger.visMal; }
+    2: function (d) { d.innstillinger.visMal = standard.innstillinger.visMal; },
+
+    /* 3: menyen viser bare det barnet er klar for. «Første lyd» har hittil
+     *    stått der bestandig, så den som allerede har spilt skal ikke
+     *    oppleve at en modus plutselig er borte. */
+    3: function (d) { d.laasteOpp = ['forstelyd']; }
   };
 
+  var maaSkrives = false;
   var data = les();
   /* Migreringen skal ikke bare gjelde denne økten – den skrives ned. */
   if (maaSkrives) skriv();
-
-  var maaSkrives = false;
 
   function les() {
     try {
@@ -2306,6 +2538,8 @@ var Lagring = (function () {
       /* Slå sammen med standard, så nye felter ikke mangler i gamle lagringer. */
       var ut = kopi(standard);
       if (lest.navn) ut.navn = { bane: lest.navn.bane || '', oy: lest.navn.oy || '' };
+      if (typeof lest.barnenavn === 'string') ut.barnenavn = lest.barnenavn;
+      if (lest.laasteOpp instanceof Array) ut.laasteOpp = lest.laasteOpp.slice();
       if (lest.framgang) ut.framgang = lest.framgang;
       if (lest.innstillinger) {
         for (var k in ut.innstillinger) {
@@ -2406,6 +2640,29 @@ var Lagring = (function () {
     settNavn: function (verdenId, navn) {
       data.navn[verdenId] = (navn || '').trim().slice(0, 20);
       skriv();
+    },
+
+    /* --- barnets eget navn --- */
+
+    barnenavn: function () { return data.barnenavn; },
+
+    settBarnenavn: function (navn) {
+      data.barnenavn = (navn || '').trim().slice(0, 20);
+      skriv();
+    },
+
+    /* --- moduser som er låst opp --- */
+
+    erLaastOpp: function (id) {
+      return data.laasteOpp.indexOf(id) !== -1;
+    },
+
+    /* Idempotent: å låse opp noe som allerede er låst opp skal ikke skrive. */
+    laasOpp: function (id) {
+      if (data.laasteOpp.indexOf(id) !== -1) return false;
+      data.laasteOpp.push(id);
+      skriv();
+      return true;
     },
 
     /* --- innstillinger --- */
@@ -2645,6 +2902,28 @@ var Figurer = (function () {
           '<rect x="15" y="10" width="6" height="6"/><rect x="27" y="10" width="6" height="6"/>' +
           '<rect x="21" y="16" width="6" height="6"/><rect x="33" y="15" width="4" height="7"/>' +
         '</g>' +
+      '</svg>',
+    /* Alfabetløypa: en vei som svinger fra start til mål. */
+    loype:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M12 40c0-12 26-9 26-19 0-5-5-8-11-8" fill="none"' +
+          ' stroke="var(--aksent)" stroke-width="7" stroke-linecap="round"/>' +
+        '<path d="M12 40c0-12 26-9 26-19 0-5-5-8-11-8" fill="none"' +
+          ' stroke="#fffdf8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 6"/>' +
+        '<circle cx="12" cy="40" r="4.5" fill="var(--aksent-mork)"/>' +
+        '<circle cx="27" cy="13" r="5.5" fill="var(--aksent-mork)"/>' +
+      '</svg>',
+    /* Navnet mitt: to bokstaver på plass og én rute igjen. */
+    navn:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<rect x="5" y="12" width="38" height="24" rx="4" fill="#fffdf8"' +
+          ' stroke="var(--aksent)" stroke-width="3"/>' +
+        '<g fill="var(--aksent)">' +
+          '<rect x="11" y="19" width="7" height="10" rx="1.5"/>' +
+          '<rect x="20.5" y="19" width="7" height="10" rx="1.5"/>' +
+        '</g>' +
+        '<rect x="30" y="19" width="7" height="10" rx="1.5" fill="none"' +
+          ' stroke="var(--aksent)" stroke-width="2.4" stroke-dasharray="2.5 2.5"/>' +
       '</svg>',
     lyd:
       '<svg viewBox="0 0 48 48" aria-hidden="true">' +
@@ -3107,6 +3386,7 @@ var Moduser = (function () {
 
   /* Kort animasjon som kan spilles om igjen: klassen må fjernes først. */
   function spillOm(element, klasse, ms) {
+    if (!element) return;
     element.classList.remove(klasse);
     void element.offsetWidth;
     element.classList.add(klasse);
@@ -3362,6 +3642,12 @@ var Moduser = (function () {
       : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5 };
   }
 
+  var MODUSTITTEL = {
+    finn: 'Finn bokstaven',
+    forstelyd: 'Første lyd',
+    navn: 'Navnet mitt'
+  };
+
   var Oppgave = (function () {
     var okt = null;
 
@@ -3408,8 +3694,19 @@ var Moduser = (function () {
       }
     }
 
+    /* Bokstavene det er lov å velge mellom. I «Navnet mitt» må navnets egne
+     * bokstaver alltid være med: har foreldrene snevret inn til fire
+     * bokstaver, ville runden ellers vært uspillbar. */
+    function utvalg() {
+      var aktive = Lagring.aktiveBokstaver();
+      if (okt.type !== 'navn') return aktive;
+      var ut = aktive.slice();
+      okt.ko.forEach(function (b) { if (ut.indexOf(b) === -1) ut.push(b); });
+      return ut;
+    }
+
     function distraktorer(fasit, antall) {
-      var andre = Lagring.aktiveBokstaver().filter(function (b) { return b !== fasit; });
+      var andre = utvalg().filter(function (b) { return b !== fasit; });
       return bland(andre).slice(0, antall);
     }
 
@@ -3417,6 +3714,13 @@ var Moduser = (function () {
       var v = VERDENER[okt.verden];
       if (okt.type === 'finn') {
         return [v.oppdrag + '…', 280, bokstavnavnFor(okt.fasit) + '.'];
+      }
+      if (okt.type === 'navn') {
+        /* Første rute knytter oppgaven til navnet hans; resten holder tempoet
+         * nede uten å gjenta hele setningen hver gang. */
+        return okt.indeks === 0
+          ? ['Navnet ditt begynner med…', 320, bokstavnavnFor(okt.fasit) + '.']
+          : ['Så kommer…', 300, bokstavnavnFor(okt.fasit) + '.'];
       }
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
@@ -3433,10 +3737,11 @@ var Moduser = (function () {
       tegnPrikker();
 
       var mal = el('oppgave-mal');
-      mal.className = 'oppdrag-mal ' +
-        (okt.type === 'finn' ? 'oppdrag-mal--bokstav' : 'oppdrag-mal--ord');
-      if (okt.type === 'finn') {
-        el('oppgave-tekst').textContent = v.oppdrag;
+      mal.className = 'oppdrag-mal oppdrag-mal--' +
+        (okt.type === 'finn' ? 'bokstav' : okt.type === 'navn' ? 'navn' : 'ord');
+      if (okt.type === 'finn' || okt.type === 'navn') {
+        el('oppgave-tekst').textContent =
+          okt.type === 'navn' ? 'Navnet ditt' : v.oppdrag;
         /* Bokstaven er skjult, ellers er oppgaven bare å finne to like.
          * Trykker han på merket, kommer den fram – hjelp når han trenger den. */
         okt.malVist = !!Lagring.innstilling('visMal');
@@ -3452,7 +3757,7 @@ var Moduser = (function () {
       var valgfelt = el('oppgave-valg');
       valgfelt.innerHTML = '';
       /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
-      var antallValg = Math.min(okt.antallValg, Lagring.aktiveBokstaver().length);
+      var antallValg = Math.min(okt.antallValg, utvalg().length);
       var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
       alternativer.forEach(function (bokstav) {
         var b = document.createElement('button');
@@ -3474,16 +3779,34 @@ var Moduser = (function () {
      * bokstaven når den er avslørt. */
     function tegnMal() {
       var mal = el('oppgave-mal');
-      if (okt.type !== 'finn') return;
+      if (okt.type === 'finn') {
+        mal.classList.toggle('skjult', !okt.malVist);
+        mal.textContent = okt.malVist ? okt.fasit : '?';
+        mal.setAttribute('aria-label', okt.malVist
+          ? 'Bokstaven er ' + bokstavnavnFor(okt.fasit)
+          : 'Trykk for å se bokstaven');
+        return;
+      }
+      if (okt.type !== 'navn') return;
+
+      /* Navnet som ruter: det han har bygd står, ruten han holder på med er
+       * et spørsmålstegn, og resten er tomme. Sto bokstavene der ferdig,
+       * ville oppgaven vært å avskrive i stedet for å kjenne igjen. */
       mal.classList.toggle('skjult', !okt.malVist);
-      mal.textContent = okt.malVist ? okt.fasit : '?';
+      mal.innerHTML = okt.ko.map(function (b, i) {
+        if (i < okt.indeks) return '<span class="navnrute full">' + b + '</span>';
+        if (i === okt.indeks) {
+          return '<span class="navnrute na">' + (okt.malVist ? b : '?') + '</span>';
+        }
+        return '<span class="navnrute"></span>';
+      }).join('');
       mal.setAttribute('aria-label', okt.malVist
         ? 'Bokstaven er ' + bokstavnavnFor(okt.fasit)
         : 'Trykk for å se bokstaven');
     }
 
     function visMal() {
-      if (!okt || okt.type !== 'finn' || okt.malVist) return false;
+      if (!okt || okt.type === 'forstelyd' || okt.malVist) return false;
       okt.malVist = true;
       tegnMal();
       spillOm(el('oppgave-mal'), 'bytter', 460);
@@ -3549,6 +3872,14 @@ var Moduser = (function () {
       knapp.classList.remove('pekes');
       knapp.classList.add('riktig');
 
+      /* I «Navnet mitt» skal bokstaven falle på plass i navnet med én gang –
+       * det er hele poenget med runden. */
+      if (okt.type === 'navn') {
+        okt.malVist = true;
+        tegnMal();
+        spillOm(el('oppgave-mal').querySelector('.navnrute.na'), 'lander', 520);
+      }
+
       kjorTil(okt.verden, knapp);
 
       if (forsteForsok) {
@@ -3606,8 +3937,16 @@ var Moduser = (function () {
       Spill.visSkjerm('skjerm-oppsummering');
       Spill.settTopp('Ferdig', true);
 
+      /* Navnet skrevet som et navn: «SOFIA» sendt til talesyntesen blir
+       * stavet bokstav for bokstav, «Sofia» blir lest som navnet hans. */
+      var navnet = okt.type === 'navn'
+        ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
+        : '';
+
       el('oppsum-flagg').textContent = okt.verden === 'oy' ? '🏝️' : '🏁';
-      el('oppsum-tittel').textContent = tilfeldig(VERDENER[okt.verden].ros) + '!';
+      el('oppsum-tittel').textContent = okt.type === 'navn'
+        ? navnet + '!'
+        : tilfeldig(VERDENER[okt.verden].ros) + '!';
 
       /* En treåring kan ikke lese en resultatliste. Han kan telle stjerner
        * og kjenne igjen bokstavene sine, så det er det oppsummeringen viser.
@@ -3624,12 +3963,19 @@ var Moduser = (function () {
 
       var brikker = el('oppsum-brikker');
       brikker.innerHTML = '';
-      var funnet = Object.keys(okt.telling).sort();
+      /* I «Navnet mitt» er rekkefølgen hele poenget – der skal navnet stå
+       * som et navn, ikke sortert alfabetisk slik de andre rundene gjør. */
+      brikker.classList.toggle('oppsum-brikker--navn', okt.type === 'navn');
+      var funnet = okt.type === 'navn'
+        ? okt.ko.slice()
+        : Object.keys(okt.telling).sort();
       funnet.forEach(function (b, n) {
         var brikke = document.createElement('span');
         brikke.className = 'oppsum-brikke';
         brikke.style.animationDelay = (okt.oppsett.antall * 130 + 160 + n * 90) + 'ms';
-        brikke.innerHTML = '<b>' + b + '</b><i>' + ordFor(okt.verden, b).ikon + '</i>';
+        brikke.innerHTML = okt.type === 'navn'
+          ? '<b>' + b + '</b>'
+          : '<b>' + b + '</b><i>' + ordFor(okt.verden, b).ikon + '</i>';
         brikker.appendChild(brikke);
       });
 
@@ -3649,7 +3995,9 @@ var Moduser = (function () {
 
       var tekst = 'Klarte ' + okt.riktigForste + ' av ' + okt.oppsett.antall +
                   ' med én gang.';
-      if (funnet.length) {
+      if (okt.type === 'navn') {
+        tekst = 'Bygde ' + navnet + '. ' + tekst;
+      } else if (funnet.length) {
         tekst += ' Fant ' + listetekst(funnet) + ' selv.';
       }
       if (okt.nyeMestrede.length) {
@@ -3658,9 +4006,11 @@ var Moduser = (function () {
       el('oppsum-tekst').textContent = tekst;
 
       Lyd.ferdig();
-      var hilsen = okt.nyeMestrede.length
-        ? 'Se her! ' + bokstavnavnFor(okt.nyeMestrede[0]) + ' kan du nå.'
-        : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
+      var hilsen = okt.type === 'navn'
+        ? navnet + '. Det er navnet ditt!'
+        : okt.nyeMestrede.length
+          ? 'Se her! ' + bokstavnavnFor(okt.nyeMestrede[0]) + ' kan du nå.'
+          : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
       window.setTimeout(function () { Tale.rekke([hilsen]); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
       window.setTimeout(function () { hopp(); }, 400);
@@ -3669,13 +4019,29 @@ var Moduser = (function () {
     }
 
     return {
-      start: function (type, verdenId) {
+      /* «Navnet mitt» sender med bokstavene i navnet som kø; runden er da
+       * nøyaktig så lang som navnet, og har en slutt barnet skjønner. */
+      start: function (type, verdenId, navnkoe) {
         var opps = oppsett();
+        var ko;
+        if (type === 'navn') {
+          ko = (navnkoe || []).slice();
+          if (!ko.length) return false;
+          opps = {
+            antall: ko.length,
+            maksValg: opps.maksValg,
+            bomForHjelp: opps.bomForHjelp,
+            opprykk: opps.opprykk
+          };
+        } else {
+          ko = byggKo(opps.antall);
+        }
+
         okt = {
           type: type,
           verden: verdenId,
           oppsett: opps,
-          ko: byggKo(opps.antall),
+          ko: ko,
           indeks: 0,
           antallValg: 2,
           paRad: 0,
@@ -3687,10 +4053,11 @@ var Moduser = (function () {
         };
 
         Spill.visSkjerm('skjerm-oppgave');
-        Spill.settTopp(type === 'finn' ? 'Finn bokstaven' : 'Første lyd', true);
+        Spill.settTopp(MODUSTITTEL[type] || 'Finn bokstaven', true);
         stillFigurTilStart();
         Spill.settTastLytter(tastesvar);
         visOppgave();
+        return true;
       },
 
       videre: videre,
@@ -3706,9 +4073,109 @@ var Moduser = (function () {
     };
   })();
 
+  /* ================= 4. Alfabetløypa ================= */
+
+  /* En rolig tur fra A til Å, ett trykk per bokstav. Dette er ikke en
+   * oppgave: han blir lest for, slik dere leser alfabetboka sammen. Derfor
+   * ingen valg, ingen feil og ingen stjerner – bare bokstaven, bildet og
+   * ordet, og en figur som kommer litt lenger for hvert trykk. */
+  var Loype = (function () {
+    var verdenId = 'bane';
+    var indeks = 0;
+    var ferdig = false;
+    var naarFerdig = null;
+
+    function si() {
+      var b = ALFABET[indeks];
+      var navn = bokstavnavnFor(b);
+      Tale.stopp();
+      Tale.rekke([
+        navn + '.', 450,
+        navn + ' for ' + tilTale(ordFor(verdenId, b).ord) + '.'
+      ]);
+    }
+
+    function settKnapp(ikon, tekst) {
+      el('loype-videre-ikon').innerHTML = Figurer.ikon(ikon);
+      el('loype-videre-tekst').textContent = tekst;
+      el('loype-videre').setAttribute('aria-label', tekst);
+    }
+
+    function tegn() {
+      var b = ALFABET[indeks];
+      var oppslag = ordFor(verdenId, b);
+      var siste = indeks + 1 >= ALFABET.length;
+
+      el('loype-bokstav').textContent = b;
+      el('loype-bokstav').classList.remove('smal');
+      el('loype-ikon').textContent = oppslag.ikon;
+      el('loype-ord').textContent = oppslag.ord;
+      el('loype-teller').textContent = (indeks + 1) + ' av ' + ALFABET.length;
+      el('loype-fyll').style.width =
+        ((indeks + 1) / ALFABET.length * 100) + '%';
+      spillOm(el('loype-kort'), 'bytter', 460);
+      settKnapp(siste ? 'malflagg' : 'pil', siste ? 'Se hvor langt du kom' : 'Neste');
+
+      /* Figuren står der i alfabetet han er – framdriften synes i scenen. */
+      kjorTil(verdenId, indeks / (ALFABET.length - 1));
+      si();
+      el('loype-videre').focus();
+    }
+
+    function avslutt() {
+      ferdig = true;
+      el('loype-bokstav').textContent = 'A–Å';
+      el('loype-bokstav').classList.add('smal');
+      el('loype-ikon').textContent = verdenId === 'oy' ? '🏝️' : '🏁';
+      el('loype-ord').textContent = 'Hele alfabetet!';
+      el('loype-teller').textContent = ALFABET.length + ' av ' + ALFABET.length;
+      spillOm(el('loype-kort'), 'bytter', 460);
+      settKnapp('malflagg', 'Tilbake');
+      Spill.settTastLytter(null);
+      Lyd.ferdig();
+      hopp();
+      Tale.stopp();
+      Tale.rekke(['Der var hele alfabetet! Fra a til å.']);
+    }
+
+    function videre() {
+      if (ferdig) { if (naarFerdig) naarFerdig(); return; }
+      if (indeks + 1 >= ALFABET.length) { avslutt(); return; }
+      indeks += 1;
+      tegn();
+    }
+
+    /* Trykker han på en bokstavtast, hopper løypa dit. Samme kobling mellom
+     * tast og tegn som i Garasjen. */
+    function hoppTil(bokstav) {
+      var n = ALFABET.indexOf(bokstav);
+      if (n === -1 || ferdig) return;
+      indeks = n;
+      tegn();
+    }
+
+    return {
+      start: function (id, ferdigHandling) {
+        verdenId = id;
+        indeks = 0;
+        ferdig = false;
+        naarFerdig = ferdigHandling || null;
+        Spill.visSkjerm('skjerm-loype');
+        Spill.settTopp('Alfabetløypa', true);
+        stillFigurTilStart();
+        Spill.settTastLytter(hoppTil);
+        tegn();
+      },
+      videre: videre,
+      gjenta: function () { if (!ferdig) si(); },
+      stopp: function () { Spill.settTastLytter(null); Tale.stopp(); }
+    };
+  })();
+
   return {
     Utforsk: Utforsk,
     Oppgave: Oppgave,
+    Loype: Loype,
     kjorTil: kjorTil,
     hopp: hopp
   };
@@ -3731,6 +4198,7 @@ var Spill = (function () {
   var MED_FIGUR = {
     'skjerm-meny': true,
     'skjerm-utforsk': true,
+    'skjerm-loype': true,
     'skjerm-oppgave': true,
     'skjerm-oppsummering': true,
     'skjerm-samling': true
@@ -3931,33 +4399,96 @@ var Spill = (function () {
       felt.appendChild(b);
     }
 
-    flis(Figurer.ikon(naVerden === 'oy' ? 'kart' : 'garasje'), v.utforsk,
-      'Trykk på en bokstav og hør den', function () {
-      Lyd.klikk();
-      tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
-      Moduser.Utforsk.start(naVerden);
+    /* Menyen slipper til én modus om gangen, i stigende vanskegrad. Åtte
+     * fliser på én gang er en vegg av valg for en treåring.
+     *
+     * Låsingen går bare én vei: så snart en modus har vist seg, låses den
+     * opp for godt. At noe han fant i går er borte i dag, kan han ikke lese
+     * seg til forklaringen på – da er det bare vekk. */
+    moduser().forEach(function (m) {
+      /* En modus som ikke kan kjøres i det hele tatt – «Navnet mitt» uten et
+       * navn – skal ikke stå der som en flis som ikke gjør noe. */
+      if (m.mulig && !m.mulig()) return;
+      if (m.apen()) Lagring.laasOpp(m.id);
+      if (!Lagring.erLaastOpp(m.id) && !Lagring.innstilling('visAlleModuser')) return;
+      flis(Figurer.ikon(m.ikon), m.navn, m.tekst, m.start);
     });
-
-    flis(Figurer.ikon('finn'), 'Finn bokstaven', 'Hør bokstaven, og velg riktig skilt', function () {
-      Lyd.klikk();
-      startOppgave('finn');
-    });
-
-    flis(Figurer.ikon('lyd'), 'Første lyd', 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
-      function () {
-        Lyd.klikk();
-        startOppgave('forstelyd');
-      });
 
     var antall = Lagring.mestrede().length;
     flis(Figurer.ikon('stjerne'), 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
       function () { Lyd.klikk(); visSamling(); });
   }
 
+  /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
+   * dem slipper til. */
+  function moduser() {
+    var v = VERDENER[naVerden];
+    return [
+      {
+        id: 'utforsk',
+        ikon: naVerden === 'oy' ? 'kart' : 'garasje',
+        navn: v.utforsk,
+        tekst: 'Trykk på en bokstav og hør den',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
+          Moduser.Utforsk.start(naVerden);
+        }
+      },
+      {
+        id: 'loype',
+        ikon: 'loype',
+        navn: 'Alfabetløypa',
+        tekst: 'Hele alfabetet, ett trykk om gangen',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Loype.stopp(); visMeny(); };
+          Moduser.Loype.start(naVerden, function () {
+            Moduser.Loype.stopp();
+            visMeny();
+          });
+        }
+      },
+      {
+        id: 'navn',
+        ikon: 'navn',
+        navn: 'Navnet mitt',
+        tekst: 'Bygg navnet ditt, bokstav for bokstav',
+        /* Uten et navn i foreldremenyen finnes det ingenting å bygge. */
+        mulig: function () { return navnBokstaver(Lagring.barnenavn()).length > 0; },
+        apen: function () { return true; },
+        start: function () { Lyd.klikk(); startOppgave('navn'); }
+      },
+      {
+        id: 'finn',
+        ikon: 'finn',
+        navn: 'Finn bokstaven',
+        tekst: 'Hør bokstaven, og velg riktig skilt',
+        apen: function () { return true; },
+        start: function () { Lyd.klikk(); startOppgave('finn'); }
+      },
+      {
+        id: 'forstelyd',
+        ikon: 'lyd',
+        navn: 'Første lyd',
+        tekst: 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
+        /* Lydanalyse krever at bokstavene sitter først. */
+        apen: function () { return Lagring.mestrede().length >= 8; },
+        start: function () { Lyd.klikk(); startOppgave('forstelyd'); }
+      }
+    ];
+  }
+
   function startOppgave(type) {
+    var navnkoe = type === 'navn' ? navnBokstaver(Lagring.barnenavn()) : null;
+    /* Er navnet tatt bort igjen i foreldremenyen, finnes det ingen runde å
+     * starte. Da blir vi stående i menyen framfor å vise en tom skjerm. */
+    if (type === 'navn' && !navnkoe.length) { visMeny(); return; }
     sisteModus = type;
     tilbakeHandling = function () { Moduser.Oppgave.stopp(); visMeny(); };
-    Moduser.Oppgave.start(type, naVerden);
+    Moduser.Oppgave.start(type, naVerden, navnkoe);
   }
 
   function settOppsummering(type) {
@@ -4014,6 +4545,7 @@ var Spill = (function () {
     el('inn-lyd').checked = Lagring.innstilling('lyd');
     el('inn-vis-mal').checked = Lagring.innstilling('visMal');
     el('inn-bevegelse').checked = Lagring.innstilling('bevegelse');
+    el('inn-alle-moduser').checked = Lagring.innstilling('visAlleModuser');
     el('inn-fart').value = Lagring.innstilling('talefart');
     visFart();
 
@@ -4032,6 +4564,9 @@ var Spill = (function () {
     } else {
       merknad.hidden = true;
     }
+
+    el('inn-barnenavn').value = Lagring.barnenavn();
+    visBarnenavn();
 
     el('inn-navn-bane').value = Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '';
     el('inn-navn-bane').placeholder = VERDENER.bane.standardnavn;
@@ -4193,11 +4728,29 @@ var Spill = (function () {
     });
   }
 
+  /* Viser hvilke bokstaver spillet faktisk kommer til å bruke, så den voksne
+   * ser resultatet med én gang: «Ida Marie» blir I·D·A. */
+  function visBarnenavn() {
+    var bokstaver = navnBokstaver(el('inn-barnenavn').value);
+    var linje = el('barnenavn-vis');
+    if (!el('inn-barnenavn').value.trim()) {
+      linje.textContent = '';
+    } else if (!bokstaver.length) {
+      linje.textContent = 'Fant ingen bokstaver spillet kjenner igjen her.';
+    } else {
+      linje.textContent = 'Spiller med: ' + bokstaver.join('·') +
+        ' (' + bokstaver.length + ' oppgaver)';
+    }
+  }
+
   function lukkForeldre() {
     var navnBane = el('inn-navn-bane').value.trim();
     var navnOy = el('inn-navn-oy').value.trim();
     if (navnBane) Lagring.settNavn('bane', navnBane);
     if (navnOy) Lagring.settNavn('oy', navnOy);
+    /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
+     * bort «Navnet mitt» igjen. */
+    Lagring.settBarnenavn(el('inn-barnenavn').value);
     el('foreldre').hidden = true;
     /* Tilbake til et trygt sted – innstillingene kan ha endret bokstavutvalget. */
     if (naVerden) visMeny(); else visVerden();
@@ -4260,6 +4813,14 @@ var Spill = (function () {
       Moduser.Utforsk.gjenta();
     });
 
+    pa('loype-videre', 'click', function () {
+      Lyd.klikk();
+      Moduser.Loype.videre();
+    });
+    pa('loype-lytt', 'click', function () {
+      Moduser.Loype.gjenta();
+    });
+
     pa('oppsum-igjen', 'click', function () {
       Lyd.klikk();
       startOppgave(sisteModus || 'finn');
@@ -4315,6 +4876,10 @@ var Spill = (function () {
       Lagring.settInnstilling('bevegelse', this.checked);
       settBevegelse();
     });
+    pa('inn-alle-moduser', 'change', function () {
+      Lagring.settInnstilling('visAlleModuser', this.checked);
+    });
+    pa('inn-barnenavn', 'input', visBarnenavn);
     pa('inn-stemmevalg', 'change', function () {
       Tale.velgStemme(this.value || null);
       visIBruk();

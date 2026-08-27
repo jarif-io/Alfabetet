@@ -206,6 +206,28 @@ var Figurer = (function () {
           '<rect x="21" y="16" width="6" height="6"/><rect x="33" y="15" width="4" height="7"/>' +
         '</g>' +
       '</svg>',
+    /* Alfabetløypa: en vei som svinger fra start til mål. */
+    loype:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M12 40c0-12 26-9 26-19 0-5-5-8-11-8" fill="none"' +
+          ' stroke="var(--aksent)" stroke-width="7" stroke-linecap="round"/>' +
+        '<path d="M12 40c0-12 26-9 26-19 0-5-5-8-11-8" fill="none"' +
+          ' stroke="#fffdf8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 6"/>' +
+        '<circle cx="12" cy="40" r="4.5" fill="var(--aksent-mork)"/>' +
+        '<circle cx="27" cy="13" r="5.5" fill="var(--aksent-mork)"/>' +
+      '</svg>',
+    /* Navnet mitt: to bokstaver på plass og én rute igjen. */
+    navn:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<rect x="5" y="12" width="38" height="24" rx="4" fill="#fffdf8"' +
+          ' stroke="var(--aksent)" stroke-width="3"/>' +
+        '<g fill="var(--aksent)">' +
+          '<rect x="11" y="19" width="7" height="10" rx="1.5"/>' +
+          '<rect x="20.5" y="19" width="7" height="10" rx="1.5"/>' +
+        '</g>' +
+        '<rect x="30" y="19" width="7" height="10" rx="1.5" fill="none"' +
+          ' stroke="var(--aksent)" stroke-width="2.4" stroke-dasharray="2.5 2.5"/>' +
+      '</svg>',
     lyd:
       '<svg viewBox="0 0 48 48" aria-hidden="true">' +
         '<path d="M8 19h8l10-8v26l-10-8H8z" fill="var(--aksent)"/>' +

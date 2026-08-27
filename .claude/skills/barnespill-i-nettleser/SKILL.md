@@ -144,6 +144,22 @@ var MIGRERINGER = {
 Regelen: **endrer du en standardverdi, spør alltid hva som skjer med dem som
 allerede har spilt** – og skriv en test som seeder gammel lagret tilstand.
 
+**Mål først når animasjonene har lagt seg.** Flisene på menyen flyr inn med en
+kort animasjon. Måler man 400 ms etter at skjermen kom opp, måler man
+posisjoner som ikke finnes et halvsekund senere – i én runde ga det
+«innholdet er 12 piksler for høyt» på noe som passet perfekt. Vent til
+bevegelsen er over før du henter geometri, ellers jager du spøkelser.
+
+**Skill mellom bokser og det som males.** En vid, gjennomsiktig beholder kan
+godt overlappe en knapp uten at noe ser galt ut. Sammenlign de synlige barna –
+stolpen, teksten – ikke foreldrenoden. Og sjekk med et skjermbilde før du
+retter noe: overlappet i landskapsmodus viste seg å ikke finnes.
+
+**Velg elementer på navn, ikke posisjon.** Testene klikket `.flis` nummer 1 for
+å komme til «Finn bokstaven». Da menyen fikk en modus til, pekte nummer 1 et
+annet sted, og seks testfiler feilet på én gang uten at noe var i veien med
+spillet. `{ hasText: 'Finn bokstaven' }` overlever at menyen vokser.
+
 **Test skjermen forelderen faktisk klaget på.** Mobiltesten dekket
 verdensvelgeren, ikke Garasjen, så mobilfeilen i Garasjen overlevde en runde
 med «alt grønt». Når en feil meldes fra en bestemt skjerm eller

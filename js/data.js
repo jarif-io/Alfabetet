@@ -44,6 +44,26 @@ var BOKSTAVNAVN = {
 
 function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
 
+/* Gjør barnets navn om til bokstavene «Navnet mitt» skal bygge.
+ *
+ * Bare det første leddet brukes: «Ida Marie» blir IDA og «Ole-Martin» blir
+ * OLE. Et helt dobbeltnavn er for langt for én runde, og fornavnet er uansett
+ * det barnet kjenner igjen først. Tegn spillet ikke har en bokstav for – som
+ * é i «Zoé» – faller bort, og lengre navn kuttes ved ti bokstaver.
+ *
+ * Blir resultatet tomt, finnes det ikke noe navn å bygge, og modusen holdes
+ * utenfor menyen.
+ */
+function navnBokstaver(navn) {
+  var forste = String(navn || '').trim().split(/[\s\-–—]+/)[0] || '';
+  var ut = [];
+  var store = forste.toUpperCase();
+  for (var i = 0; i < store.length && ut.length < 10; i++) {
+    if (ALFABET.indexOf(store[i]) !== -1) ut.push(store[i]);
+  }
+  return ut;
+}
+
 var VERDENER = {
   bane: {
     id: 'bane',

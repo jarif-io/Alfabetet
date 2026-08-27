@@ -6,11 +6,16 @@
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
-  var NA_VERSJON = 2;
+  var NA_VERSJON = 3;
 
   var standard = {
     versjon: NA_VERSJON,
     navn: { bane: '', oy: '' },
+    /* Barnets eget navn. Tomt = «Navnet mitt» er ikke tilgjengelig ennå. */
+    barnenavn: '',
+    /* Moduser som har dukket opp på menyen. Låsingen går bare én vei: en
+     * modus som forsvinner igjen er uforståelig for en som ikke kan lese. */
+    laasteOpp: [],
     /* framgang['B'] = { riktig: 4, feil: 1, dager: ['2026-08-26', ...] } */
     framgang: {},
     innstillinger: {
@@ -23,7 +28,8 @@ var Lagring = (function () {
       stemmenavn: null,   /* null = spillet velger den beste norske selv */
       visMal: false,    /* bokstaven er skjult til barnet trykker på merket */
       bevegelse: true,  /* la skyer og bølger drive sakte */
-      bokstaver: null   /* null = alle bokstaver er med */
+      bokstaver: null,  /* null = alle bokstaver er med */
+      visAlleModuser: false /* av = menyen slipper til én modus om gangen */
     }
   };
 
@@ -32,14 +38,18 @@ var Lagring = (function () {
    * Hver endring får derfor et steg her, som kjøres én gang på gammel lagring. */
   var MIGRERINGER = {
     /* 2: bokstaven i «Finn bokstaven» ble skjult som standard. */
-    2: function (d) { d.innstillinger.visMal = standard.innstillinger.visMal; }
+    2: function (d) { d.innstillinger.visMal = standard.innstillinger.visMal; },
+
+    /* 3: menyen viser bare det barnet er klar for. «Første lyd» har hittil
+     *    stått der bestandig, så den som allerede har spilt skal ikke
+     *    oppleve at en modus plutselig er borte. */
+    3: function (d) { d.laasteOpp = ['forstelyd']; }
   };
 
+  var maaSkrives = false;
   var data = les();
   /* Migreringen skal ikke bare gjelde denne økten – den skrives ned. */
   if (maaSkrives) skriv();
-
-  var maaSkrives = false;
 
   function les() {
     try {
@@ -49,6 +59,8 @@ var Lagring = (function () {
       /* Slå sammen med standard, så nye felter ikke mangler i gamle lagringer. */
       var ut = kopi(standard);
       if (lest.navn) ut.navn = { bane: lest.navn.bane || '', oy: lest.navn.oy || '' };
+      if (typeof lest.barnenavn === 'string') ut.barnenavn = lest.barnenavn;
+      if (lest.laasteOpp instanceof Array) ut.laasteOpp = lest.laasteOpp.slice();
       if (lest.framgang) ut.framgang = lest.framgang;
       if (lest.innstillinger) {
         for (var k in ut.innstillinger) {
@@ -149,6 +161,29 @@ var Lagring = (function () {
     settNavn: function (verdenId, navn) {
       data.navn[verdenId] = (navn || '').trim().slice(0, 20);
       skriv();
+    },
+
+    /* --- barnets eget navn --- */
+
+    barnenavn: function () { return data.barnenavn; },
+
+    settBarnenavn: function (navn) {
+      data.barnenavn = (navn || '').trim().slice(0, 20);
+      skriv();
+    },
+
+    /* --- moduser som er låst opp --- */
+
+    erLaastOpp: function (id) {
+      return data.laasteOpp.indexOf(id) !== -1;
+    },
+
+    /* Idempotent: å låse opp noe som allerede er låst opp skal ikke skrive. */
+    laasOpp: function (id) {
+      if (data.laasteOpp.indexOf(id) !== -1) return false;
+      data.laasteOpp.push(id);
+      skriv();
+      return true;
     },
 
     /* --- innstillinger --- */

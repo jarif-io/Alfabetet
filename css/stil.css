@@ -646,6 +646,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
   gap: 20px;
   justify-content: center;
+  /* Fliser kan komme til etter hvert som han vokser. Får de ikke plass,
+     skal de kunne rulles til – ikke havne under bakken der de verken er
+     synlige eller mulige å trykke på. Målet er likevel at det aldri
+     trengs; derfor krymper flisene på små skjermer lenger nede. */
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .flis {
@@ -668,6 +674,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .flis:nth-child(2) { animation-delay: 70ms; }
 .flis:nth-child(3) { animation-delay: 140ms; }
 .flis:nth-child(4) { animation-delay: 210ms; }
+.flis:nth-child(5) { animation-delay: 280ms; }
+.flis:nth-child(6) { animation-delay: 350ms; }
 .flis:hover { transform: translateY(-7px); box-shadow: var(--sk-3); }
 .flis:active { transform: translateY(-1px); }
 
@@ -910,6 +918,43 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   color: var(--blekk);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
 }
+/* «Navnet mitt»: navnet som ruter. Det han har bygd står ferdig, ruten han
+   holder på med er et spørsmålstegn å trykke på, og resten er tomme – ser han
+   hele navnet ferdig skrevet, er oppgaven å avskrive og ikke å kjenne igjen. */
+.oppdrag-mal--navn {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  cursor: pointer;
+  max-width: 100%;
+}
+.navnrute {
+  width: 72px; height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  font-size: 2.9rem;
+  line-height: 1;
+  color: var(--aksent);
+  background: rgba(255, 253, 248, .7);
+  box-shadow: inset 0 0 0 3px rgba(40, 30, 15, .12);
+  text-shadow: none;
+}
+.navnrute.full {
+  color: #fff;
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+  box-shadow: var(--sk-1);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+}
+.navnrute.na {
+  background: rgba(255, 253, 248, .96);
+  box-shadow: inset 0 0 0 5px var(--aksent), var(--sk-2);
+}
+.oppdrag-mal--navn:hover .navnrute.na { transform: translateY(-3px); }
+.oppdrag-mal--navn:active .navnrute.na { transform: translateY(1px) scale(.98); }
+.navnrute.lander { animation: kort-bytt 500ms cubic-bezier(.3, 1.4, .5, 1); }
+
 .oppdrag-mal.bytter { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
 
 .valg {
@@ -1140,6 +1185,20 @@ body[data-verden="oy"] .skilt::after {
 }
 .oppsum-brikke i { font-style: normal; font-size: 1rem; line-height: 1; }
 
+/* «Navnet mitt» ender med navnet hans, ikke med en alfabetisk liste. Da skal
+   brikkene stå tett nok til at det leses som ett ord. */
+.oppsum-brikker--navn { gap: 5px; }
+.oppsum-brikker--navn .oppsum-brikke {
+  min-width: 46px;
+  padding: 9px 8px;
+  background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
+}
+.oppsum-brikker--navn .oppsum-brikke b {
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+}
+
 .oppsum-ny {
   display: flex;
   align-items: center;
@@ -1172,6 +1231,38 @@ body[data-verden="oy"] .skilt::after {
   text-align: center;
   max-width: 34em;
 }
+
+/* ============================================================
+   11b. Alfabetløypa
+   ============================================================ */
+
+/* En bokstav om gangen, midt på skjermen, med sporet under. Ingen valg og
+   ingen fasit – han blir lest for, slik dere leser alfabetboka sammen. */
+#skjerm-loype { justify-content: center; gap: 22px; }
+
+/* I Garasjen står ordkortet over rutenettet med 29 bokstaver, og da skal det
+   være bredt. Her er kortet det eneste på skjermen, så innholdet samles på
+   midten i stedet for å ligge klint mot venstre kant. */
+.loype-kort {
+  width: min(560px, 100%);
+  justify-content: center;
+}
+.loype-kort .ordkort-innhold { flex: 0 1 auto; }
+
+.loype-spor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.loype-teller {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--blekk-svak);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+}
+/* «A–Å» på slutten er bredere enn én bokstav og må få plass i merket. */
+.ordkort-bokstav.smal { font-size: 2.6rem; letter-spacing: -.02em; }
 
 /* ============================================================
    12. Samlingen
@@ -1625,6 +1716,10 @@ body[data-verden="oy"] .skilt::after {
   .lytt-tekst { display: none; }
   .lyttknapp { padding: 9px 11px; }
 
+  /* Navnet skal helst stå på én linje, ellers leses det ikke som et navn. */
+  .navnrute { width: 48px; height: 58px; font-size: 2rem; border-radius: 13px; }
+  .oppdrag-mal--navn { gap: 6px; }
+
   .bokstavrutenett { gap: 7px; padding: 4px 0; }
   .bokstav { border-radius: 13px; padding: 4px 2px 3px; }
   .bokstav-tegn { font-size: 1.45rem; }
@@ -1652,10 +1747,40 @@ body[data-verden="oy"] .skilt::after {
   .figur { width: 120px; bottom: 20px; }
   .samling-rute { width: 88px; }
   .samling-rute .stor { font-size: 1.9rem; }
-  .menyrad { gap: 12px; }
-  .flis { padding: 16px 16px 14px; }
-  .flis-merke { width: 48px; height: 48px; border-radius: 15px; }
-  .flis-merke svg { width: 30px; height: 30px; }
+  /* Menyen kan komme opp i seks fliser. Stablet loddrett rant den ut av
+     skjermen på telefon, og en treåring som må rulle for å finne modusen
+     sin, finner den ikke. Liggende fliser tar under halve høyden. */
+  .menyrad { gap: 6px; grid-template-columns: 1fr; }
+  .flis {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "merke navn" "merke tekst";
+    align-items: center;
+    column-gap: 13px;
+    row-gap: 1px;
+    padding: 8px 12px 8px 16px;
+  }
+  .flis-merke {
+    grid-area: merke;
+    width: 42px; height: 42px;
+    border-radius: 13px;
+  }
+  .flis-merke svg { width: 26px; height: 26px; }
+  .flis-navn { grid-area: navn; align-self: end; font-size: 1.1rem; }
+  /* Forklaringen er til den voksne. To linjer er nok; resten er uansett
+     ikke det barnet navigerer etter. */
+  /* Forklaringen er til den voksne. Én linje holder flisene like høye, og
+     det er høyden som avgjør om seks moduser får plass uten rulling. */
+  .flis-tekst {
+    grid-area: tekst;
+    align-self: start;
+    font-size: .85rem;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   /* På telefon fyller innstillingene hele skjermen. Da er det aldri tvil om
      hva som ruller, og bunnknappene ligger alltid der de skal. */
   .overlegg { padding: 0; }
@@ -1721,6 +1846,32 @@ body[data-verden="oy"] .skilt::after {
   .lyttknapp { padding: 7px 10px; }
   .prikker { gap: 6px; padding-top: 0; }
   .prikk { width: 10px; height: 10px; }
+
+  /* Samme grep som på smal telefon: liggende fliser, ellers får ikke seks
+     moduser plass på en skjerm som bare er 360 piksler høy. */
+  .menyrad { gap: 10px; }
+  .flis {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "merke navn" "merke tekst";
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 1px;
+    padding: 9px 12px 9px 16px;
+  }
+  .flis-merke { grid-area: merke; width: 42px; height: 42px; border-radius: 13px; }
+  .flis-merke svg { width: 26px; height: 26px; }
+  .flis-navn { grid-area: navn; align-self: center; font-size: 1.05rem; }
+  /* På en telefon på tvers er det ikke høyde til forklaringene. De er
+     uansett til den voksne – barnet kjenner igjen merket og navnet. */
+  .flis { grid-template-areas: "merke navn"; row-gap: 0; }
+  .flis-tekst { display: none; }
+
+  /* Navnet må få plass på én linje – brekker det i to, leses det ikke
+     lenger som navnet hans. */
+  .navnrute { width: 46px; height: 54px; font-size: 1.9rem; border-radius: 12px; }
+  .oppdrag-mal--navn { gap: 6px; }
+  .loype-teller { font-size: .85rem; }
 
   .skilt { width: 74px; height: 74px; font-size: 2.2rem; border-radius: 16px; }
   .skilt::after { height: 18px; width: 10px; }

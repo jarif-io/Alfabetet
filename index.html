@@ -110,7 +110,33 @@
     <div class="bokstavrutenett" id="utforsk-rutenett"></div>
   </section>
 
-  <!-- 6. Oppgave (både «Finn bokstaven» og «Første lyd») -->
+  <!-- 6. Alfabetløypa: A til Å, ett trykk per bokstav -->
+  <section class="skjerm" id="skjerm-loype" hidden>
+    <div class="ordkort loype-kort" id="loype-kort" aria-live="polite">
+      <div class="ordkort-bokstav" id="loype-bokstav">A</div>
+      <div class="ordkort-innhold">
+        <div class="ordkort-ikon" id="loype-ikon">🚑</div>
+        <div class="ordkort-ord" id="loype-ord">Ambulanse</div>
+      </div>
+      <button class="lyttknapp" id="loype-lytt" type="button">
+        <span class="lytt-ikon" aria-hidden="true"></span><span class="lytt-tekst">Hør igjen</span>
+      </button>
+    </div>
+
+    <div class="loype-spor">
+      <div class="framdrift"><span id="loype-fyll"></span></div>
+      <p class="loype-teller" id="loype-teller">1 av 29</p>
+    </div>
+
+    <div class="videre-felt">
+      <button class="knapp knapp--stor knapp--pil" id="loype-videre" type="button">
+        <span class="knapp-ikon" id="loype-videre-ikon" aria-hidden="true"></span>
+        <span class="knapp-tekst" id="loype-videre-tekst">Neste</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 7. Oppgave («Finn bokstaven», «Første lyd» og «Navnet mitt») -->
   <section class="skjerm" id="skjerm-oppgave" hidden>
     <div class="prikker" id="oppgave-prikker" aria-hidden="true"></div>
 
@@ -132,7 +158,7 @@
     </div>
   </section>
 
-  <!-- 7. Oppsummering -->
+  <!-- 8. Oppsummering -->
   <section class="skjerm skjerm--midt" id="skjerm-oppsummering" hidden>
     <div class="stabel panelkort">
       <div class="malflagg" id="oppsum-flagg">🏁</div>
@@ -148,7 +174,7 @@
     </div>
   </section>
 
-  <!-- 8. Samlingen -->
+  <!-- 9. Samlingen -->
   <section class="skjerm" id="skjerm-samling" hidden>
     <h2 class="skjermtittel trinn" id="samling-tittel">Samlingen din</h2>
     <p class="ingress trinn" id="samling-undertekst"></p>
@@ -277,6 +303,17 @@
       <p class="merknad">
         Skru av om barnet lettest holder fokus på en helt stille skjerm.
       </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-alle-moduser">
+        <span class="bryter-spor"></span>
+        <span>Vis alle modusene på menyen</span>
+      </label>
+      <p class="merknad">
+        Normalt slipper spillet til én modus om gangen: de letteste fra start,
+        og «Første lyd» når åtte bokstaver sitter. En modus som først har
+        dukket opp, blir stående – noe som forsvinner igjen er uforståelig for
+        en som ikke kan lese seg til hvorfor.
+      </p>
     </section>
 
     <section class="panel-del">
@@ -299,6 +336,20 @@
       <p class="merknad">
         Fylt = mestret. En bokstav regnes som mestret når han har truffet den
         på tre ulike dager.
+      </p>
+    </section>
+
+    <section class="panel-del">
+      <h3>Barnets navn</h3>
+      <div class="navnrad">
+        <label>Fornavn<input type="text" id="inn-barnenavn" maxlength="20"
+               autocomplete="off" spellcheck="false"></label>
+      </div>
+      <p class="merknad" id="barnenavn-vis"></p>
+      <p class="merknad">
+        Skriver du inn navnet, dukker <b>Navnet mitt</b> opp på menyen. Barn
+        lærer bokstavene i sitt eget navn først og best, fordi de betyr noe.
+        Bare fornavnet brukes, og runden blir like lang som navnet.
       </p>
     </section>
 
