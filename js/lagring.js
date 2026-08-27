@@ -6,9 +6,10 @@
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
+  var NA_VERSJON = 2;
 
   var standard = {
-    versjon: 1,
+    versjon: NA_VERSJON,
     navn: { bane: '', oy: '' },
     /* framgang['B'] = { riktig: 4, feil: 1, dager: ['2026-08-26', ...] } */
     framgang: {},
@@ -20,13 +21,25 @@ var Lagring = (function () {
       niva: 'liten',
       talefart: 0.9,
       stemmenavn: null,   /* null = spillet velger den beste norske selv */
-      visMal: false,    /* start med bokstaven synlig i stedet for skjult */
+      visMal: false,    /* bokstaven er skjult til barnet trykker på merket */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null   /* null = alle bokstaver er med */
     }
   };
 
+  /* Endrer vi en standardverdi, hjelper det ikke for dem som har spilt før:
+   * verdien deres ligger allerede lagret og vinner over den nye standarden.
+   * Hver endring får derfor et steg her, som kjøres én gang på gammel lagring. */
+  var MIGRERINGER = {
+    /* 2: bokstaven i «Finn bokstaven» ble skjult som standard. */
+    2: function (d) { d.innstillinger.visMal = standard.innstillinger.visMal; }
+  };
+
   var data = les();
+  /* Migreringen skal ikke bare gjelde denne økten – den skrives ned. */
+  if (maaSkrives) skriv();
+
+  var maaSkrives = false;
 
   function les() {
     try {
@@ -43,6 +56,14 @@ var Lagring = (function () {
             ut.innstillinger[k] = lest.innstillinger[k];
           }
         }
+      }
+      var fra = typeof lest.versjon === 'number' ? lest.versjon : 1;
+      if (fra < NA_VERSJON) {
+        for (var v = fra + 1; v <= NA_VERSJON; v++) {
+          if (MIGRERINGER[v]) MIGRERINGER[v](ut);
+        }
+        ut.versjon = NA_VERSJON;
+        maaSkrives = true;
       }
       return ut;
     } catch (e) {

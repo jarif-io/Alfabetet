@@ -64,10 +64,10 @@ Spillet er med vilje rolig. Det er ikke en innstilling, men måten det er laget 
   animasjoner som løper, ingen blinking.
 - **Feiringen er kort.** Riktig svar gir ett sekund med figur, lyd og en stjerne —
   så stille.
-- **Ingen blindvei.** Etter to bom viser spillet svaret og lar ham trykke på det
+- **Ingen blindvei.** Bommer han, viser spillet svaret og lar ham trykke på det
   selv, slik at runden alltid ender med at han fikk det til.
-- **En runde er åtte oppgaver**, rundt tre minutter, og slutter av seg selv.
-  Spillet maser aldri om «en runde til».
+- **En runde er kort** — fem oppgaver på standardnivået, et par minutter — og
+  slutter av seg selv. Spillet maser aldri om «en runde til».
 
 Fra start er alt stilt inn på de aller minste: **fem oppgaver i en runde**, to valg å
 se på, og hjelp allerede etter ett bom. Vanskegraden stiger til tre valg etter fire
@@ -92,16 +92,16 @@ telefon. Bekreftelsen forsvinner av seg selv etter noen sekunder.
 På telefon fyller innstillingene hele skjermen, med tittelen øverst og **Lukk**
 nederst hele tiden, så du aldri mister veien ut. Der kan du:
 
-- Skru stemme og lydeffekter av og på, og **justere hvor fort stemmen snakker**.
-  Standardstemmen snakker som regel for fort for en femåring, så den er satt tregere
-  fra start.
+- Skru stemme og lydeffekter av og på, og **velge hvilken stemme** som leser, med
+  en prøveknapp. Farten kan justeres, men ikke sett den for lavt — se «Om stemmen».
 - **Velge nivå.** «Helt liten» (standard, fra ca. 3 år) eller «litt større».
 - **Velge hvilke bokstaver som er med** — for eksempel bare bokstavene i navnet hans,
   eller de dere leser om denne uka. Dette er funksjonen som knytter spillet til
   lesestundene, og for en treåring er det trolig den nyttigste: begynn med tre–fire
   bokstaver i stedet for alle 29.
-- Skru av **«vis bokstaven i oppdraget»**. Da må han kjenne igjen bokstaven kun på
-  lyden — et vanskeligere steg å ta når han begynner å sitte trygt.
+- Slå på **«vis bokstaven med én gang»**. Normalt er bokstaven skjult bak et
+  spørsmålstegn han kan trykke på, så oppgaven blir å kjenne den igjen på lyden.
+  Slår du denne på, står den framme fra start — da blir oppgaven å finne to like.
 - Skru av **«la skyer og bølger drive sakte»**. Bakgrunnen er det eneste i spillet som
   beveger seg av seg selv, og den bruker over to minutter på en runde. Holder han
   lettest fokus på en helt stille skjerm, så slå den av.
@@ -235,13 +235,22 @@ css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
 js/data.js        bokstavene, ordene og navneforslagene  ← denne kan dere endre
 js/figurer.js     bil, skip og landskap, tegnet som SVG
-js/lagring.js     framgang og innstillinger (localStorage)
+js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        norsk talesyntese
 js/lyd.js         lydeffekter, laget av nettleseren selv
 js/moduser.js     de tre modusene
 js/spill.js       navigasjon, scene, tastatur og foreldremeny
 bygg-enfil.js     limer alt sammen til én fil du kan flytte rundt
 ```
+
+
+Framgang og innstillinger lagres i nettleserens `localStorage` — ingen innlogging,
+ingen server, ingenting sendes ut av maskinen.
+
+Endrer vi en standardinnstilling senere, hjelper det ikke for dem som allerede har
+spilt: verdien deres ligger lagret og vinner over den nye standarden. Derfor har
+`js/lagring.js` et versjonsnummer og en liste over migreringer, som kjøres én gang
+på gammel lagring. Framgang og navn røres ikke.
 
 ## Skriftene
 
