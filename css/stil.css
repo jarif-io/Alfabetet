@@ -1565,6 +1565,7 @@ body[data-verden="oy"] .skilt::after {
   border-radius: 999px;
 }
 .ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
+.stemmetall { font-size: .82rem; font-weight: 600; color: var(--blekk-svak); }
 
 .hjelpetekst {
   margin-top: 10px;

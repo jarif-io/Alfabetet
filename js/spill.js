@@ -351,6 +351,13 @@ var Spill = (function () {
     return tekst + '  (' + v.lang + ')';
   }
 
+  /* iPad melder seg som Mac i nyere iOS, så berøringspunkter må med. */
+  function erIOS() {
+    var ua = navigator.userAgent || '';
+    if (/iPad|iPhone|iPod/.test(ua)) return true;
+    return /Mac/.test(navigator.platform || '') && navigator.maxTouchPoints > 1;
+  }
+
   function tegnStemmevalg() {
     var velger = el('inn-stemmevalg');
     var norske = Tale.norskeStemmer();
@@ -395,6 +402,15 @@ var Spill = (function () {
     /* Den lagrede stemmen finnes ikke lenger – da skal det ikke se ut som
      * om den er i bruk. */
     if (velger.value !== (valgt || '')) velger.value = '';
+
+    /* Å vise hva nettleseren faktisk tilbyr gjør det mulig å se forskjell på
+     * «stemmene har ikke kommet ennå» og «nettleseren gir oss dem ikke». */
+    el('stemme-tall').textContent = alle.length
+      ? 'Nettleseren tilbyr ' + alle.length + (alle.length === 1 ? ' stemme, ' : ' stemmer, ') +
+        (norske.length === 0 ? 'ingen norske'
+          : norske.length === 1 ? 'én norsk' : norske.length + ' norske')
+      : 'Nettleseren har ikke meldt om noen stemmer ennå';
+    el('ios-merknad').hidden = !erIOS();
 
     visIBruk();
   }
@@ -586,6 +602,17 @@ var Spill = (function () {
       Tale.prov();
     });
     pa('inn-prov', 'click', function () { visIBruk(); Tale.prov(); });
+
+    pa('inn-let', 'click', function () {
+      Tale.letEtterStemmer();
+      tegnStemmevalg();
+    });
+
+    /* Stemmelista kommer ofte etter at panelet er åpnet – særlig på iOS.
+     * Uten dette ble lista stående som den var da panelet ble tegnet. */
+    Tale.naarStemmerEndres(function () {
+      if (!el('foreldre').hidden) tegnStemmevalg();
+    });
 
     pa('inn-fart', 'input', function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));

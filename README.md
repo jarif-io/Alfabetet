@@ -144,16 +144,21 @@ stemmene er metalliske; de nyere nevrale stemmene er langt bedre, og gratis:
 
 - **Mac:** Systeminnstillinger → Tilgjengelighet → Talt innhold → Systemstemme →
   Tilpass. Last ned **Nora (Premium)**.
-- **iPhone og iPad:** Innstillinger → Tilgjengelighet → Opplest innhold → Stemmer →
-  Norsk (bokmål). Last ned **Nora (forbedret)** eller **(premium)**. Siri-stemmene
-  er ikke tilgjengelige for nettsider, bare for systemet selv.
+- **iPhone og iPad:** her går det dessverre ikke. Safari gir nettsider bare de
+  enkle systemstemmene. Du kan laste ned Nora og Henrik i «forbedret» eller
+  «premium» til telefonen, men Apple lar dem ikke brukes av nettsider — bare av
+  iOS selv. Derfor dukker de ikke opp i lista, uansett hva spillet gjør. På
+  iPhone er det beste å slå av stemmen med høyttalerknappen og lese selv.
 - **Windows:** Innstillinger → Tid og språk → Tale → Legg til stemmer → Norsk bokmål.
   Stemmer som heter **Natural** eller **Online** er de nye. Microsoft Edge viser som
   regel flere av dem enn Chrome gjør.
 
 Spillet plukker den beste norske stemmen det finner av seg selv, men i foreldremenyen
 ligger det en liste over alle stemmene maskinen har, med en **Hør stemmen**-knapp så
-du kan sammenligne og velge selv. Ved siden av knappen står det hvilken stemme som
+du kan sammenligne og velge selv. Under lista står det hvor mange stemmer nettleseren
+faktisk tilbyr, så du kan se forskjell på «stemmene har ikke kommet ennå» og
+«nettleseren gir oss dem ikke». Kommer de sent, oppdaterer lista seg av seg selv —
+og **Søk etter stemmer på nytt** tvinger fram et nytt forsøk. Ved siden av knappen står det hvilken stemme som
 **faktisk er i bruk akkurat nå** — sjekk den hvis du er i tvil om et valg slo inn.
 
 Et par ting som er greie å vite på Mac:

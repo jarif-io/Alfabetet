@@ -76,7 +76,20 @@ var Tale = (function () {
     return norske.length ? norske[0] : null;
   }
 
-  function oppdater() { stemme = finnStemme(); }
+  /* Andre deler av spillet vil vite når stemmelista endrer seg. På iOS kommer
+   * den ofte flere sekunder etter at siden er lastet, og noen ganger først
+   * etter at noe er sagt høyt. */
+  var lyttere = [];
+  var forrigeAntall = -1;
+
+  function oppdater() {
+    stemme = finnStemme();
+    var antall = stotte ? (window.speechSynthesis.getVoices() || []).length : 0;
+    if (antall !== forrigeAntall) {
+      forrigeAntall = antall;
+      for (var i = 0; i < lyttere.length; i++) lyttere[i]();
+    }
+  }
 
   if (stotte) {
     oppdater();
@@ -140,6 +153,8 @@ var Tale = (function () {
 
       try {
         window.speechSynthesis.speak(ytring);
+        /* iOS fyller av og til stemmelista først etter at noe er sagt. */
+        window.setTimeout(oppdater, 400);
       } catch (e) {
         los();
       }
@@ -176,6 +191,12 @@ var Tale = (function () {
 
     /* Brukes av foreldremenyen. */
     norskeStemmer: norskeStemmer,
+    /* Kalles hver gang nettleseren melder om en ny stemmeliste. */
+    naarStemmerEndres: function (fn) { lyttere.push(fn); },
+    letEtterStemmer: function () {
+      forrigeAntall = -1;
+      oppdater();
+    },
     alleStemmer: function () {
       return stotte ? (window.speechSynthesis.getVoices() || []) : [];
     },

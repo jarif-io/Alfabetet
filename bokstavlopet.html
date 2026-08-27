@@ -1605,6 +1605,7 @@ body[data-verden="oy"] .skilt::after {
   border-radius: 999px;
 }
 .ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
+.stemmetall { font-size: .82rem; font-weight: 600; color: var(--blekk-svak); }
 
 .hjelpetekst {
   margin-top: 10px;
@@ -1978,6 +1979,19 @@ body[data-verden="oy"] .skilt::after {
         </button>
         <span class="ibruk" id="stemme-ibruk"></span>
       </div>
+      <div class="provrad">
+        <button class="knapp knapp--flat knapp--liten" id="inn-let" type="button">
+          Søk etter stemmer på nytt
+        </button>
+        <span class="stemmetall" id="stemme-tall"></span>
+      </div>
+      <p class="merknad advarsel" id="ios-merknad" hidden>
+        <b>På iPhone og iPad:</b> Safari gir nettsider bare de enkle
+        systemstemmene. Nora og Henrik i «forbedret» eller «premium» kan lastes
+        ned til iPhonen, men Apple lar dem ikke brukes av nettsider — bare av
+        iOS selv. Det er derfor de ikke dukker opp i lista over.
+        På Mac og Windows virker de nedlastede stemmene som de skal.
+      </p>
       <label class="skyver">
         <span>Hvor fort stemmen snakker</span>
         <input type="range" id="inn-fart" min="0.75" max="1.1" step="0.05">
@@ -2751,7 +2765,20 @@ var Tale = (function () {
     return norske.length ? norske[0] : null;
   }
 
-  function oppdater() { stemme = finnStemme(); }
+  /* Andre deler av spillet vil vite når stemmelista endrer seg. På iOS kommer
+   * den ofte flere sekunder etter at siden er lastet, og noen ganger først
+   * etter at noe er sagt høyt. */
+  var lyttere = [];
+  var forrigeAntall = -1;
+
+  function oppdater() {
+    stemme = finnStemme();
+    var antall = stotte ? (window.speechSynthesis.getVoices() || []).length : 0;
+    if (antall !== forrigeAntall) {
+      forrigeAntall = antall;
+      for (var i = 0; i < lyttere.length; i++) lyttere[i]();
+    }
+  }
 
   if (stotte) {
     oppdater();
@@ -2815,6 +2842,8 @@ var Tale = (function () {
 
       try {
         window.speechSynthesis.speak(ytring);
+        /* iOS fyller av og til stemmelista først etter at noe er sagt. */
+        window.setTimeout(oppdater, 400);
       } catch (e) {
         los();
       }
@@ -2851,6 +2880,12 @@ var Tale = (function () {
 
     /* Brukes av foreldremenyen. */
     norskeStemmer: norskeStemmer,
+    /* Kalles hver gang nettleseren melder om en ny stemmeliste. */
+    naarStemmerEndres: function (fn) { lyttere.push(fn); },
+    letEtterStemmer: function () {
+      forrigeAntall = -1;
+      oppdater();
+    },
     alleStemmer: function () {
       return stotte ? (window.speechSynthesis.getVoices() || []) : [];
     },
@@ -4014,6 +4049,13 @@ var Spill = (function () {
     return tekst + '  (' + v.lang + ')';
   }
 
+  /* iPad melder seg som Mac i nyere iOS, så berøringspunkter må med. */
+  function erIOS() {
+    var ua = navigator.userAgent || '';
+    if (/iPad|iPhone|iPod/.test(ua)) return true;
+    return /Mac/.test(navigator.platform || '') && navigator.maxTouchPoints > 1;
+  }
+
   function tegnStemmevalg() {
     var velger = el('inn-stemmevalg');
     var norske = Tale.norskeStemmer();
@@ -4058,6 +4100,15 @@ var Spill = (function () {
     /* Den lagrede stemmen finnes ikke lenger – da skal det ikke se ut som
      * om den er i bruk. */
     if (velger.value !== (valgt || '')) velger.value = '';
+
+    /* Å vise hva nettleseren faktisk tilbyr gjør det mulig å se forskjell på
+     * «stemmene har ikke kommet ennå» og «nettleseren gir oss dem ikke». */
+    el('stemme-tall').textContent = alle.length
+      ? 'Nettleseren tilbyr ' + alle.length + (alle.length === 1 ? ' stemme, ' : ' stemmer, ') +
+        (norske.length === 0 ? 'ingen norske'
+          : norske.length === 1 ? 'én norsk' : norske.length + ' norske')
+      : 'Nettleseren har ikke meldt om noen stemmer ennå';
+    el('ios-merknad').hidden = !erIOS();
 
     visIBruk();
   }
@@ -4249,6 +4300,17 @@ var Spill = (function () {
       Tale.prov();
     });
     pa('inn-prov', 'click', function () { visIBruk(); Tale.prov(); });
+
+    pa('inn-let', 'click', function () {
+      Tale.letEtterStemmer();
+      tegnStemmevalg();
+    });
+
+    /* Stemmelista kommer ofte etter at panelet er åpnet – særlig på iOS.
+     * Uten dette ble lista stående som den var da panelet ble tegnet. */
+    Tale.naarStemmerEndres(function () {
+      if (!el('foreldre').hidden) tegnStemmevalg();
+    });
 
     pa('inn-fart', 'input', function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));
