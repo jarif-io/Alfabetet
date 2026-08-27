@@ -112,6 +112,9 @@ var Moduser = (function () {
 
   /* Vanlig riktig svar: en stjerne lander på skiltet og blir borte igjen. */
   function stjerneLander(vertEl) {
+    /* Skjermen kan være forlatt før forsinkelsen slår til – da er knappen
+     * borte eller skjult, og stjernen ville landet i hjørnet av vinduet. */
+    if (!vertEl.isConnected || vertEl.offsetWidth === 0) return;
     var r = vertEl.getBoundingClientRect();
     var s = document.createElement('span');
     s.className = 'flystjerne';
@@ -135,6 +138,7 @@ var Moduser = (function () {
   /* Ny mestret bokstav er den sjeldne hendelsen, og den eneste som får
    * fanfare: stjerna flyr opp i telleren, og det kommer litt konfetti. */
   function feirMestret(vertEl) {
+    if (!vertEl.isConnected || vertEl.offsetWidth === 0) { Spill.oppdaterTeller(true); return; }
     var teller = el('stjerneteller');
     var r = vertEl.getBoundingClientRect();
     var fraX = r.left + r.width / 2;
@@ -303,7 +307,15 @@ var Moduser = (function () {
       var lettePott = bland(resten);
       while (ko.length < antall) {
         if (!pott.length) pott = bland(trengsMest);
-        ko.push(pott.pop());
+        var neste = pott.pop();
+        /* Samme bokstav to ganger på rad kjennes som at spillet står fast. */
+        if (neste === ko[ko.length - 1] && (pott.length || trengsMest.length > 1)) {
+          if (!pott.length) pott = bland(trengsMest);
+          pott.unshift(neste);
+          neste = pott.pop();
+          if (neste === ko[ko.length - 1] && pott.length) neste = pott.shift();
+        }
+        ko.push(neste);
         if (ko.length < antall && lettePott.length && ko.length % 3 === 2) {
           ko.push(lettePott.pop());
         }
@@ -361,7 +373,9 @@ var Moduser = (function () {
 
       var valgfelt = el('oppgave-valg');
       valgfelt.innerHTML = '';
-      var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, okt.antallValg - 1)));
+      /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
+      var antallValg = Math.min(okt.antallValg, Lagring.aktiveBokstaver().length);
+      var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
       alternativer.forEach(function (bokstav) {
         var b = document.createElement('button');
         b.type = 'button';
@@ -536,9 +550,7 @@ var Moduser = (function () {
         tekst += ' Fant ' + listetekst(funnet) + ' selv.';
       }
       if (okt.nyeMestrede.length) {
-        tekst += ' ' + listetekst(okt.nyeMestrede) +
-                 (okt.nyeMestrede.length === 1 ? ' er nå truffet' : ' er nå truffet') +
-                 ' tre ulike dager.';
+        tekst += ' ' + listetekst(okt.nyeMestrede) + ' er nå truffet tre ulike dager.';
       }
       el('oppsum-tekst').textContent = tekst;
 

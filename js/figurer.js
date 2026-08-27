@@ -125,16 +125,42 @@ var Figurer = (function () {
   /* Åser i to lag gir dybde uten å ta oppmerksomhet. */
   function aser() {
     return '' +
+    /* Fjern ås, nesten i himmelfarge – gir dybde uten å ta plass. */
+    '<svg class="lag lag--fjern" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M0 240V120c70-38 150-46 240-18s170 26 250-6 180-34 270 0 160 30 240-4 130-24 200 4v144z" fill="var(--as-fjern)"/>' +
+    '</svg>' +
     '<svg class="lag lag--bak" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
       '<path d="M0 240V150c90-46 170-40 240-6s150 40 236 2 168-44 254-8 156 34 230-8 148-40 240 6v104z" fill="var(--as-bak)"/>' +
     '</svg>' +
     '<svg class="lag lag--fram" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">' +
       '<path d="M0 200v-64c110-52 196-36 268 6s154 44 244 4 176-34 250 6 152 32 236-14 132-42 202-8v70z" fill="var(--as-fram)"/>' +
+      /* Trær i to grupper. Runde, rolige former i samme grønnfamilie. */
+      '<g fill="var(--tre,#4c8a63)">' +
+        '<rect x="146" y="128" width="9" height="34" rx="4" fill="var(--stamme,#7a5230)"/>' +
+        '<circle cx="150" cy="112" r="26"/>' +
+        '<rect x="210" y="140" width="8" height="28" rx="4" fill="var(--stamme,#7a5230)"/>' +
+        '<circle cx="214" cy="128" r="19"/>' +
+        '<rect x="986" y="124" width="9" height="36" rx="4" fill="var(--stamme,#7a5230)"/>' +
+        '<circle cx="990" cy="106" r="28"/>' +
+        '<rect x="1064" y="142" width="8" height="26" rx="4" fill="var(--stamme,#7a5230)"/>' +
+        '<circle cx="1068" cy="130" r="18"/>' +
+      '</g>' +
     '</svg>';
   }
 
   function oy() {
     return '' +
+    '<svg class="lag lag--fjern" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
+      /* Måker og et seil i det fjerne – havet skal kjennes stort. */
+      '<g fill="none" stroke="var(--as-fjern)" stroke-width="5" stroke-linecap="round">' +
+        '<path d="M170 96c10-11 22-11 30 0M200 96c10-11 22-11 30 0"/>' +
+        '<path d="M640 62c8-9 18-9 25 0M665 62c8-9 18-9 25 0"/>' +
+      '</g>' +
+      '<g fill="var(--as-fjern)">' +
+        '<path d="M1042 176l0-52 34 52z"/>' +
+        '<rect x="1038" y="176" width="42" height="8" rx="4"/>' +
+      '</g>' +
+    '</svg>' +
     '<svg class="lag lag--bak" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
       '<path d="M0 240v-40c120-30 210-22 300 8s180 30 268 0 176-26 262 8 168 26 250-16h120v40z" fill="var(--as-bak)"/>' +
     '</svg>' +
@@ -150,9 +176,55 @@ var Figurer = (function () {
     '</svg>';
   }
 
+  /* ---------- menyikoner ----------
+   *
+   * Tegnet selv i stedet for emoji: emoji ser forskjellig ut på hver
+   * maskin, og det er den forskjellen som får en meny til å se hjemmesnekret
+   * ut. Fargene arves fra verdenens aksentfarge via CSS-variabler. */
+
+  var IKONER = {
+    garasje:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M6 22L24 8l18 14v16a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="var(--aksent)"/>' +
+        '<rect x="13" y="24" width="22" height="17" rx="2" fill="#fffdf8"/>' +
+        '<g stroke="var(--aksent-mork)" stroke-width="2.6" stroke-linecap="round">' +
+          '<path d="M16 29h16M16 34h16"/>' +
+        '</g>' +
+      '</svg>',
+    kart:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M7 12l11-4 12 4 11-4v28l-11 4-12-4-11 4z" fill="#fffdf8" stroke="var(--aksent)" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M14 24c5-6 12 4 19-3" fill="none" stroke="var(--aksent)" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="1 5"/>' +
+        '<path d="M33 28l6 6M39 28l-6 6" stroke="var(--aksent-mork)" stroke-width="3.4" stroke-linecap="round"/>' +
+      '</svg>',
+    finn:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<rect x="9" y="6" width="4" height="37" rx="2" fill="var(--aksent-mork)"/>' +
+        '<path d="M13 8h26l-5 8 5 8H13z" fill="#fffdf8" stroke="var(--aksent)" stroke-width="2.4"/>' +
+        '<g fill="var(--aksent)">' +
+          '<rect x="15" y="10" width="6" height="6"/><rect x="27" y="10" width="6" height="6"/>' +
+          '<rect x="21" y="16" width="6" height="6"/><rect x="33" y="15" width="4" height="7"/>' +
+        '</g>' +
+      '</svg>',
+    lyd:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M8 19h8l10-8v26l-10-8H8z" fill="var(--aksent)"/>' +
+        '<g fill="none" stroke="var(--aksent-mork)" stroke-width="3.2" stroke-linecap="round">' +
+          '<path d="M32 18c3 3 3 9 0 12"/>' +
+          '<path d="M37 14c5 5 5 15 0 20"/>' +
+        '</g>' +
+      '</svg>',
+    stjerne:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M24 5l5.6 11.6L42 18.4l-9 8.9 2.1 12.7L24 34l-11.1 6 2.1-12.7-9-8.9 12.4-1.8z" fill="#e2a017"/>' +
+        '<path d="M24 10.5l3.9 8 8.7 1.2-6.3 6.2 1.5 8.8L24 30.6z" fill="#f2c33d"/>' +
+      '</svg>'
+  };
+
   return {
     bil: bil,
     skip: skip,
+    ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
       return VERDENER[verdenId].figur === 'skip' ? skip() : bil();
     },

@@ -97,7 +97,10 @@ var Spill = (function () {
       b.type = 'button';
       b.className = 'verdenkort verdenkort--' + id;
       b.innerHTML =
-        '<span class="verdenkort-bilde">' + Figurer.figurFor(id) + '</span>' +
+        '<span class="verdenkort-bilde">' +
+          '<span class="verdenkort-scene" aria-hidden="true">' + Figurer.landskapFor(id) + '</span>' +
+          Figurer.figurFor(id) +
+        '</span>' +
         '<span class="verdenkort-under">' +
           '<span class="verdenkort-navn">' + v.navn + '</span>' +
           '<span class="verdenkort-tekst">' +
@@ -184,25 +187,26 @@ var Spill = (function () {
       felt.appendChild(b);
     }
 
-    flis(v.utforskIkon, v.utforsk, 'Trykk på en bokstav og hør den', function () {
+    flis(Figurer.ikon(naVerden === 'oy' ? 'kart' : 'garasje'), v.utforsk,
+      'Trykk på en bokstav og hør den', function () {
       Lyd.klikk();
       tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
       Moduser.Utforsk.start(naVerden);
     });
 
-    flis('🎯', 'Finn bokstaven', 'Hør bokstaven, og velg riktig skilt', function () {
+    flis(Figurer.ikon('finn'), 'Finn bokstaven', 'Hør bokstaven, og velg riktig skilt', function () {
       Lyd.klikk();
       startOppgave('finn');
     });
 
-    flis('👂', 'Første lyd', 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
+    flis(Figurer.ikon('lyd'), 'Første lyd', 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
       function () {
         Lyd.klikk();
         startOppgave('forstelyd');
       });
 
     var antall = Lagring.mestrede().length;
-    flis('⭐', 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
+    flis(Figurer.ikon('stjerne'), 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
       function () { Lyd.klikk(); visSamling(); });
   }
 

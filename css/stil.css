@@ -29,8 +29,11 @@
   --himmel-topp: #b7e0f2;
   --himmel-bunn: #ffe7c9;
   --sol: rgba(255, 236, 190, .85);
+  --as-fjern: #c2dcc6;
   --as-bak: #9ec9a8;
   --as-fram: #7bb18c;
+  --tre: #4c8a63;
+  --stamme: #7a5230;
   --palme: #3f8f6a;
   --grunn-topp: #86b58f;
   --grunn-bunn: #5e8f6c;
@@ -67,8 +70,10 @@ body[data-verden="bane"] {
   --himmel-topp: #8fcdea;
   --himmel-bunn: #ffdcae;
   --sol: rgba(255, 226, 168, .9);
+  --as-fjern: #b6d3ba;
   --as-bak: #8fbb9c;
   --as-fram: #6aa47f;
+  --tre: #4c8a63;
   --grunn-topp: #4a4f5b;
   --grunn-bunn: #33373f;
   --stripe: #f2c33d;
@@ -85,6 +90,7 @@ body[data-verden="oy"] {
   --himmel-topp: #9fd8e8;
   --himmel-bunn: #ffe3b0;
   --sol: rgba(255, 233, 178, .95);
+  --as-fjern: #a9c9cf;
   --as-bak: #cdb98c;
   --as-fram: #b9a173;
   --palme: #3f8f6a;
@@ -182,7 +188,8 @@ body.bevegelse .scene-skyer { animation: driv 190s linear infinite; }
   left: 0; right: 0; bottom: 0;
   width: 100%;
 }
-.scene-landskap .lag--bak { height: 150px; opacity: .85; }
+.scene-landskap .lag--fjern { height: 184px; }
+.scene-landskap .lag--bak { height: 150px; opacity: .9; }
 .scene-landskap .lag--fram { height: 118px; }
 
 .scene-grunn {
@@ -191,6 +198,16 @@ body.bevegelse .scene-skyer { animation: driv 190s linear infinite; }
   height: var(--grunn-h);
   background: linear-gradient(to bottom, var(--grunn-topp), var(--grunn-bunn));
   transition: background 600ms ease;
+}
+
+/* Lys kantlinje øverst på asfalten – veier har kanter. */
+body[data-verden="bane"] .scene-grunn::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 7px;
+  height: 5px;
+  background: rgba(255, 255, 255, .38);
+  border-radius: 3px;
 }
 
 /* Midtstripa på asfalten. Havet har ingen. */
@@ -557,7 +574,27 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   position: relative;
   overflow: hidden;
 }
-.verdenkort-bilde svg { width: 76%; height: auto; position: relative; z-index: 2; }
+.verdenkort-bilde > svg { width: 74%; height: auto; position: relative; z-index: 2; }
+
+.verdenkort-scene { position: absolute; inset: 0; z-index: 1; }
+.verdenkort-scene .lag {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 34px;
+  width: 100%;
+}
+.verdenkort-scene .lag--fjern { height: 92px; }
+.verdenkort-scene .lag--bak { height: 72px; opacity: .9; }
+.verdenkort-scene .lag--fram { height: 54px; }
+
+/* Kortene har hver sin verdenspalett, uavhengig av hvilken som er valgt. */
+.verdenkort--bane .verdenkort-bilde {
+  --as-fjern: #b6d3ba; --as-bak: #8fbb9c; --as-fram: #6aa47f;
+  --tre: #4c8a63; --stamme: #7a5230;
+}
+.verdenkort--oy .verdenkort-bilde {
+  --as-fjern: #a9c9cf; --as-bak: #cdb98c; --as-fram: #b9a173; --palme: #3f8f6a;
+}
 .verdenkort-bilde::after {
   content: "";
   position: absolute;
@@ -616,14 +653,14 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .flis:active { transform: translateY(-1px); }
 
 .flis-merke {
-  width: 62px; height: 62px;
+  width: 64px; height: 64px;
   border-radius: 20px;
   display: grid;
   place-items: center;
-  font-size: 2rem;
   background: var(--aksent-svak);
   box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .05);
 }
+.flis-merke svg { width: 40px; height: 40px; display: block; }
 .flis-navn { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; }
 .flis-tekst { color: var(--blekk-svak); font-size: .93rem; font-weight: 600; line-height: 1.35; }
 
@@ -675,7 +712,16 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 .ordkort-innhold { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
-.ordkort-ikon { font-size: 3.6rem; line-height: 1; }
+.ordkort-ikon {
+  font-size: 2.9rem;
+  line-height: 1;
+  width: 92px; height: 92px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: var(--flate-2);
+  box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .05);
+}
 .ordkort-ord {
   font-family: var(--font-display);
   font-weight: 700;
@@ -798,9 +844,14 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   box-shadow: var(--sk-2);
 }
 .oppdrag-mal .mal-ikon {
-  display: block;
-  font-size: 3.6rem;
-  filter: drop-shadow(0 6px 10px rgba(40, 30, 15, .25));
+  display: grid;
+  place-items: center;
+  font-size: 3.1rem;
+  width: 104px; height: 104px;
+  margin: 0 auto 6px;
+  border-radius: 24px;
+  background: rgba(255, 253, 248, .96);
+  box-shadow: var(--sk-2);
 }
 .oppdrag-mal .mal-ord {
   display: block;
