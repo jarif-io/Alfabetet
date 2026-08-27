@@ -214,6 +214,23 @@ var Figurer = (function () {
           '<path d="M37 14c5 5 5 15 0 20"/>' +
         '</g>' +
       '</svg>',
+    pil:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">' +
+          '<path d="M5 16h20"/><path d="M18 8l8 8-8 8"/>' +
+        '</g>' +
+      '</svg>',
+    malflagg:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<rect x="5" y="3" width="4" height="26" rx="2" fill="currentColor"/>' +
+        '<path d="M9 5h19l-4 6 4 6H9z" fill="currentColor"/>' +
+      '</svg>',
+    oye:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M2 16c4-7 9-10 14-10s10 3 14 10c-4 7-9 10-14 10S6 23 2 16z"' +
+          ' fill="none" stroke="currentColor" stroke-width="3"/>' +
+        '<circle cx="16" cy="16" r="5" fill="currentColor"/>' +
+      '</svg>',
     stemmePa:
       '<svg viewBox="0 0 32 32" aria-hidden="true">' +
         '<path d="M4 12h5l7-6v20l-7-6H4z" fill="currentColor"/>' +

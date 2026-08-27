@@ -33,7 +33,7 @@ Så er det tre ting å gjøre:
 | | Hva det er |
 | --- | --- |
 | **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «L … L for Løve» — samme formel som alfabetbøkene bruker. Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil, fint å slå opp i mens dere leser. |
-| **Finn bokstaven** | Spillet ber om en bokstav, og han velger blant skiltene. Hovedøvelsen. |
+| **Finn bokstaven** | Spillet sier en bokstav, og han velger blant skiltene. Bokstaven er skjult bak et spørsmålstegn han kan trykke på hvis han trenger å se den — ellers ville oppgaven bare vært å finne to like. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? |
 
 **På tastaturet** kan han trykke bokstaven direkte i alle tre. Det er ofte den
@@ -43,6 +43,10 @@ holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
 
 **Trykk på bilen eller skipet**, så tuter den og hopper. Det er det første han
 prøver, og da skal det skje noe.
+
+**Knappen videre** viser en pil, ikke ordet «Videre» — en treåring leser ikke, men
+en pil i samme retning som bilen kjører forstår han. På siste oppgave blir pilen et
+målflagg.
 
 **Høyttalerknappen i toppen** slår stemmen av og på med ett trykk. Vil dere lese
 bokstavene selv i stedet for å høre på talesyntesen, er det den knappen dere
@@ -140,6 +144,9 @@ stemmene er metalliske; de nyere nevrale stemmene er langt bedre, og gratis:
 
 - **Mac:** Systeminnstillinger → Tilgjengelighet → Talt innhold → Systemstemme →
   Tilpass. Last ned **Nora (Premium)**.
+- **iPhone og iPad:** Innstillinger → Tilgjengelighet → Opplest innhold → Stemmer →
+  Norsk (bokmål). Last ned **Nora (forbedret)** eller **(premium)**. Siri-stemmene
+  er ikke tilgjengelige for nettsider, bare for systemet selv.
 - **Windows:** Innstillinger → Tid og språk → Tale → Legg til stemmer → Norsk bokmål.
   Stemmer som heter **Natural** eller **Online** er de nye. Microsoft Edge viser som
   regel flere av dem enn Chrome gjør.

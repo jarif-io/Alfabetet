@@ -437,6 +437,22 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 .knapp--stor { font-size: 1.45rem; padding: 19px 52px 16px; }
+
+/* Pilen er det en treåring leser, ikke ordet. */
+.knapp--pil {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 34px 14px 28px;
+}
+.knapp--pil .knapp-ikon { display: block; }
+.knapp--pil .knapp-ikon svg { width: 38px; height: 38px; display: block; }
+.knapp--pil .knapp-tekst { display: block; line-height: 1.2; text-shadow: 0 1px 1px rgba(0, 0, 0, .22); }
+
+/* Felle verdt å huske: en klasse som setter display overstyrer nettleserens
+   egen regel for [hidden], og da blir knappen stående synlig selv om koden
+   tror den er skjult. Disse to må derfor sies eksplisitt. */
+.knapp[hidden], .lyttknapp[hidden] { display: none; }
 .knapp--liten { font-size: .95rem; padding: 11px 20px 9px; }
 
 .knapp--flat {
@@ -858,6 +874,16 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   gap: 12px;
   min-height: 0;
 }
+
+/* «Hør igjen» er den knappen han bruker mest. Den skal være stor nok til
+   å treffes uten å sikte. */
+#oppgave-lytt, #utforsk-lytt {
+  font-size: 1.1rem;
+  padding: 14px 26px;
+  gap: 12px;
+}
+#oppgave-lytt .lytt-ikon svg,
+#utforsk-lytt .lytt-ikon svg { width: 26px; height: 26px; }
 .oppdrag-tekst {
   margin: 0;
   font-family: var(--font-display);
@@ -868,6 +894,10 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 .oppdrag-mal {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: default;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 4rem;
@@ -890,7 +920,20 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
   text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
   box-shadow: var(--sk-2);
+  transition: transform 140ms ease, box-shadow 140ms ease;
 }
+
+/* Skjult bokstav: et spørsmålstegn som ser ut som noe man kan trykke på.
+   Da handler oppgaven om lyden, ikke om å finne to like tegn. */
+.oppdrag-mal--bokstav.skjult {
+  cursor: pointer;
+  color: var(--aksent);
+  background: rgba(255, 253, 248, .96);
+  text-shadow: none;
+  box-shadow: inset 0 0 0 5px var(--aksent), var(--sk-2);
+}
+.oppdrag-mal--bokstav.skjult:hover { transform: translateY(-3px); }
+.oppdrag-mal--bokstav.skjult:active { transform: translateY(1px) scale(.98); }
 .oppdrag-mal .mal-ikon {
   display: grid;
   place-items: center;
@@ -1856,7 +1899,7 @@ body[data-verden="oy"] .skilt::after {
 
     <div class="oppdrag" id="oppgave-oppdrag">
       <p class="oppdrag-tekst" id="oppgave-tekst">Kjør til</p>
-      <div class="oppdrag-mal" id="oppgave-mal"></div>
+      <button class="oppdrag-mal" id="oppgave-mal" type="button"></button>
       <button class="lyttknapp" id="oppgave-lytt" type="button">
         <span class="lytt-ikon" aria-hidden="true"></span><span class="lytt-tekst">Hør igjen</span>
       </button>
@@ -1865,8 +1908,9 @@ body[data-verden="oy"] .skilt::after {
     <div class="valg" id="oppgave-valg"></div>
 
     <div class="videre-felt">
-      <button class="knapp knapp--stor" id="oppgave-videre" type="button" hidden>
-        <span>Videre</span>
+      <button class="knapp knapp--stor knapp--pil" id="oppgave-videre" type="button" hidden>
+        <span class="knapp-ikon" id="videre-ikon" aria-hidden="true"></span>
+        <span class="knapp-tekst" id="videre-tekst">Videre</span>
       </button>
     </div>
   </section>
@@ -1987,10 +2031,13 @@ body[data-verden="oy"] .skilt::after {
       <label class="bryter">
         <input type="checkbox" id="inn-vis-mal">
         <span class="bryter-spor"></span>
-        <span>Vis bokstaven i oppdraget</span>
+        <span>Vis bokstaven med én gang</span>
       </label>
       <p class="merknad">
-        Slås denne av, må barnet kjenne igjen bokstaven kun på lyden.
+        Normalt er bokstaven skjult bak et spørsmålstegn, så oppgaven blir å
+        kjenne den igjen på lyden. Barnet kan alltid trykke på spørsmålstegnet
+        for å se den. Slår du denne på, står bokstaven framme fra start – da
+        blir oppgaven å finne to like.
       </p>
       <label class="bryter">
         <input type="checkbox" id="inn-bevegelse">
@@ -2216,7 +2263,7 @@ var Lagring = (function () {
       niva: 'liten',
       talefart: 0.9,
       stemmenavn: null,   /* null = spillet velger den beste norske selv */
-      visMal: true,     /* vis bokstaven i oppdraget, ikke bare si den */
+      visMal: false,    /* start med bokstaven synlig i stedet for skjult */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null   /* null = alle bokstaver er med */
     }
@@ -2571,6 +2618,23 @@ var Figurer = (function () {
           '<path d="M32 18c3 3 3 9 0 12"/>' +
           '<path d="M37 14c5 5 5 15 0 20"/>' +
         '</g>' +
+      '</svg>',
+    pil:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">' +
+          '<path d="M5 16h20"/><path d="M18 8l8 8-8 8"/>' +
+        '</g>' +
+      '</svg>',
+    malflagg:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<rect x="5" y="3" width="4" height="26" rx="2" fill="currentColor"/>' +
+        '<path d="M9 5h19l-4 6 4 6H9z" fill="currentColor"/>' +
+      '</svg>',
+    oye:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M2 16c4-7 9-10 14-10s10 3 14 10c-4 7-9 10-14 10S6 23 2 16z"' +
+          ' fill="none" stroke="currentColor" stroke-width="3"/>' +
+        '<circle cx="16" cy="16" r="5" fill="currentColor"/>' +
       '</svg>',
     stemmePa:
       '<svg viewBox="0 0 32 32" aria-hidden="true">' +
@@ -3317,7 +3381,10 @@ var Moduser = (function () {
         (okt.type === 'finn' ? 'oppdrag-mal--bokstav' : 'oppdrag-mal--ord');
       if (okt.type === 'finn') {
         el('oppgave-tekst').textContent = v.oppdrag;
-        mal.textContent = Lagring.innstilling('visMal') ? okt.fasit : '?';
+        /* Bokstaven er skjult, ellers er oppgaven bare å finne to like.
+         * Trykker han på merket, kommer den fram – hjelp når han trenger den. */
+        okt.malVist = !!Lagring.innstilling('visMal');
+        tegnMal();
       } else {
         var oppslag = ordFor(okt.verden, okt.fasit);
         el('oppgave-tekst').textContent = 'Hvilken bokstav begynner ordet på?';
@@ -3345,6 +3412,27 @@ var Moduser = (function () {
 
       Tale.stopp();
       Tale.rekke(sporsmalstale());
+    }
+
+    /* Tegner oppdragsmerket: enten et spørsmålstegn å trykke på, eller
+     * bokstaven når den er avslørt. */
+    function tegnMal() {
+      var mal = el('oppgave-mal');
+      if (okt.type !== 'finn') return;
+      mal.classList.toggle('skjult', !okt.malVist);
+      mal.textContent = okt.malVist ? okt.fasit : '?';
+      mal.setAttribute('aria-label', okt.malVist
+        ? 'Bokstaven er ' + bokstavnavnFor(okt.fasit)
+        : 'Trykk for å se bokstaven');
+    }
+
+    function visMal() {
+      if (!okt || okt.type !== 'finn' || okt.malVist) return false;
+      okt.malVist = true;
+      tegnMal();
+      spillOm(el('oppgave-mal'), 'bytter', 460);
+      Lyd.klikk();
+      return true;
     }
 
     function knappFor(bokstav) {
@@ -3434,9 +3522,13 @@ var Moduser = (function () {
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
 
       var videre = el('oppgave-videre');
+      var siste = okt.indeks + 1 >= okt.oppsett.antall;
       videre.hidden = false;
-      videre.querySelector('span').textContent =
-        okt.indeks + 1 >= okt.oppsett.antall ? 'Se hvordan det gikk' : 'Videre';
+      /* En treåring leser ikke «Videre». En pil i samme retning som bilen
+       * kjører forstår han med én gang. */
+      el('videre-ikon').innerHTML = Figurer.ikon(siste ? 'malflagg' : 'pil');
+      el('videre-tekst').textContent = siste ? 'Se hvordan det gikk' : 'Videre';
+      videre.setAttribute('aria-label', el('videre-tekst').textContent);
       videre.focus();
     }
 
@@ -3546,6 +3638,7 @@ var Moduser = (function () {
       },
 
       videre: videre,
+      visMal: visMal,
 
       gjentaSporsmal: function () {
         if (!okt) return;
@@ -4086,6 +4179,10 @@ var Spill = (function () {
     });
     pa('oppgave-lytt', 'click', function () {
       Moduser.Oppgave.gjentaSporsmal();
+    });
+    /* Trykk på merket avslører bokstaven, og sier den samtidig. */
+    pa('oppgave-mal', 'click', function () {
+      if (Moduser.Oppgave.visMal()) Moduser.Oppgave.gjentaSporsmal();
     });
     pa('utforsk-lytt', 'click', function () {
       Moduser.Utforsk.gjenta();

@@ -116,7 +116,7 @@
 
     <div class="oppdrag" id="oppgave-oppdrag">
       <p class="oppdrag-tekst" id="oppgave-tekst">Kjør til</p>
-      <div class="oppdrag-mal" id="oppgave-mal"></div>
+      <button class="oppdrag-mal" id="oppgave-mal" type="button"></button>
       <button class="lyttknapp" id="oppgave-lytt" type="button">
         <span class="lytt-ikon" aria-hidden="true"></span><span class="lytt-tekst">Hør igjen</span>
       </button>
@@ -125,8 +125,9 @@
     <div class="valg" id="oppgave-valg"></div>
 
     <div class="videre-felt">
-      <button class="knapp knapp--stor" id="oppgave-videre" type="button" hidden>
-        <span>Videre</span>
+      <button class="knapp knapp--stor knapp--pil" id="oppgave-videre" type="button" hidden>
+        <span class="knapp-ikon" id="videre-ikon" aria-hidden="true"></span>
+        <span class="knapp-tekst" id="videre-tekst">Videre</span>
       </button>
     </div>
   </section>
@@ -247,10 +248,13 @@
       <label class="bryter">
         <input type="checkbox" id="inn-vis-mal">
         <span class="bryter-spor"></span>
-        <span>Vis bokstaven i oppdraget</span>
+        <span>Vis bokstaven med én gang</span>
       </label>
       <p class="merknad">
-        Slås denne av, må barnet kjenne igjen bokstaven kun på lyden.
+        Normalt er bokstaven skjult bak et spørsmålstegn, så oppgaven blir å
+        kjenne den igjen på lyden. Barnet kan alltid trykke på spørsmålstegnet
+        for å se den. Slår du denne på, står bokstaven framme fra start – da
+        blir oppgaven å finne to like.
       </p>
       <label class="bryter">
         <input type="checkbox" id="inn-bevegelse">

@@ -397,6 +397,22 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 .knapp--stor { font-size: 1.45rem; padding: 19px 52px 16px; }
+
+/* Pilen er det en treåring leser, ikke ordet. */
+.knapp--pil {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 34px 14px 28px;
+}
+.knapp--pil .knapp-ikon { display: block; }
+.knapp--pil .knapp-ikon svg { width: 38px; height: 38px; display: block; }
+.knapp--pil .knapp-tekst { display: block; line-height: 1.2; text-shadow: 0 1px 1px rgba(0, 0, 0, .22); }
+
+/* Felle verdt å huske: en klasse som setter display overstyrer nettleserens
+   egen regel for [hidden], og da blir knappen stående synlig selv om koden
+   tror den er skjult. Disse to må derfor sies eksplisitt. */
+.knapp[hidden], .lyttknapp[hidden] { display: none; }
 .knapp--liten { font-size: .95rem; padding: 11px 20px 9px; }
 
 .knapp--flat {
@@ -818,6 +834,16 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   gap: 12px;
   min-height: 0;
 }
+
+/* «Hør igjen» er den knappen han bruker mest. Den skal være stor nok til
+   å treffes uten å sikte. */
+#oppgave-lytt, #utforsk-lytt {
+  font-size: 1.1rem;
+  padding: 14px 26px;
+  gap: 12px;
+}
+#oppgave-lytt .lytt-ikon svg,
+#utforsk-lytt .lytt-ikon svg { width: 26px; height: 26px; }
 .oppdrag-tekst {
   margin: 0;
   font-family: var(--font-display);
@@ -828,6 +854,10 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 .oppdrag-mal {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: default;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 4rem;
@@ -850,7 +880,20 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
   text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
   box-shadow: var(--sk-2);
+  transition: transform 140ms ease, box-shadow 140ms ease;
 }
+
+/* Skjult bokstav: et spørsmålstegn som ser ut som noe man kan trykke på.
+   Da handler oppgaven om lyden, ikke om å finne to like tegn. */
+.oppdrag-mal--bokstav.skjult {
+  cursor: pointer;
+  color: var(--aksent);
+  background: rgba(255, 253, 248, .96);
+  text-shadow: none;
+  box-shadow: inset 0 0 0 5px var(--aksent), var(--sk-2);
+}
+.oppdrag-mal--bokstav.skjult:hover { transform: translateY(-3px); }
+.oppdrag-mal--bokstav.skjult:active { transform: translateY(1px) scale(.98); }
 .oppdrag-mal .mal-ikon {
   display: grid;
   place-items: center;

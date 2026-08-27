@@ -20,7 +20,7 @@ var Lagring = (function () {
       niva: 'liten',
       talefart: 0.9,
       stemmenavn: null,   /* null = spillet velger den beste norske selv */
-      visMal: true,     /* vis bokstaven i oppdraget, ikke bare si den */
+      visMal: false,    /* start med bokstaven synlig i stedet for skjult */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null   /* null = alle bokstaver er med */
     }

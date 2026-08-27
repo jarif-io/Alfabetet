@@ -517,6 +517,10 @@ var Spill = (function () {
     pa('oppgave-lytt', 'click', function () {
       Moduser.Oppgave.gjentaSporsmal();
     });
+    /* Trykk på merket avslører bokstaven, og sier den samtidig. */
+    pa('oppgave-mal', 'click', function () {
+      if (Moduser.Oppgave.visMal()) Moduser.Oppgave.gjentaSporsmal();
+    });
     pa('utforsk-lytt', 'click', function () {
       Moduser.Utforsk.gjenta();
     });

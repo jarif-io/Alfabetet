@@ -368,7 +368,10 @@ var Moduser = (function () {
         (okt.type === 'finn' ? 'oppdrag-mal--bokstav' : 'oppdrag-mal--ord');
       if (okt.type === 'finn') {
         el('oppgave-tekst').textContent = v.oppdrag;
-        mal.textContent = Lagring.innstilling('visMal') ? okt.fasit : '?';
+        /* Bokstaven er skjult, ellers er oppgaven bare å finne to like.
+         * Trykker han på merket, kommer den fram – hjelp når han trenger den. */
+        okt.malVist = !!Lagring.innstilling('visMal');
+        tegnMal();
       } else {
         var oppslag = ordFor(okt.verden, okt.fasit);
         el('oppgave-tekst').textContent = 'Hvilken bokstav begynner ordet på?';
@@ -396,6 +399,27 @@ var Moduser = (function () {
 
       Tale.stopp();
       Tale.rekke(sporsmalstale());
+    }
+
+    /* Tegner oppdragsmerket: enten et spørsmålstegn å trykke på, eller
+     * bokstaven når den er avslørt. */
+    function tegnMal() {
+      var mal = el('oppgave-mal');
+      if (okt.type !== 'finn') return;
+      mal.classList.toggle('skjult', !okt.malVist);
+      mal.textContent = okt.malVist ? okt.fasit : '?';
+      mal.setAttribute('aria-label', okt.malVist
+        ? 'Bokstaven er ' + bokstavnavnFor(okt.fasit)
+        : 'Trykk for å se bokstaven');
+    }
+
+    function visMal() {
+      if (!okt || okt.type !== 'finn' || okt.malVist) return false;
+      okt.malVist = true;
+      tegnMal();
+      spillOm(el('oppgave-mal'), 'bytter', 460);
+      Lyd.klikk();
+      return true;
     }
 
     function knappFor(bokstav) {
@@ -485,9 +509,13 @@ var Moduser = (function () {
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
 
       var videre = el('oppgave-videre');
+      var siste = okt.indeks + 1 >= okt.oppsett.antall;
       videre.hidden = false;
-      videre.querySelector('span').textContent =
-        okt.indeks + 1 >= okt.oppsett.antall ? 'Se hvordan det gikk' : 'Videre';
+      /* En treåring leser ikke «Videre». En pil i samme retning som bilen
+       * kjører forstår han med én gang. */
+      el('videre-ikon').innerHTML = Figurer.ikon(siste ? 'malflagg' : 'pil');
+      el('videre-tekst').textContent = siste ? 'Se hvordan det gikk' : 'Videre';
+      videre.setAttribute('aria-label', el('videre-tekst').textContent);
       videre.focus();
     }
 
@@ -597,6 +625,7 @@ var Moduser = (function () {
       },
 
       videre: videre,
+      visMal: visMal,
 
       gjentaSporsmal: function () {
         if (!okt) return;
