@@ -150,6 +150,12 @@ posisjoner som ikke finnes et halvsekund senere – i én runde ga det
 «innholdet er 12 piksler for høyt» på noe som passet perfekt. Vent til
 bevegelsen er over før du henter geometri, ellers jager du spøkelser.
 
+**Ellipse er en feil som ser ut som design.** Ordkortet hadde
+`text-overflow: ellipsis` på ordet, og da plassen tok slutt sto det «sju br…»
+i stedet for «sju bregner». Ingenting krasjet, ingenting stakk utenfor, og
+alle overlapp-testene var grønne – teksten var bare borte. Der en tekst
+faktisk skal leses, mål `scrollWidth > clientWidth` og la det være en feil.
+
 **Skill mellom bokser og det som males.** En vid, gjennomsiktig beholder kan
 godt overlappe en knapp uten at noe ser galt ut. Sammenlign de synlige barna –
 stolpen, teksten – ikke foreldrenoden. Og sjekk med et skjermbilde før du

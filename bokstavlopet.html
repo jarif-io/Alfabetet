@@ -803,13 +803,19 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
    8. Utforsk
    ============================================================ */
 
+/* Kortet har fire ting i seg: merket, bildene, ordet og lytteknappen. Før sto
+   alle fire på én linje, og ordet var det eneste som kunne krympe – så det ble
+   kuttet til «sju br…» så snart plassen tok slutt. Nå får lytteknappen falle
+   ned på egen linje i stedet, og ordet skrives alltid helt ut. */
 .ordkort {
   flex: 0 0 auto;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 26px;
+  row-gap: 10px;
   align-self: center;
-  width: min(680px, 100%);
+  width: min(760px, 100%);
   padding: 14px 22px 14px 18px;
   border-radius: var(--r-xl);
   background: rgba(255, 253, 248, .96);
@@ -839,7 +845,21 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   100% { transform: none; }
 }
 
-.ordkort-innhold { display: flex; align-items: center; gap: 20px; flex: 1 1 auto; min-width: 0; }
+/* Grunnbredden holder bildene og ordet samlet. Er det ikke plass til
+   lytteknappen ved siden av, brytes den ned i stedet for å presse ordet. */
+.ordkort .lyttknapp { margin-left: auto; }
+
+.ordkort-innhold {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  row-gap: 8px;
+  /* Naturlig bredde, ikke grådig: får innholdet lov til å vokse, dyttes
+     lytteknappen ned på egen linje selv når det er god plass til den. */
+  flex: 0 1 auto;
+  min-width: 0;
+}
 .ordkort-ikon {
   font-size: 2.9rem;
   line-height: 1;
@@ -851,15 +871,15 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   background: var(--flate-2);
   box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .05);
 }
+/* Ordet skal alltid stå helt. Ellipse her betydde at den voksne ikke kunne
+   lese hva bildet forestiller, og det er hele poenget med teksten. */
 .ordkort-ord {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 2.2rem;
   line-height: 1.1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
 }
 .ordkort-innhold.bytter { animation: trinn-inn 380ms cubic-bezier(.2, .8, .3, 1); }
 
@@ -1464,10 +1484,12 @@ body[data-verden="oy"] .skilt::after {
    være bredt. Her er kortet det eneste på skjermen, så innholdet samles på
    midten i stedet for å ligge klint mot venstre kant. */
 .loype-kort {
-  width: min(560px, 100%);
+  width: min(620px, 100%);
   justify-content: center;
 }
-.loype-kort .ordkort-innhold { flex: 0 1 auto; }
+.loype-kort .ordkort-innhold { flex: 0 1 auto; justify-content: center; }
+/* Lytteknappen står under innholdet når den brytes ned, midtstilt som kortet. */
+.loype-kort .lyttknapp { margin: 0 auto; }
 
 .loype-spor {
   display: flex;
