@@ -470,6 +470,26 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 .knapp--fare::before { display: none; }
 
+/* Knapp som må holdes inne. Fyllingen viser den voksne at noe skjer, og at
+   det tar tid – en dialogboks er bare ett trykk til for et barn som uansett
+   ikke kan lese hva den spør om. */
+.knapp--hold {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.hold-tekst { position: relative; z-index: 1; }
+.hold-fyll {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: rgba(176, 58, 43, .22);
+  pointer-events: none;
+}
+.knapp--hold.holder .hold-fyll { width: 100%; transition: width 2s linear; }
+
 .knapperad { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
 
 .lyttknapp {
@@ -919,11 +939,14 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 /* Én bokstav får samme merke som ellers i spillet, så den ikke blir
    en løs strek på himmelen – særlig viktig for I og J. */
 .oppdrag-mal--bokstav {
-  width: 104px; height: 104px;
+  /* Minst like stort som skiltene (142 px). Merket er det han skal holde
+     i hodet mens han leter; er det mindre enn svarene, peker hierarkiet
+     motsatt vei av oppgaven. */
+  width: 150px; height: 150px;
   display: grid;
   place-items: center;
-  border-radius: 24px;
-  font-size: 4.2rem;
+  border-radius: 28px;
+  font-size: 5.4rem;
   color: #fff;
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
   text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
@@ -970,7 +993,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   max-width: 100%;
 }
 .navnrute {
-  width: 72px; height: 84px;
+  width: 84px; height: 96px;
   display: grid;
   place-items: center;
   border-radius: 18px;
@@ -1066,6 +1089,16 @@ body[data-verden="oy"] .skilt::after {
   box-shadow: inset 0 0 0 6px rgba(35, 38, 45, .13), 0 3px 0 rgba(40, 30, 15, .1);
   opacity: .62;
 }
+/* Skiltene han aldri rørte, når spillet peker på svaret. De skal tre i
+   bakgrunnen, men ikke se ut som feil han har gjort – «feil» er forbeholdt
+   det skiltet han faktisk trykket på. */
+.skilt.borte {
+  background: var(--flate-2);
+  color: rgba(35, 38, 45, .3);
+  box-shadow: 0 3px 0 rgba(40, 30, 15, .08);
+  opacity: .45;
+}
+
 .skilt.vugg { animation: vugg 460ms ease-in-out; }
 @keyframes vugg {
   0%, 100% { transform: rotate(0) translateX(0); }
@@ -1732,6 +1765,7 @@ body[data-verden="oy"] .skilt::after {
   .ordkort-innhold { gap: 12px; }
   .ordkort-ord { font-size: 1.5rem; }
   .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
+  .oppdrag-mal--bokstav { width: 124px; height: 124px; font-size: 4.4rem; border-radius: 24px; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
   .verdenkort { width: min(320px, 86vw); }
@@ -1739,10 +1773,10 @@ body[data-verden="oy"] .skilt::after {
 }
 
 /* Telefon på høykant. Her var alt for stort før: ordkortet rant ut over
-   skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får alle
-   29 plass uten å rulle. */
+   skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får hele
+   utvalget plass uten å rulle. */
 @media (max-width: 560px) {
-  :root { --grunn-h: 104px; --rute: 62px; }
+  :root { --grunn-h: 104px; --rute: 72px; }
   #topp { gap: 8px; padding: 8px 10px; }
   #topp-midt { display: none; }
   #app { padding: 6px 8px calc(var(--grunn-h) + 2px); }
@@ -1768,7 +1802,7 @@ body[data-verden="oy"] .skilt::after {
 
   .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: 20px; }
   .skilt::after { height: 22px; width: 12px; }
-  .oppdrag-mal--bokstav { width: 78px; height: 78px; font-size: 3rem; border-radius: 18px; }
+  .oppdrag-mal--bokstav { width: 110px; height: 110px; font-size: 4rem; border-radius: 22px; }
   .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: 18px; }
   .oppdrag-mal .mal-ord { font-size: 1.5rem; }
   .oppdrag-tekst { font-size: 1.1rem; }
@@ -1853,6 +1887,18 @@ body[data-verden="oy"] .skilt::after {
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
+/* Bokstavrutene er 72 px på telefon, ikke 62: en treåring treffer bredere enn
+   en voksen, og 62 px er så vidt over voksenminimum. På en kort telefon får
+   ikke alle bokstavene plass ved 72 px, og da veier det tyngre at han ser hele
+   alfabetet på én gang enn at hver rute er stor – ruller rutenettet, finner
+   han ikke bokstavene som er utenfor.
+
+   Merk øvre og nedre grense: uten min-height slår denne inn på telefon som
+   holdes på tvers også, der 48 px er riktig og settes lenger ned. */
+@media (max-width: 560px) and (max-height: 700px) and (min-height: 521px) {
+  :root { --rute: 62px; }
+}
+
 /* Lav skjerm – typisk telefon som holdes på tvers. Bakken må vike,
    ellers blir det ikke plass til bokstavene i det hele tatt. */
 @media (max-height: 520px) {
@@ -1879,7 +1925,7 @@ body[data-verden="oy"] .skilt::after {
   }
   .oppdrag-tekst { width: 100%; text-align: center; }
   .oppdrag-tekst { font-size: .95rem; }
-  .oppdrag-mal--bokstav { width: 62px; height: 62px; font-size: 2.4rem; border-radius: 16px; }
+  .oppdrag-mal--bokstav { width: 80px; height: 80px; font-size: 3rem; border-radius: 18px; }
   .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }
   .oppdrag-mal .mal-ord { font-size: 1.1rem; }
   .lytt-tekst { display: none; }
@@ -1929,6 +1975,7 @@ body[data-verden="oy"] .skilt::after {
   :root { --grunn-h: 128px; }
   .oppdrag-mal { font-size: 3.2rem; }
   .skilt { width: 118px; height: 118px; font-size: 3.2rem; }
+  .oppdrag-mal--bokstav { width: 126px; height: 126px; font-size: 4.4rem; border-radius: 24px; }
   .figur { width: 160px; bottom: 28px; }
 }
 
@@ -2169,6 +2216,24 @@ body[data-verden="oy"] .skilt::after {
         iOS selv. Det er derfor de ikke dukker opp i lista over.
         På Mac og Windows virker de nedlastede stemmene som de skal.
       </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-bokstavlyd">
+        <span class="bryter-spor"></span>
+        <span>Si bokstavlyden også</span>
+      </label>
+      <p class="merknad">
+        Normalt sier spillet «ell … ell for Løve». Med denne på legges selve
+        lyden inn imellom: «ell … lll … ell for Løve». Navnet på en konsonant
+        begynner på en vokal, så uten lyden hører han ingen sammenheng mellom
+        «ell» og lyden L lager i «Løve» — og det er nettopp den sammenhengen
+        «Første lyd» bygger på.
+        <br><br>
+        <b>Hør gjennom før du lar den stå på.</b> Hvordan en stemme leser
+        «sss» eller «rrr» varierer, og en lyd som blir rot er verre enn ingen
+        lyd. Bare bokstaver som kan holdes ut i tid er med (F, J, L, M, N, R,
+        S, V); B, D, G, K, P og T kan ikke sies uten en vokal etterpå. Tabellen
+        står øverst i <code>js/data.js</code> og er lett å rette i.
+      </p>
       <label class="skyver">
         <span>Hvor fort stemmen snakker</span>
         <input type="range" id="inn-fart" min="0.75" max="1.1" step="0.05">
@@ -2208,13 +2273,19 @@ body[data-verden="oy"] .skilt::after {
       <div class="nivavelger" id="inn-niva">
         <button type="button" data-niva="liten">
           <b>Helt liten</b>
-          <span>Fem oppgaver, to valg, hjelp med én gang. Passer fra ca. 3 år.</span>
+          <span>Fem oppgaver, to skilt som stiger til tre, hjelp med én gang.
+            Passer fra ca. 3 år.</span>
         </button>
         <button type="button" data-niva="storre">
           <b>Litt større</b>
-          <span>Åtte oppgaver, opp til fire valg, to forsøk før hjelp.</span>
+          <span>Åtte oppgaver, opp til fire skilt, to forsøk før hjelp.</span>
         </button>
       </div>
+      <p class="merknad">
+        Antall skilt stiger av seg selv når han klarer flere på rad, og det
+        følger med til neste runde. Går det tungt to runder på rad, går det ned
+        et hakk igjen. Setter du nivået ned, klippes det mot det nye taket.
+      </p>
     </section>
 
     <section class="panel-del">
@@ -2299,9 +2370,14 @@ body[data-verden="oy"] .skilt::after {
     </div>
 
     <footer class="panel-bunn">
-      <button class="knapp knapp--fare knapp--liten" id="inn-nullstill" type="button">
-        Nullstill all framgang
+      <!-- Hold inne i to sekunder. En dialogboks er ett trykk på en knapp
+           han ikke kan lese; å holde inne er ingenting han gjør ved uhell. -->
+      <button class="knapp knapp--fare knapp--liten knapp--hold" id="inn-nullstill"
+              type="button" aria-describedby="nullstill-hjelp">
+        <span class="hold-fyll" aria-hidden="true"></span>
+        <span class="hold-tekst" id="nullstill-tekst">Nullstill all framgang</span>
       </button>
+      <span class="skjult-visuelt" id="nullstill-hjelp">Hold knappen inne i to sekunder</span>
       <button class="knapp" id="foreldre-lukk" type="button"><span>Lukk</span></button>
     </footer>
   </div>
@@ -2329,6 +2405,12 @@ body[data-verden="oy"] .skilt::after {
  * til fordel for «Åtte» av samme grunn som over: bildet av en kano leser
  * han som «båt».
  *
+ * De fire verste – Q, W, X og Z – står i SJELDNE_BOKSTAVER lenger nede og
+ * er utenfor standardutvalget. To av ikonene her er ærlig talt svake:
+ * «Xylofon 🎵» leser han som noter, og «Yoghurt 🥣» som grøt. Det finnes
+ * ingen bedre emoji for dem – skal de bli gode, må de tegnes som SVG slik
+ * figurene er. X er nå utenfor standardutvalget, så den dukker sjelden opp.
+ *
  * Hvert felt betyr:
  *   ord   – ordet som sies og vises
  *   ikon  – en emoji som vises stort på skjermen
@@ -2354,6 +2436,37 @@ var BOKSTAVNAVN = {
 };
 
 function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
+
+/* Bokstavene som knapt finnes i norske ord et lite barn kjenner. De er med i
+ * spillet, men ikke i standardutvalget – ellers bruker han en sjuendedel av
+ * øvingen på Q, W, X og Z. Foreldremenyen kan hake dem på igjen.
+ *
+ * Å står bevisst ikke her: «Åtte 8️⃣» er et svakt bilde, men Å er en vanlig
+ * norsk bokstav han møter overalt, og å utelate den er noe helt annet enn å
+ * utelate Q. Y står heller ikke her – «yoghurt» er et ord han faktisk sier. */
+var SJELDNE_BOKSTAVER = ['Q', 'W', 'X', 'Z'];
+
+/* Selve bokstavlyden, til bruk mellom bokstavnavnet og ordet:
+ * «ell … lll … ell for Løve».
+ *
+ * Poenget er at bokstavnavnet til en konsonant begynner på en vokal («ell»,
+ * «emm», «eff»), så et barn hører ingen kobling mellom «ell» og /l/-lyden i
+ * «Løve». Vokalene trenger ingen oppføring – der er navn og lyd det samme.
+ *
+ * Bare lyder som kan holdes ut i tid står her. Plosivene (B, D, G, K, P, T)
+ * er utelatt med vilje: de kan ikke uttales uten en vokal etterpå, og da er
+ * man tilbake til bokstavnavnet.
+ *
+ * VIKTIG: dette er forslag som må høres på. Hvordan en stemme leser «sss»
+ * varierer fra stemme til stemme, og en lyd som blir rot er verre enn ingen
+ * lyd. Slå på «si bokstavlyden» i foreldremenyen, hør gjennom, og stryk
+ * linjene som ikke funker. Det er derfor bryteren er av fra start. */
+var BOKSTAVLYD = {
+  'F': 'fff', 'J': 'jjj', 'L': 'lll', 'M': 'mmm',
+  'N': 'nnn', 'R': 'rrr', 'S': 'sss', 'V': 'vvv'
+};
+
+function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
 
 /* Gjør barnets navn om til bokstavene «Navnet mitt» skal bygge.
  *
@@ -2441,7 +2554,7 @@ var VERDENER = {
       'C': { ord: 'Cowboy',       ikon: '🤠' },
       'D': { ord: 'Delfin',       ikon: '🐬' },
       'E': { ord: 'Eple',         ikon: '🍎' },
-      'F': { ord: 'Flagg',        ikon: '🏴‍☠️' },
+      'F': { ord: 'Flagg',        ikon: '🚩' },
       'G': { ord: 'Gull',         ikon: '🪙' },
       'H': { ord: 'Hai',          ikon: '🦈' },
       'I': { ord: 'Isbjørn',      ikon: '🐻‍❄️' },
@@ -2485,11 +2598,18 @@ function ordFor(verdenId, bokstav) {
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
-  var NA_VERSJON = 3;
+  var NA_VERSJON = 4;
 
   var standard = {
     versjon: NA_VERSJON,
     navn: { bane: '', oy: '' },
+    /* Hvor mange skilt han får å velge mellom. Dette må overleve runden:
+     * settes det tilbake til to hver gang, rykker han aldri varig opp, og
+     * vanskegraden er bygget uten at noen merker den. */
+    antallValg: { bane: 2, oy: 2 },
+    /* Runder på rad der under halvparten satt på første forsøk. To slike
+     * betyr at det ble for vanskelig, og han rykker ned igjen. */
+    svakeRunder: { bane: 0, oy: 0 },
     /* Barnets eget navn. Tomt = «Navnet mitt» er ikke tilgjengelig ennå. */
     barnenavn: '',
     /* Moduser som har dukket opp på menyen. Låsingen går bare én vei: en
@@ -2507,8 +2627,9 @@ var Lagring = (function () {
       stemmenavn: null,   /* null = spillet velger den beste norske selv */
       visMal: false,    /* bokstaven er skjult til barnet trykker på merket */
       bevegelse: true,  /* la skyer og bølger drive sakte */
-      bokstaver: null,  /* null = alle bokstaver er med */
-      visAlleModuser: false /* av = menyen slipper til én modus om gangen */
+      bokstaver: null,  /* null = alle utenom de sjeldne (Q, W, X, Z) */
+      visAlleModuser: false, /* av = menyen slipper til én modus om gangen */
+      bokstavlyd: false /* av = si bare bokstavnavnet, ikke selve lyden */
     }
   };
 
@@ -2523,6 +2644,12 @@ var Lagring = (function () {
      *    stått der bestandig, så den som allerede har spilt skal ikke
      *    oppleve at en modus plutselig er borte. */
     3: function (d) { d.laasteOpp = ['forstelyd']; }
+
+    /* 4 har ingen steg med vilje. Da ble antallValg og bokstavlyd lagt til,
+     * og begge har standardverdier som er nøyaktig dagens oppførsel – to
+     * skilt og ingen bokstavlyd. Samtidig ble Q, W, X og Z tatt ut av
+     * standardutvalget; det er en villet endring for alle, ikke noe som
+     * skal migreres bort. Har forelderen valgt bokstaver selv, står valget. */
   };
 
   var maaSkrives = false;
@@ -2540,6 +2667,12 @@ var Lagring = (function () {
       if (lest.navn) ut.navn = { bane: lest.navn.bane || '', oy: lest.navn.oy || '' };
       if (typeof lest.barnenavn === 'string') ut.barnenavn = lest.barnenavn;
       if (lest.laasteOpp instanceof Array) ut.laasteOpp = lest.laasteOpp.slice();
+      ['antallValg', 'svakeRunder'].forEach(function (felt) {
+        if (!lest[felt]) return;
+        ['bane', 'oy'].forEach(function (v) {
+          if (typeof lest[felt][v] === 'number') ut[felt][v] = lest[felt][v];
+        });
+      });
       if (lest.framgang) ut.framgang = lest.framgang;
       if (lest.innstillinger) {
         for (var k in ut.innstillinger) {
@@ -2589,11 +2722,20 @@ var Lagring = (function () {
   return {
     /* --- framgang --- */
 
-    registrerRiktig: function (bokstav) {
+    /* «Mestret» er det telleren, garasjeveggen og fanfaren hviler på, så
+     * målingen må tåle vekten. Med bare to skilt på skjermen gir ren gjetting
+     * treff halvparten av gangene, og over tre dager blir «mestret» da mest
+     * flaks. Derfor teller dagen bare når han valgte blant minst tre.
+     *
+     * Treffet i seg selv telles uansett – det er dagene som er kriteriet.
+     * Dager som allerede ligger lagret røres ikke; regelen gjelder framover. */
+    registrerRiktig: function (bokstav, antallValg) {
       var f = forBokstav(bokstav);
       f.riktig += 1;
-      var dag = idag();
-      if (f.dager.indexOf(dag) === -1) f.dager.push(dag);
+      if (antallValg === undefined || antallValg >= 3) {
+        var dag = idag();
+        if (f.dager.indexOf(dag) === -1) f.dager.push(dag);
+      }
       skriv();
     },
 
@@ -2619,10 +2761,13 @@ var Lagring = (function () {
       return f ? f.dager.length : 0;
     },
 
+    /* Bare bokstaver som er i bruk nå. Har forelderen begrenset utvalget til
+     * fem, ville det vært rart om telleren viste sju mestrede av fem. */
     mestrede: function () {
+      var aktive = this.aktiveBokstaver();
       var ut = [];
-      for (var i = 0; i < ALFABET.length; i++) {
-        if (this.erMestret(ALFABET[i])) ut.push(ALFABET[i]);
+      for (var i = 0; i < aktive.length; i++) {
+        if (this.erMestret(aktive[i])) ut.push(aktive[i]);
       }
       return ut;
     },
@@ -2651,6 +2796,33 @@ var Lagring = (function () {
       skriv();
     },
 
+    /* --- vanskegrad som varer mellom øktene --- */
+
+    antallValgFor: function (verdenId) {
+      return data.antallValg[verdenId] || 2;
+    },
+
+    settAntallValg: function (verdenId, n) {
+      data.antallValg[verdenId] = Math.max(2, n);
+      skriv();
+    },
+
+    /* Kalles når en runde er ferdig. Returnerer true hvis han rykket ned,
+     * så den som spør kan si fra. To svake runder på rad skal til – én
+     * dårlig dag er ikke et signal om at det ble for vanskelig. */
+    registrerRunde: function (verdenId, riktigForste, antall) {
+      var svak = riktigForste * 2 < antall;
+      data.svakeRunder[verdenId] = svak ? (data.svakeRunder[verdenId] || 0) + 1 : 0;
+      var ned = false;
+      if (data.svakeRunder[verdenId] >= 2 && this.antallValgFor(verdenId) > 2) {
+        data.antallValg[verdenId] = this.antallValgFor(verdenId) - 1;
+        data.svakeRunder[verdenId] = 0;
+        ned = true;
+      }
+      skriv();
+      return ned;
+    },
+
     /* --- moduser som er låst opp --- */
 
     erLaastOpp: function (id) {
@@ -2676,10 +2848,16 @@ var Lagring = (function () {
       skriv();
     },
 
-    /* Bokstavene som er i bruk nå. Foreldremenyen kan snevre inn utvalget. */
+    /* Bokstavene som er i bruk nå. Foreldremenyen kan snevre inn utvalget.
+     * Uten et eget valg er alle med unntatt Q, W, X og Z – se
+     * SJELDNE_BOKSTAVER i data.js for hvorfor. */
     aktiveBokstaver: function () {
       var valgt = data.innstillinger.bokstaver;
-      if (!valgt || !valgt.length) return ALFABET.slice();
+      if (!valgt || !valgt.length) {
+        return ALFABET.filter(function (b) {
+          return SJELDNE_BOKSTAVER.indexOf(b) === -1;
+        });
+      }
       var ut = ALFABET.filter(function (b) { return valgt.indexOf(b) !== -1; });
       /* Under to bokstaver gir ingen oppgave å velge mellom. */
       return ut.length >= 2 ? ut : ALFABET.slice();
@@ -3262,17 +3440,31 @@ var Lyd = (function () {
   }
 
   /* Filtrert støy – brukes til motorbrum og bølgeskvulp. */
+  /* Støybufferne gjenbrukes. Før ble det fylt ~24 000 tilfeldige tall på nytt
+   * hver gang bilen kjørte – altså ved hvert riktige svar. Umerkelig på en PC,
+   * målbart på en gammel iPad. Filtrert og fadet hører man ikke at det er
+   * samme støy hver gang. */
+  var stoybuffere = {};
+
+  function stoybuffer(c, lengde) {
+    var nokkel = String(lengde);
+    var b = stoybuffere[nokkel];
+    if (b && b.sampleRate === c.sampleRate) return b;
+    var rammer = Math.max(1, Math.floor(c.sampleRate * lengde));
+    b = c.createBuffer(1, rammer, c.sampleRate);
+    var data = b.getChannelData(0);
+    for (var i = 0; i < rammer; i++) data[i] = Math.random() * 2 - 1;
+    stoybuffere[nokkel] = b;
+    return b;
+  }
+
   function stoy(start_s, lengde, filterHz, styrke, filterSlutt) {
     var c = klar();
     if (!c) return;
     var t = c.currentTime + start_s;
-    var lengdeIRammer = Math.floor(c.sampleRate * lengde);
-    var buffer = c.createBuffer(1, lengdeIRammer, c.sampleRate);
-    var data = buffer.getChannelData(0);
-    for (var i = 0; i < lengdeIRammer; i++) data[i] = Math.random() * 2 - 1;
 
     var kilde = c.createBufferSource();
-    kilde.buffer = buffer;
+    kilde.buffer = stoybuffer(c, lengde);
 
     var filter = c.createBiquadFilter();
     filter.type = 'lowpass';
@@ -3382,6 +3574,22 @@ var Moduser = (function () {
    * talesyntesen sporet og staver dem feil – de skal stå som de står. */
   function tilTale(ord) {
     return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
+  }
+
+  /* «ell … ell for Løve» – samme formel som alfabetbøkene bruker, og kort nok
+   * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»), ellers
+   * leser talesyntesen det store tegnet som «stor L».
+   *
+   * Er bokstavlyden slått på, legges selve lyden inn mellom: «ell … lll …
+   * ell for Løve». Uten den hører han ingen sammenheng mellom navnet på
+   * konsonanten, som begynner på en vokal, og lyden den lager i ordet – og
+   * det er nettopp den sammenhengen «Første lyd» forutsetter. */
+  function bokstavrekke(bokstav, oppslag) {
+    var navn = bokstavnavnFor(bokstav);
+    var lyd = Lagring.innstilling('bokstavlyd') ? bokstavlydFor(bokstav) : null;
+    var rekke = [navn + '.', 450];
+    if (lyd) rekke = rekke.concat([lyd + '.', 450]);
+    return rekke.concat([navn + ' for ' + tilTale(oppslag.ord) + '.']);
   }
 
   /* Kort animasjon som kan spilles om igjen: klassen må fjernes først. */
@@ -3604,14 +3812,7 @@ var Moduser = (function () {
 
     function si(bokstav, oppslag) {
       Tale.stopp();
-      /* «L» … «L for Løve» – samme formel som i alfabetbøkene, og kort nok
-       * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»),
-       * ellers leser talesyntesen det store tegnet som «stor L». */
-      var navn = bokstavnavnFor(bokstav);
-      Tale.rekke([
-        navn + '.', 450,
-        navn + ' for ' + tilTale(oppslag.ord) + '.'
-      ]);
+      Tale.rekke(bokstavrekke(bokstav, oppslag));
     }
 
     return {
@@ -3681,7 +3882,26 @@ var Moduser = (function () {
           ko.push(lettePott.pop());
         }
       }
-      return ko.slice(0, antall);
+      ko = ko.slice(0, antall);
+
+      /* Bokstavene som står på to av tre dager er de som kan bli hans i dag.
+       * De havner midt mellom «trengs mest» og «kan godt», og kan derfor bli
+       * hoppet over runde etter runde. Er ingen av dem med, byttes én inn –
+       * da kommer mestringsøyeblikkene jevnere i stedet for i klumper. */
+      var naerMestring = aktive.filter(function (b) {
+        return Lagring.dagerFor(b) === 2 && !Lagring.erMestret(b);
+      });
+      if (naerMestring.length && !ko.some(function (b) {
+        return naerMestring.indexOf(b) !== -1;
+      })) {
+        var inn = tilfeldig(naerMestring);
+        /* Ikke på første plass, og ikke slik at samme bokstav kommer to
+         * ganger etter hverandre. */
+        for (var i = 1; i < ko.length; i++) {
+          if (ko[i - 1] !== inn && ko[i + 1] !== inn) { ko[i] = inn; break; }
+        }
+      }
+      return ko;
     }
 
     function tegnPrikker() {
@@ -3759,6 +3979,7 @@ var Moduser = (function () {
       /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
       var antallValg = Math.min(okt.antallValg, utvalg().length);
       var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
+      okt.visteValg = alternativer.length;
       alternativer.forEach(function (bokstav) {
         var b = document.createElement('button');
         b.type = 'button';
@@ -3857,7 +4078,13 @@ var Moduser = (function () {
       var riktigKnapp = knappFor(okt.fasit);
       var alle = el('oppgave-valg').querySelectorAll('.skilt');
       for (var i = 0; i < alle.length; i++) {
-        if (alle[i] !== riktigKnapp) { alle[i].disabled = true; alle[i].classList.add('feil'); }
+        if (alle[i] === riktigKnapp) continue;
+        alle[i].disabled = true;
+        /* Bare skiltet han faktisk trykket på er «feil» – det har allerede
+         * fått klassen i svar(). De andre tones bare ned. Å farge et skilt
+         * han aldri rørte som feil er å gi ham skylden for noe han ikke
+         * gjorde. */
+        if (!alle[i].classList.contains('feil')) alle[i].classList.add('borte');
       }
       riktigKnapp.classList.add('pekes');
       Tale.stopp();
@@ -3887,7 +4114,9 @@ var Moduser = (function () {
         okt.paRad += 1;
         okt.bomPaRad = 0;
         var forMestret = Lagring.erMestret(okt.fasit);
-        Lagring.registrerRiktig(okt.fasit);
+        /* Antall skilt som faktisk sto på skjermen avgjør om treffet teller
+         * mot mestring – med to er halvparten flaks. */
+        Lagring.registrerRiktig(okt.fasit, okt.visteValg);
         var bleMestret = !forMestret && Lagring.erMestret(okt.fasit);
         if (bleMestret) okt.nyeMestrede.push(okt.fasit);
         okt.telling[okt.fasit] = (okt.telling[okt.fasit] || 0) + 1;
@@ -3898,8 +4127,19 @@ var Moduser = (function () {
         }, 380);
       }
 
-      var opp = okt.paRad >= okt.oppsett.opprykk && okt.antallValg < okt.oppsett.maksValg;
-      if (opp) { okt.antallValg += 1; okt.paRad = 0; }
+      /* Ikke lov noe vanskeligere på siste oppgave – runden slutter ved neste
+       * trykk, og løftet ville aldri blitt innfridd. */
+      var siste = okt.indeks + 1 >= okt.oppsett.antall;
+      var opp = !siste && okt.paRad >= okt.oppsett.opprykk &&
+                okt.antallValg < okt.oppsett.maksValg;
+      if (opp) {
+        okt.antallValg += 1;
+        okt.paRad = 0;
+        /* Opprykket må overleve runden. Ble det nullstilt hver gang, ville
+         * han aldri komme forbi to skilt, og hele vanskegraden vært bygget
+         * uten at noen fikk se den. */
+        Lagring.settAntallValg(okt.verden, okt.antallValg);
+      }
 
       var ros = forsteForsok
         ? tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!'
@@ -3909,7 +4149,6 @@ var Moduser = (function () {
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
 
       var videre = el('oppgave-videre');
-      var siste = okt.indeks + 1 >= okt.oppsett.antall;
       videre.hidden = false;
       /* En treåring leser ikke «Videre». En pil i samme retning som bilen
        * kjører forstår han med én gang. */
@@ -3936,6 +4175,13 @@ var Moduser = (function () {
       Tale.stopp();
       Spill.visSkjerm('skjerm-oppsummering');
       Spill.settTopp('Ferdig', true);
+
+      /* Gikk det tungt to runder på rad, går vi ned et hakk igjen. «Navnet
+       * mitt» holdes utenfor: den runden er like lang som navnet og sier
+       * ingenting om hvor vanskelig bokstavene er. */
+      if (okt.type !== 'navn') {
+        Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
+      }
 
       /* Navnet skrevet som et navn: «SOFIA» sendt til talesyntesen blir
        * stavet bokstav for bokstav, «Sofia» blir lest som navnet hans. */
@@ -4043,7 +4289,11 @@ var Moduser = (function () {
           oppsett: opps,
           ko: ko,
           indeks: 0,
-          antallValg: 2,
+          /* Der han slapp forrige runde, klippet mot taket på dagens nivå –
+           * settes nivået ned i foreldremenyen, skal ikke et gammelt opprykk
+           * overstyre det. */
+          antallValg: Math.min(Lagring.antallValgFor(verdenId), opps.maksValg),
+          visteValg: 2,
           paRad: 0,
           bomPaRad: 0,
           forsokPaDenne: 0,
@@ -4087,12 +4337,8 @@ var Moduser = (function () {
 
     function si() {
       var b = ALFABET[indeks];
-      var navn = bokstavnavnFor(b);
       Tale.stopp();
-      Tale.rekke([
-        navn + '.', 450,
-        navn + ' for ' + tilTale(ordFor(verdenId, b).ord) + '.'
-      ]);
+      Tale.rekke(bokstavrekke(b, ordFor(verdenId, b)));
     }
 
     function settKnapp(ikon, tekst) {
@@ -4226,12 +4472,17 @@ var Spill = (function () {
 
   function settTastLytter(fn) { tastLytter = fn; }
 
-  /* Telleren i toppen viser hvor mange bokstaver som er blitt hans. */
+  /* Telleren i toppen viser hvor mange bokstaver som er blitt hans.
+   *
+   * Nevneren er bokstavene som er i bruk nå, ikke alltid 29. Foreldremenyen
+   * oppfordrer til å begrense utvalget – «velg gjerne bare bokstavene i navnet
+   * hans» – og følger man det rådet, skal ikke målet være uoppnåelig i samme
+   * øyeblikk. Fire av fire er en seier; fire av 29 ser ut som nesten ingenting. */
   function oppdaterTeller(medSmell) {
     var teller = el('stjerneteller');
     var antall = Lagring.mestrede().length;
     el('teller-tall').textContent = antall;
-    el('teller-av').textContent = '/' + ALFABET.length;
+    el('teller-av').textContent = '/' + Lagring.aktiveBokstaver().length;
     if (medSmell) {
       teller.classList.remove('smell');
       void teller.offsetWidth;
@@ -4315,12 +4566,14 @@ var Spill = (function () {
         '</span>' +
         '<span class="verdenkort-under">' +
           '<span class="verdenkort-navn">' + v.navn + '</span>' +
-          '<span class="verdenkort-tekst">' +
-            (Lagring.harNavn(id)
-              ? 'Sammen med ' + Lagring.navnFor(id)
-              : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter')) +
-          '</span>' +
+          '<span class="verdenkort-tekst"></span>' +
         '</span>';
+      /* Navnet forelderen har skrevet er det eneste stedet brukertekst når
+       * HTML-en. Døper man bilen «Bil <3», skal kortet vise «Bil <3» og ikke
+       * gå i stykker – derfor textContent i stedet for konkatenering. */
+      b.querySelector('.verdenkort-tekst').textContent = Lagring.harNavn(id)
+        ? 'Sammen med ' + Lagring.navnFor(id)
+        : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter');
       b.addEventListener('click', function () { Lyd.klikk(); velgVerden(id); });
       felt.appendChild(b);
     });
@@ -4415,8 +4668,15 @@ var Spill = (function () {
     });
 
     var antall = Lagring.mestrede().length;
-    flis(Figurer.ikon('stjerne'), 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
+    flis(Figurer.ikon('stjerne'), 'Samlingen din',
+      antall + ' av ' + Lagring.aktiveBokstaver().length + ' bokstaver er dine',
       function () { Lyd.klikk(); visSamling(); });
+
+    /* Menyen var den eneste skjermen som ikke sa noe. For en som ikke leser,
+     * er fire–seks tekstetiketter ingen hjelp; spørsmålet forteller ham i det
+     * minste hva skjermen er til for. Å lese opp hver flis når han trykker
+     * nytter ikke – modusen starter og stopper talen i samme øyeblikk. */
+    Tale.rekke(['Hva vil du gjøre?']);
   }
 
   /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
@@ -4506,14 +4766,18 @@ var Spill = (function () {
     visSkjerm('skjerm-samling');
 
     var mestrede = Lagring.mestrede();
+    /* Veggen viser bokstavene som er i bruk nå. Er utvalget begrenset til
+     * fem, er det de fem som er målet – ikke 29 ruter der 24 aldri kan
+     * fylles. */
+    var aktive = Lagring.aktiveBokstaver();
     el('samling-tittel').textContent = v.samling;
     el('samling-undertekst').textContent = mestrede.length === 0
       ? 'Her samler du bokstavene du klarer.'
-      : 'Du har ' + mestrede.length + ' av ' + ALFABET.length + ' bokstaver.';
+      : 'Du har ' + mestrede.length + ' av ' + aktive.length + ' bokstaver.';
 
     var felt = el('samling-rutenett');
     felt.innerHTML = '';
-    ALFABET.forEach(function (bokstav, i) {
+    aktive.forEach(function (bokstav, i) {
       var dager = Lagring.dagerFor(bokstav);
       var mestret = Lagring.erMestret(bokstav);
       var rute = document.createElement('div');
@@ -4531,7 +4795,7 @@ var Spill = (function () {
     var fyll = el('framdrift-fyll');
     fyll.style.width = '0';
     window.setTimeout(function () {
-      fyll.style.width = (mestrede.length / ALFABET.length * 100) + '%';
+      fyll.style.width = (mestrede.length / aktive.length * 100) + '%';
     }, 60);
   }
 
@@ -4546,6 +4810,7 @@ var Spill = (function () {
     el('inn-vis-mal').checked = Lagring.innstilling('visMal');
     el('inn-bevegelse').checked = Lagring.innstilling('bevegelse');
     el('inn-alle-moduser').checked = Lagring.innstilling('visAlleModuser');
+    el('inn-bokstavlyd').checked = Lagring.innstilling('bokstavlyd');
     el('inn-fart').value = Lagring.innstilling('talefart');
     visFart();
 
@@ -4581,7 +4846,7 @@ var Spill = (function () {
 
   function tegnNiva() {
     var na = Lagring.innstilling('niva') === 'storre' ? 'storre' : 'liten';
-    var knapper = el('inn-niva').querySelectorAll('button');
+    var knapper = alle('inn-niva', 'button');
     for (var i = 0; i < knapper.length; i++) {
       knapper[i].classList.toggle('valgt', knapper[i].dataset.niva === na);
     }
@@ -4744,10 +5009,11 @@ var Spill = (function () {
   }
 
   function lukkForeldre() {
-    var navnBane = el('inn-navn-bane').value.trim();
-    var navnOy = el('inn-navn-oy').value.trim();
-    if (navnBane) Lagring.settNavn('bane', navnBane);
-    if (navnOy) Lagring.settNavn('oy', navnOy);
+    /* Tomt felt lagres også: da faller navnet tilbake til standardnavnet,
+     * og barnet får døpe figuren på nytt neste gang han velger verdenen.
+     * Plassholderen lover det, så feltet skal oppføre seg slik. */
+    Lagring.settNavn('bane', el('inn-navn-bane').value.trim());
+    Lagring.settNavn('oy', el('inn-navn-oy').value.trim());
     /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
      * bort «Navnet mitt» igjen. */
     Lagring.settBarnenavn(el('inn-barnenavn').value);
@@ -4761,6 +5027,15 @@ var Spill = (function () {
   /* Kobler en hendelse til et element. Mangler elementet, sier vi fra i
    * konsollen i stedet for å kaste – ellers stopper resten av oppkoblingen,
    * og da virker plutselig ingenting. */
+  /* Søsteren til pa() for et sett elementer inne i et element. Uten den
+   * kaster et oppslag med querySelectorAll hvis id-en mangler – akkurat det pa()
+   * ble skrevet for å hindre, bare et annet sted i samme funksjon. */
+  function alle(id, velger) {
+    var e = document.getElementById(id);
+    if (!e) { console.warn('Fant ikke element:', id); return []; }
+    return e.querySelectorAll(velger);
+  }
+
   function pa(id, hendelse, fn, valg) {
     var e = el(id);
     if (!e) {
@@ -4879,6 +5154,9 @@ var Spill = (function () {
     pa('inn-alle-moduser', 'change', function () {
       Lagring.settInnstilling('visAlleModuser', this.checked);
     });
+    pa('inn-bokstavlyd', 'change', function () {
+      Lagring.settInnstilling('bokstavlyd', this.checked);
+    });
     pa('inn-barnenavn', 'input', visBarnenavn);
     pa('inn-stemmevalg', 'change', function () {
       Tale.velgStemme(this.value || null);
@@ -4902,7 +5180,7 @@ var Spill = (function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));
       visFart();
     });
-    var nivaKnapper = el('inn-niva').querySelectorAll('button');
+    var nivaKnapper = alle('inn-niva', 'button');
     for (var n = 0; n < nivaKnapper.length; n++) {
       nivaKnapper[n].addEventListener('click', function () {
         Lagring.settInnstilling('niva', this.dataset.niva);
@@ -4918,14 +5196,42 @@ var Spill = (function () {
       Lagring.settInnstilling('bokstaver', null);
       tegnBokstavvelger();
     });
-    pa('inn-nullstill', 'click', function () {
-      if (window.confirm('Slette all framgang og starte helt på nytt?')) {
-        Lagring.nullstill();
-        el('foreldre').hidden = true;
-        settBevegelse();
-        visStart();
+    /* Nullstilling bak to sekunders hold. Før lå den bak window.confirm –
+     * ett trykk til på en knapp barnet ikke kan lese, altså tre tilfeldige
+     * trykk fra å slette ukevis med framgang. Å holde inne er derimot
+     * ingenting en treåring gjør ved et uhell, og fyllingen viser den voksne
+     * at noe faktisk skjer. */
+    (function () {
+      var knapp = el('inn-nullstill');
+      if (!knapp) { console.warn('Fant ikke element: inn-nullstill'); return; }
+      var tekst = el('nullstill-tekst');
+      var timer = null;
+
+      function slipp() {
+        window.clearTimeout(timer);
+        timer = null;
+        knapp.classList.remove('holder');
+        tekst.textContent = 'Nullstill all framgang';
       }
-    });
+
+      knapp.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        knapp.classList.add('holder');
+        tekst.textContent = 'Hold inne …';
+        timer = window.setTimeout(function () {
+          slipp();
+          Lagring.nullstill();
+          Tale.stopp();
+          el('foreldre').hidden = true;
+          settBevegelse();
+          visStemmeknapp();
+          visStart();
+        }, 2000);
+      });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (h) {
+        knapp.addEventListener(h, slipp);
+      });
+    })();
 
     /* Tastaturet: bokstavtastene velger bokstaven direkte. På en PC er det
      * den beste koblingen mellom tegnet på skjermen og fingeren hans. */

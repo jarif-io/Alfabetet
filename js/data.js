@@ -18,6 +18,12 @@
  * til fordel for «Åtte» av samme grunn som over: bildet av en kano leser
  * han som «båt».
  *
+ * De fire verste – Q, W, X og Z – står i SJELDNE_BOKSTAVER lenger nede og
+ * er utenfor standardutvalget. To av ikonene her er ærlig talt svake:
+ * «Xylofon 🎵» leser han som noter, og «Yoghurt 🥣» som grøt. Det finnes
+ * ingen bedre emoji for dem – skal de bli gode, må de tegnes som SVG slik
+ * figurene er. X er nå utenfor standardutvalget, så den dukker sjelden opp.
+ *
  * Hvert felt betyr:
  *   ord   – ordet som sies og vises
  *   ikon  – en emoji som vises stort på skjermen
@@ -43,6 +49,37 @@ var BOKSTAVNAVN = {
 };
 
 function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
+
+/* Bokstavene som knapt finnes i norske ord et lite barn kjenner. De er med i
+ * spillet, men ikke i standardutvalget – ellers bruker han en sjuendedel av
+ * øvingen på Q, W, X og Z. Foreldremenyen kan hake dem på igjen.
+ *
+ * Å står bevisst ikke her: «Åtte 8️⃣» er et svakt bilde, men Å er en vanlig
+ * norsk bokstav han møter overalt, og å utelate den er noe helt annet enn å
+ * utelate Q. Y står heller ikke her – «yoghurt» er et ord han faktisk sier. */
+var SJELDNE_BOKSTAVER = ['Q', 'W', 'X', 'Z'];
+
+/* Selve bokstavlyden, til bruk mellom bokstavnavnet og ordet:
+ * «ell … lll … ell for Løve».
+ *
+ * Poenget er at bokstavnavnet til en konsonant begynner på en vokal («ell»,
+ * «emm», «eff»), så et barn hører ingen kobling mellom «ell» og /l/-lyden i
+ * «Løve». Vokalene trenger ingen oppføring – der er navn og lyd det samme.
+ *
+ * Bare lyder som kan holdes ut i tid står her. Plosivene (B, D, G, K, P, T)
+ * er utelatt med vilje: de kan ikke uttales uten en vokal etterpå, og da er
+ * man tilbake til bokstavnavnet.
+ *
+ * VIKTIG: dette er forslag som må høres på. Hvordan en stemme leser «sss»
+ * varierer fra stemme til stemme, og en lyd som blir rot er verre enn ingen
+ * lyd. Slå på «si bokstavlyden» i foreldremenyen, hør gjennom, og stryk
+ * linjene som ikke funker. Det er derfor bryteren er av fra start. */
+var BOKSTAVLYD = {
+  'F': 'fff', 'J': 'jjj', 'L': 'lll', 'M': 'mmm',
+  'N': 'nnn', 'R': 'rrr', 'S': 'sss', 'V': 'vvv'
+};
+
+function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
 
 /* Gjør barnets navn om til bokstavene «Navnet mitt» skal bygge.
  *
@@ -130,7 +167,7 @@ var VERDENER = {
       'C': { ord: 'Cowboy',       ikon: '🤠' },
       'D': { ord: 'Delfin',       ikon: '🐬' },
       'E': { ord: 'Eple',         ikon: '🍎' },
-      'F': { ord: 'Flagg',        ikon: '🏴‍☠️' },
+      'F': { ord: 'Flagg',        ikon: '🚩' },
       'G': { ord: 'Gull',         ikon: '🪙' },
       'H': { ord: 'Hai',          ikon: '🦈' },
       'I': { ord: 'Isbjørn',      ikon: '🐻‍❄️' },

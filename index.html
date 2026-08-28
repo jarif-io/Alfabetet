@@ -234,6 +234,24 @@
         iOS selv. Det er derfor de ikke dukker opp i lista over.
         På Mac og Windows virker de nedlastede stemmene som de skal.
       </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-bokstavlyd">
+        <span class="bryter-spor"></span>
+        <span>Si bokstavlyden også</span>
+      </label>
+      <p class="merknad">
+        Normalt sier spillet «ell … ell for Løve». Med denne på legges selve
+        lyden inn imellom: «ell … lll … ell for Løve». Navnet på en konsonant
+        begynner på en vokal, så uten lyden hører han ingen sammenheng mellom
+        «ell» og lyden L lager i «Løve» — og det er nettopp den sammenhengen
+        «Første lyd» bygger på.
+        <br><br>
+        <b>Hør gjennom før du lar den stå på.</b> Hvordan en stemme leser
+        «sss» eller «rrr» varierer, og en lyd som blir rot er verre enn ingen
+        lyd. Bare bokstaver som kan holdes ut i tid er med (F, J, L, M, N, R,
+        S, V); B, D, G, K, P og T kan ikke sies uten en vokal etterpå. Tabellen
+        står øverst i <code>js/data.js</code> og er lett å rette i.
+      </p>
       <label class="skyver">
         <span>Hvor fort stemmen snakker</span>
         <input type="range" id="inn-fart" min="0.75" max="1.1" step="0.05">
@@ -273,13 +291,19 @@
       <div class="nivavelger" id="inn-niva">
         <button type="button" data-niva="liten">
           <b>Helt liten</b>
-          <span>Fem oppgaver, to valg, hjelp med én gang. Passer fra ca. 3 år.</span>
+          <span>Fem oppgaver, to skilt som stiger til tre, hjelp med én gang.
+            Passer fra ca. 3 år.</span>
         </button>
         <button type="button" data-niva="storre">
           <b>Litt større</b>
-          <span>Åtte oppgaver, opp til fire valg, to forsøk før hjelp.</span>
+          <span>Åtte oppgaver, opp til fire skilt, to forsøk før hjelp.</span>
         </button>
       </div>
+      <p class="merknad">
+        Antall skilt stiger av seg selv når han klarer flere på rad, og det
+        følger med til neste runde. Går det tungt to runder på rad, går det ned
+        et hakk igjen. Setter du nivået ned, klippes det mot det nye taket.
+      </p>
     </section>
 
     <section class="panel-del">
@@ -364,9 +388,14 @@
     </div>
 
     <footer class="panel-bunn">
-      <button class="knapp knapp--fare knapp--liten" id="inn-nullstill" type="button">
-        Nullstill all framgang
+      <!-- Hold inne i to sekunder. En dialogboks er ett trykk på en knapp
+           han ikke kan lese; å holde inne er ingenting han gjør ved uhell. -->
+      <button class="knapp knapp--fare knapp--liten knapp--hold" id="inn-nullstill"
+              type="button" aria-describedby="nullstill-hjelp">
+        <span class="hold-fyll" aria-hidden="true"></span>
+        <span class="hold-tekst" id="nullstill-tekst">Nullstill all framgang</span>
       </button>
+      <span class="skjult-visuelt" id="nullstill-hjelp">Hold knappen inne i to sekunder</span>
       <button class="knapp" id="foreldre-lukk" type="button"><span>Lukk</span></button>
     </footer>
   </div>

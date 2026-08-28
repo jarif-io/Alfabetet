@@ -430,6 +430,26 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 .knapp--fare::before { display: none; }
 
+/* Knapp som må holdes inne. Fyllingen viser den voksne at noe skjer, og at
+   det tar tid – en dialogboks er bare ett trykk til for et barn som uansett
+   ikke kan lese hva den spør om. */
+.knapp--hold {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.hold-tekst { position: relative; z-index: 1; }
+.hold-fyll {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: rgba(176, 58, 43, .22);
+  pointer-events: none;
+}
+.knapp--hold.holder .hold-fyll { width: 100%; transition: width 2s linear; }
+
 .knapperad { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
 
 .lyttknapp {
@@ -879,11 +899,14 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 /* Én bokstav får samme merke som ellers i spillet, så den ikke blir
    en løs strek på himmelen – særlig viktig for I og J. */
 .oppdrag-mal--bokstav {
-  width: 104px; height: 104px;
+  /* Minst like stort som skiltene (142 px). Merket er det han skal holde
+     i hodet mens han leter; er det mindre enn svarene, peker hierarkiet
+     motsatt vei av oppgaven. */
+  width: 150px; height: 150px;
   display: grid;
   place-items: center;
-  border-radius: 24px;
-  font-size: 4.2rem;
+  border-radius: 28px;
+  font-size: 5.4rem;
   color: #fff;
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
   text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
@@ -930,7 +953,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   max-width: 100%;
 }
 .navnrute {
-  width: 72px; height: 84px;
+  width: 84px; height: 96px;
   display: grid;
   place-items: center;
   border-radius: 18px;
@@ -1026,6 +1049,16 @@ body[data-verden="oy"] .skilt::after {
   box-shadow: inset 0 0 0 6px rgba(35, 38, 45, .13), 0 3px 0 rgba(40, 30, 15, .1);
   opacity: .62;
 }
+/* Skiltene han aldri rørte, når spillet peker på svaret. De skal tre i
+   bakgrunnen, men ikke se ut som feil han har gjort – «feil» er forbeholdt
+   det skiltet han faktisk trykket på. */
+.skilt.borte {
+  background: var(--flate-2);
+  color: rgba(35, 38, 45, .3);
+  box-shadow: 0 3px 0 rgba(40, 30, 15, .08);
+  opacity: .45;
+}
+
 .skilt.vugg { animation: vugg 460ms ease-in-out; }
 @keyframes vugg {
   0%, 100% { transform: rotate(0) translateX(0); }
@@ -1692,6 +1725,7 @@ body[data-verden="oy"] .skilt::after {
   .ordkort-innhold { gap: 12px; }
   .ordkort-ord { font-size: 1.5rem; }
   .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
+  .oppdrag-mal--bokstav { width: 124px; height: 124px; font-size: 4.4rem; border-radius: 24px; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
   .verdenkort { width: min(320px, 86vw); }
@@ -1699,10 +1733,10 @@ body[data-verden="oy"] .skilt::after {
 }
 
 /* Telefon på høykant. Her var alt for stort før: ordkortet rant ut over
-   skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får alle
-   29 plass uten å rulle. */
+   skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får hele
+   utvalget plass uten å rulle. */
 @media (max-width: 560px) {
-  :root { --grunn-h: 104px; --rute: 62px; }
+  :root { --grunn-h: 104px; --rute: 72px; }
   #topp { gap: 8px; padding: 8px 10px; }
   #topp-midt { display: none; }
   #app { padding: 6px 8px calc(var(--grunn-h) + 2px); }
@@ -1728,7 +1762,7 @@ body[data-verden="oy"] .skilt::after {
 
   .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: 20px; }
   .skilt::after { height: 22px; width: 12px; }
-  .oppdrag-mal--bokstav { width: 78px; height: 78px; font-size: 3rem; border-radius: 18px; }
+  .oppdrag-mal--bokstav { width: 110px; height: 110px; font-size: 4rem; border-radius: 22px; }
   .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: 18px; }
   .oppdrag-mal .mal-ord { font-size: 1.5rem; }
   .oppdrag-tekst { font-size: 1.1rem; }
@@ -1813,6 +1847,18 @@ body[data-verden="oy"] .skilt::after {
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
+/* Bokstavrutene er 72 px på telefon, ikke 62: en treåring treffer bredere enn
+   en voksen, og 62 px er så vidt over voksenminimum. På en kort telefon får
+   ikke alle bokstavene plass ved 72 px, og da veier det tyngre at han ser hele
+   alfabetet på én gang enn at hver rute er stor – ruller rutenettet, finner
+   han ikke bokstavene som er utenfor.
+
+   Merk øvre og nedre grense: uten min-height slår denne inn på telefon som
+   holdes på tvers også, der 48 px er riktig og settes lenger ned. */
+@media (max-width: 560px) and (max-height: 700px) and (min-height: 521px) {
+  :root { --rute: 62px; }
+}
+
 /* Lav skjerm – typisk telefon som holdes på tvers. Bakken må vike,
    ellers blir det ikke plass til bokstavene i det hele tatt. */
 @media (max-height: 520px) {
@@ -1839,7 +1885,7 @@ body[data-verden="oy"] .skilt::after {
   }
   .oppdrag-tekst { width: 100%; text-align: center; }
   .oppdrag-tekst { font-size: .95rem; }
-  .oppdrag-mal--bokstav { width: 62px; height: 62px; font-size: 2.4rem; border-radius: 16px; }
+  .oppdrag-mal--bokstav { width: 80px; height: 80px; font-size: 3rem; border-radius: 18px; }
   .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }
   .oppdrag-mal .mal-ord { font-size: 1.1rem; }
   .lytt-tekst { display: none; }
@@ -1889,6 +1935,7 @@ body[data-verden="oy"] .skilt::after {
   :root { --grunn-h: 128px; }
   .oppdrag-mal { font-size: 3.2rem; }
   .skilt { width: 118px; height: 118px; font-size: 3.2rem; }
+  .oppdrag-mal--bokstav { width: 126px; height: 126px; font-size: 4.4rem; border-radius: 24px; }
   .figur { width: 160px; bottom: 28px; }
 }
 

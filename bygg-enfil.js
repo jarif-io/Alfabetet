@@ -43,7 +43,14 @@ fs.writeFileSync(sti.join(rot, 'bokstavlopet.html'), html);
 
 /* Artefaktversjonen: bare innholdet, uten ytterskallet. Stilene ligger i
  * <head> og må flyttes med, ellers blir siden helt naken. */
-var hode = html.match(/<head>([\s\S]*?)<\/head>/i)[1];
+/* Uten sjekken blir en endret <head>-formatering til «Cannot read properties
+ * of null», som ikke sier noe om hva som er galt. */
+var hodeTreff = html.match(/<head>([\s\S]*?)<\/head>/i);
+if (!hodeTreff) {
+  console.error('Fant ingen <head> i index.html – har formateringen endret seg?');
+  process.exit(1);
+}
+var hode = hodeTreff[1];
 var stiler = (hode.match(/<style>[\s\S]*?<\/style>/gi) || []).join('\n');
 
 var kropp = '<title>Bokstavløpet</title>\n' + stiler + '\n' +

@@ -36,6 +36,22 @@ var Moduser = (function () {
     return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
   }
 
+  /* «ell … ell for Løve» – samme formel som alfabetbøkene bruker, og kort nok
+   * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»), ellers
+   * leser talesyntesen det store tegnet som «stor L».
+   *
+   * Er bokstavlyden slått på, legges selve lyden inn mellom: «ell … lll …
+   * ell for Løve». Uten den hører han ingen sammenheng mellom navnet på
+   * konsonanten, som begynner på en vokal, og lyden den lager i ordet – og
+   * det er nettopp den sammenhengen «Første lyd» forutsetter. */
+  function bokstavrekke(bokstav, oppslag) {
+    var navn = bokstavnavnFor(bokstav);
+    var lyd = Lagring.innstilling('bokstavlyd') ? bokstavlydFor(bokstav) : null;
+    var rekke = [navn + '.', 450];
+    if (lyd) rekke = rekke.concat([lyd + '.', 450]);
+    return rekke.concat([navn + ' for ' + tilTale(oppslag.ord) + '.']);
+  }
+
   /* Kort animasjon som kan spilles om igjen: klassen må fjernes først. */
   function spillOm(element, klasse, ms) {
     if (!element) return;
@@ -256,14 +272,7 @@ var Moduser = (function () {
 
     function si(bokstav, oppslag) {
       Tale.stopp();
-      /* «L» … «L for Løve» – samme formel som i alfabetbøkene, og kort nok
-       * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»),
-       * ellers leser talesyntesen det store tegnet som «stor L». */
-      var navn = bokstavnavnFor(bokstav);
-      Tale.rekke([
-        navn + '.', 450,
-        navn + ' for ' + tilTale(oppslag.ord) + '.'
-      ]);
+      Tale.rekke(bokstavrekke(bokstav, oppslag));
     }
 
     return {
@@ -333,7 +342,26 @@ var Moduser = (function () {
           ko.push(lettePott.pop());
         }
       }
-      return ko.slice(0, antall);
+      ko = ko.slice(0, antall);
+
+      /* Bokstavene som står på to av tre dager er de som kan bli hans i dag.
+       * De havner midt mellom «trengs mest» og «kan godt», og kan derfor bli
+       * hoppet over runde etter runde. Er ingen av dem med, byttes én inn –
+       * da kommer mestringsøyeblikkene jevnere i stedet for i klumper. */
+      var naerMestring = aktive.filter(function (b) {
+        return Lagring.dagerFor(b) === 2 && !Lagring.erMestret(b);
+      });
+      if (naerMestring.length && !ko.some(function (b) {
+        return naerMestring.indexOf(b) !== -1;
+      })) {
+        var inn = tilfeldig(naerMestring);
+        /* Ikke på første plass, og ikke slik at samme bokstav kommer to
+         * ganger etter hverandre. */
+        for (var i = 1; i < ko.length; i++) {
+          if (ko[i - 1] !== inn && ko[i + 1] !== inn) { ko[i] = inn; break; }
+        }
+      }
+      return ko;
     }
 
     function tegnPrikker() {
@@ -411,6 +439,7 @@ var Moduser = (function () {
       /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
       var antallValg = Math.min(okt.antallValg, utvalg().length);
       var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
+      okt.visteValg = alternativer.length;
       alternativer.forEach(function (bokstav) {
         var b = document.createElement('button');
         b.type = 'button';
@@ -509,7 +538,13 @@ var Moduser = (function () {
       var riktigKnapp = knappFor(okt.fasit);
       var alle = el('oppgave-valg').querySelectorAll('.skilt');
       for (var i = 0; i < alle.length; i++) {
-        if (alle[i] !== riktigKnapp) { alle[i].disabled = true; alle[i].classList.add('feil'); }
+        if (alle[i] === riktigKnapp) continue;
+        alle[i].disabled = true;
+        /* Bare skiltet han faktisk trykket på er «feil» – det har allerede
+         * fått klassen i svar(). De andre tones bare ned. Å farge et skilt
+         * han aldri rørte som feil er å gi ham skylden for noe han ikke
+         * gjorde. */
+        if (!alle[i].classList.contains('feil')) alle[i].classList.add('borte');
       }
       riktigKnapp.classList.add('pekes');
       Tale.stopp();
@@ -539,7 +574,9 @@ var Moduser = (function () {
         okt.paRad += 1;
         okt.bomPaRad = 0;
         var forMestret = Lagring.erMestret(okt.fasit);
-        Lagring.registrerRiktig(okt.fasit);
+        /* Antall skilt som faktisk sto på skjermen avgjør om treffet teller
+         * mot mestring – med to er halvparten flaks. */
+        Lagring.registrerRiktig(okt.fasit, okt.visteValg);
         var bleMestret = !forMestret && Lagring.erMestret(okt.fasit);
         if (bleMestret) okt.nyeMestrede.push(okt.fasit);
         okt.telling[okt.fasit] = (okt.telling[okt.fasit] || 0) + 1;
@@ -550,8 +587,19 @@ var Moduser = (function () {
         }, 380);
       }
 
-      var opp = okt.paRad >= okt.oppsett.opprykk && okt.antallValg < okt.oppsett.maksValg;
-      if (opp) { okt.antallValg += 1; okt.paRad = 0; }
+      /* Ikke lov noe vanskeligere på siste oppgave – runden slutter ved neste
+       * trykk, og løftet ville aldri blitt innfridd. */
+      var siste = okt.indeks + 1 >= okt.oppsett.antall;
+      var opp = !siste && okt.paRad >= okt.oppsett.opprykk &&
+                okt.antallValg < okt.oppsett.maksValg;
+      if (opp) {
+        okt.antallValg += 1;
+        okt.paRad = 0;
+        /* Opprykket må overleve runden. Ble det nullstilt hver gang, ville
+         * han aldri komme forbi to skilt, og hele vanskegraden vært bygget
+         * uten at noen fikk se den. */
+        Lagring.settAntallValg(okt.verden, okt.antallValg);
+      }
 
       var ros = forsteForsok
         ? tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!'
@@ -561,7 +609,6 @@ var Moduser = (function () {
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
 
       var videre = el('oppgave-videre');
-      var siste = okt.indeks + 1 >= okt.oppsett.antall;
       videre.hidden = false;
       /* En treåring leser ikke «Videre». En pil i samme retning som bilen
        * kjører forstår han med én gang. */
@@ -588,6 +635,13 @@ var Moduser = (function () {
       Tale.stopp();
       Spill.visSkjerm('skjerm-oppsummering');
       Spill.settTopp('Ferdig', true);
+
+      /* Gikk det tungt to runder på rad, går vi ned et hakk igjen. «Navnet
+       * mitt» holdes utenfor: den runden er like lang som navnet og sier
+       * ingenting om hvor vanskelig bokstavene er. */
+      if (okt.type !== 'navn') {
+        Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
+      }
 
       /* Navnet skrevet som et navn: «SOFIA» sendt til talesyntesen blir
        * stavet bokstav for bokstav, «Sofia» blir lest som navnet hans. */
@@ -695,7 +749,11 @@ var Moduser = (function () {
           oppsett: opps,
           ko: ko,
           indeks: 0,
-          antallValg: 2,
+          /* Der han slapp forrige runde, klippet mot taket på dagens nivå –
+           * settes nivået ned i foreldremenyen, skal ikke et gammelt opprykk
+           * overstyre det. */
+          antallValg: Math.min(Lagring.antallValgFor(verdenId), opps.maksValg),
+          visteValg: 2,
           paRad: 0,
           bomPaRad: 0,
           forsokPaDenne: 0,
@@ -739,12 +797,8 @@ var Moduser = (function () {
 
     function si() {
       var b = ALFABET[indeks];
-      var navn = bokstavnavnFor(b);
       Tale.stopp();
-      Tale.rekke([
-        navn + '.', 450,
-        navn + ' for ' + tilTale(ordFor(verdenId, b).ord) + '.'
-      ]);
+      Tale.rekke(bokstavrekke(b, ordFor(verdenId, b)));
     }
 
     function settKnapp(ikon, tekst) {

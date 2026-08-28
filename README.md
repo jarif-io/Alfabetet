@@ -82,18 +82,29 @@ Spillet er med vilje rolig. Det er ikke en innstilling, men måten det er laget 
 - **En runde er kort** — fem oppgaver på standardnivået, et par minutter — og
   slutter av seg selv. Spillet maser aldri om «en runde til».
 
-Fra start er alt stilt inn på de aller minste: **fem oppgaver i en runde**, to valg å
-se på, og hjelp allerede etter ett bom. Vanskegraden stiger til tre valg etter fire
+Fra start er alt stilt inn på de aller minste: **fem oppgaver i en runde**, to skilt å
+se på, og hjelp allerede etter ett bom. Vanskegraden stiger til tre skilt etter fire
 riktige på rad — og spillet sier fra når det blir vanskeligere, for det er den
 beskjeden som gjør at det kjennes ut som å klare noe. Blir han eldre, kan du sette
-nivået til «litt større» i foreldremenyen: åtte oppgaver, opp til fire valg, og to
+nivået til «litt større» i foreldremenyen: åtte oppgaver, opp til fire skilt, og to
 forsøk før spillet hjelper.
 
-En bokstav regnes som **mestret** først når han har truffet den på tre *ulike dager*.
-Tre på rad i én økt er gjenkjenning; tre ulike dager er læring. Mestrede bokstaver
-flyttes over på **garasjeveggen** eller i **skattekista** og blir liggende der. Telleren
-oppe i høyre hjørne viser hvor mange av de 29 som er blitt hans, og er den eneste
-tingen i spillet som får en liten fanfare når den øker.
+**Opprykket følger med til neste runde.** Det er lett å gå glipp av hvor mye det
+betyr: ble antall skilt satt tilbake til to hver gang, ville han aldri komme forbi
+to, og hele vanskegraden vært bygget uten at noen fikk se den. Går det tungt to
+runder på rad — under halvparten riktig på første forsøk — går det ned et hakk igjen.
+
+En bokstav regnes som **mestret** først når han har truffet den på tre *ulike dager*,
+og bare treff der det sto **minst tre skilt** på skjermen teller. Tre på rad i én økt
+er gjenkjenning; tre ulike dager er læring. Og med bare to skilt gir ren gjetting
+treff halvparten av gangene — da måler telleren flaks i stedet for hva han kan.
+Selve treffet registreres uansett; det er *dagene* som er kriteriet.
+
+Mestrede bokstaver flyttes over på **garasjeveggen** eller i **skattekista** og blir
+liggende der. Telleren oppe i høyre hjørne viser hvor mange av **bokstavene som er i
+bruk** som er blitt hans — har du begrenset utvalget til fem, teller den til fem.
+Ellers ville rådet om å begrense utvalget gjort målet uoppnåelig i samme øyeblikk.
+Telleren er den eneste tingen i spillet som får en liten fanfare når den øker.
 
 ## For voksne
 
@@ -111,7 +122,11 @@ nederst hele tiden, så du aldri mister veien ut. Der kan du:
 - **Velge hvilke bokstaver som er med** — for eksempel bare bokstavene i navnet hans,
   eller de dere leser om denne uka. Dette er funksjonen som knytter spillet til
   lesestundene, og for en treåring er det trolig den nyttigste: begynn med tre–fire
-  bokstaver i stedet for alle 29.
+  bokstaver i stedet for hele alfabetet. Uten et eget valg er alle med unntatt
+  **Q, W, X og Z** — se «Ordene» nedenfor.
+- Slå på **«si bokstavlyden også»**. Da sier spillet «ell … lll … ell for Løve» i
+  stedet for bare navn og ord. Hør gjennom før du lar den stå på: hvordan en stemme
+  leser «sss» varierer, og en lyd som blir rot er verre enn ingen lyd.
 - Slå på **«vis bokstaven med én gang»**. Normalt er bokstaven skjult bak et
   spørsmålstegn han kan trykke på, så oppgaven blir å kjenne den igjen på lyden.
   Slår du denne på, står den framme fra start — da blir oppgaven å finne to like.
@@ -124,7 +139,12 @@ nederst hele tiden, så du aldri mister veien ut. Der kan du:
 - Slå på **«vis alle modusene på menyen»** hvis du heller vil ha alt framme enn å la
   spillet slippe til én om gangen.
 - Se **hvilke bokstaver han sitter godt i** og hvilke som henger igjen.
-- Bytte navn på figurene, eller nullstille alt.
+- Bytte navn på figurene. Tømmer du feltet, heter figuren standardnavnet igjen, og
+  barnet får døpe den på nytt neste gang han velger verdenen.
+- **Nullstille all framgang.** Knappen må holdes inne i to sekunder, og en fylling
+  viser at det skjer noe. Før lå den bak en ja/nei-dialog — det var ett trykk til på
+  en knapp barnet ikke kan lese, altså tre tilfeldige trykk fra å slette ukevis med
+  framgang. Å holde inne er ingenting en treåring gjør ved et uhell.
 
 ## Ordene, og hvorfor de er som de er
 
@@ -143,6 +163,20 @@ Noen bokstaver finnes nesten ikke i norske ord et lite barn kjenner — **Q, W, 
 Y, Z, Æ og Å**. Der står det samme ord i begge verdener, rett og slett fordi det
 ikke finnes noe bedre å velge mellom. Æ er «Æsj», som er det eneste Æ-ordet en
 treåring bruker selv, og W er «WC», som han både kjenner og synes er morsomt.
+
+**Q, W, X og Z er utenfor standardutvalget.** De er fortsatt i spillet, men er
+ikke med med mindre du haker dem på i foreldremenyen. Ellers ville han brukt en
+sjuendedel av øvingen på fire bokstaver han knapt møter. Å og Y er *ikke* tatt ut:
+«Åtte 8️⃣» er et svakt bilde, men Å er en vanlig norsk bokstav han ser overalt,
+og «yoghurt» er et ord han faktisk sier.
+
+To ikoner er ærlig talt svake, og det finnes ingen bedre emoji for dem: «Xylofon
+🎵» leser han som noter, og «Yoghurt 🥣» som grøt. Skal de bli gode, må de tegnes
+som SVG slik figurene er. X er uansett utenfor standardutvalget nå.
+
+Emoji som er satt sammen av flere tegn kan falle fra hverandre på eldre telefoner.
+🏴‍☠️ er derfor byttet til 🚩 for «Flagg». Ser dere noe rart på deres egen enhet —
+to glyfer der det skal være én, eller en tom firkant — så si fra, så bytter vi.
 
 Listene ligger i **`js/data.js`**, og filen er laget for å bli redigert. Vil dere
 at `H` skal være «Hest» i stedet for «Hus», så endrer dere den ene linja:

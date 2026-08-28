@@ -40,12 +40,17 @@ var Spill = (function () {
 
   function settTastLytter(fn) { tastLytter = fn; }
 
-  /* Telleren i toppen viser hvor mange bokstaver som er blitt hans. */
+  /* Telleren i toppen viser hvor mange bokstaver som er blitt hans.
+   *
+   * Nevneren er bokstavene som er i bruk nå, ikke alltid 29. Foreldremenyen
+   * oppfordrer til å begrense utvalget – «velg gjerne bare bokstavene i navnet
+   * hans» – og følger man det rådet, skal ikke målet være uoppnåelig i samme
+   * øyeblikk. Fire av fire er en seier; fire av 29 ser ut som nesten ingenting. */
   function oppdaterTeller(medSmell) {
     var teller = el('stjerneteller');
     var antall = Lagring.mestrede().length;
     el('teller-tall').textContent = antall;
-    el('teller-av').textContent = '/' + ALFABET.length;
+    el('teller-av').textContent = '/' + Lagring.aktiveBokstaver().length;
     if (medSmell) {
       teller.classList.remove('smell');
       void teller.offsetWidth;
@@ -129,12 +134,14 @@ var Spill = (function () {
         '</span>' +
         '<span class="verdenkort-under">' +
           '<span class="verdenkort-navn">' + v.navn + '</span>' +
-          '<span class="verdenkort-tekst">' +
-            (Lagring.harNavn(id)
-              ? 'Sammen med ' + Lagring.navnFor(id)
-              : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter')) +
-          '</span>' +
+          '<span class="verdenkort-tekst"></span>' +
         '</span>';
+      /* Navnet forelderen har skrevet er det eneste stedet brukertekst når
+       * HTML-en. Døper man bilen «Bil <3», skal kortet vise «Bil <3» og ikke
+       * gå i stykker – derfor textContent i stedet for konkatenering. */
+      b.querySelector('.verdenkort-tekst').textContent = Lagring.harNavn(id)
+        ? 'Sammen med ' + Lagring.navnFor(id)
+        : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter');
       b.addEventListener('click', function () { Lyd.klikk(); velgVerden(id); });
       felt.appendChild(b);
     });
@@ -229,8 +236,15 @@ var Spill = (function () {
     });
 
     var antall = Lagring.mestrede().length;
-    flis(Figurer.ikon('stjerne'), 'Samlingen din', antall + ' av ' + ALFABET.length + ' bokstaver er dine',
+    flis(Figurer.ikon('stjerne'), 'Samlingen din',
+      antall + ' av ' + Lagring.aktiveBokstaver().length + ' bokstaver er dine',
       function () { Lyd.klikk(); visSamling(); });
+
+    /* Menyen var den eneste skjermen som ikke sa noe. For en som ikke leser,
+     * er fire–seks tekstetiketter ingen hjelp; spørsmålet forteller ham i det
+     * minste hva skjermen er til for. Å lese opp hver flis når han trykker
+     * nytter ikke – modusen starter og stopper talen i samme øyeblikk. */
+    Tale.rekke(['Hva vil du gjøre?']);
   }
 
   /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
@@ -320,14 +334,18 @@ var Spill = (function () {
     visSkjerm('skjerm-samling');
 
     var mestrede = Lagring.mestrede();
+    /* Veggen viser bokstavene som er i bruk nå. Er utvalget begrenset til
+     * fem, er det de fem som er målet – ikke 29 ruter der 24 aldri kan
+     * fylles. */
+    var aktive = Lagring.aktiveBokstaver();
     el('samling-tittel').textContent = v.samling;
     el('samling-undertekst').textContent = mestrede.length === 0
       ? 'Her samler du bokstavene du klarer.'
-      : 'Du har ' + mestrede.length + ' av ' + ALFABET.length + ' bokstaver.';
+      : 'Du har ' + mestrede.length + ' av ' + aktive.length + ' bokstaver.';
 
     var felt = el('samling-rutenett');
     felt.innerHTML = '';
-    ALFABET.forEach(function (bokstav, i) {
+    aktive.forEach(function (bokstav, i) {
       var dager = Lagring.dagerFor(bokstav);
       var mestret = Lagring.erMestret(bokstav);
       var rute = document.createElement('div');
@@ -345,7 +363,7 @@ var Spill = (function () {
     var fyll = el('framdrift-fyll');
     fyll.style.width = '0';
     window.setTimeout(function () {
-      fyll.style.width = (mestrede.length / ALFABET.length * 100) + '%';
+      fyll.style.width = (mestrede.length / aktive.length * 100) + '%';
     }, 60);
   }
 
@@ -360,6 +378,7 @@ var Spill = (function () {
     el('inn-vis-mal').checked = Lagring.innstilling('visMal');
     el('inn-bevegelse').checked = Lagring.innstilling('bevegelse');
     el('inn-alle-moduser').checked = Lagring.innstilling('visAlleModuser');
+    el('inn-bokstavlyd').checked = Lagring.innstilling('bokstavlyd');
     el('inn-fart').value = Lagring.innstilling('talefart');
     visFart();
 
@@ -395,7 +414,7 @@ var Spill = (function () {
 
   function tegnNiva() {
     var na = Lagring.innstilling('niva') === 'storre' ? 'storre' : 'liten';
-    var knapper = el('inn-niva').querySelectorAll('button');
+    var knapper = alle('inn-niva', 'button');
     for (var i = 0; i < knapper.length; i++) {
       knapper[i].classList.toggle('valgt', knapper[i].dataset.niva === na);
     }
@@ -558,10 +577,11 @@ var Spill = (function () {
   }
 
   function lukkForeldre() {
-    var navnBane = el('inn-navn-bane').value.trim();
-    var navnOy = el('inn-navn-oy').value.trim();
-    if (navnBane) Lagring.settNavn('bane', navnBane);
-    if (navnOy) Lagring.settNavn('oy', navnOy);
+    /* Tomt felt lagres også: da faller navnet tilbake til standardnavnet,
+     * og barnet får døpe figuren på nytt neste gang han velger verdenen.
+     * Plassholderen lover det, så feltet skal oppføre seg slik. */
+    Lagring.settNavn('bane', el('inn-navn-bane').value.trim());
+    Lagring.settNavn('oy', el('inn-navn-oy').value.trim());
     /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
      * bort «Navnet mitt» igjen. */
     Lagring.settBarnenavn(el('inn-barnenavn').value);
@@ -575,6 +595,15 @@ var Spill = (function () {
   /* Kobler en hendelse til et element. Mangler elementet, sier vi fra i
    * konsollen i stedet for å kaste – ellers stopper resten av oppkoblingen,
    * og da virker plutselig ingenting. */
+  /* Søsteren til pa() for et sett elementer inne i et element. Uten den
+   * kaster et oppslag med querySelectorAll hvis id-en mangler – akkurat det pa()
+   * ble skrevet for å hindre, bare et annet sted i samme funksjon. */
+  function alle(id, velger) {
+    var e = document.getElementById(id);
+    if (!e) { console.warn('Fant ikke element:', id); return []; }
+    return e.querySelectorAll(velger);
+  }
+
   function pa(id, hendelse, fn, valg) {
     var e = el(id);
     if (!e) {
@@ -693,6 +722,9 @@ var Spill = (function () {
     pa('inn-alle-moduser', 'change', function () {
       Lagring.settInnstilling('visAlleModuser', this.checked);
     });
+    pa('inn-bokstavlyd', 'change', function () {
+      Lagring.settInnstilling('bokstavlyd', this.checked);
+    });
     pa('inn-barnenavn', 'input', visBarnenavn);
     pa('inn-stemmevalg', 'change', function () {
       Tale.velgStemme(this.value || null);
@@ -716,7 +748,7 @@ var Spill = (function () {
       Lagring.settInnstilling('talefart', parseFloat(this.value));
       visFart();
     });
-    var nivaKnapper = el('inn-niva').querySelectorAll('button');
+    var nivaKnapper = alle('inn-niva', 'button');
     for (var n = 0; n < nivaKnapper.length; n++) {
       nivaKnapper[n].addEventListener('click', function () {
         Lagring.settInnstilling('niva', this.dataset.niva);
@@ -732,14 +764,42 @@ var Spill = (function () {
       Lagring.settInnstilling('bokstaver', null);
       tegnBokstavvelger();
     });
-    pa('inn-nullstill', 'click', function () {
-      if (window.confirm('Slette all framgang og starte helt på nytt?')) {
-        Lagring.nullstill();
-        el('foreldre').hidden = true;
-        settBevegelse();
-        visStart();
+    /* Nullstilling bak to sekunders hold. Før lå den bak window.confirm –
+     * ett trykk til på en knapp barnet ikke kan lese, altså tre tilfeldige
+     * trykk fra å slette ukevis med framgang. Å holde inne er derimot
+     * ingenting en treåring gjør ved et uhell, og fyllingen viser den voksne
+     * at noe faktisk skjer. */
+    (function () {
+      var knapp = el('inn-nullstill');
+      if (!knapp) { console.warn('Fant ikke element: inn-nullstill'); return; }
+      var tekst = el('nullstill-tekst');
+      var timer = null;
+
+      function slipp() {
+        window.clearTimeout(timer);
+        timer = null;
+        knapp.classList.remove('holder');
+        tekst.textContent = 'Nullstill all framgang';
       }
-    });
+
+      knapp.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        knapp.classList.add('holder');
+        tekst.textContent = 'Hold inne …';
+        timer = window.setTimeout(function () {
+          slipp();
+          Lagring.nullstill();
+          Tale.stopp();
+          el('foreldre').hidden = true;
+          settBevegelse();
+          visStemmeknapp();
+          visStart();
+        }, 2000);
+      });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (h) {
+        knapp.addEventListener(h, slipp);
+      });
+    })();
 
     /* Tastaturet: bokstavtastene velger bokstaven direkte. På en PC er det
      * den beste koblingen mellom tegnet på skjermen og fingeren hans. */

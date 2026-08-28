@@ -50,17 +50,31 @@ var Lyd = (function () {
   }
 
   /* Filtrert støy – brukes til motorbrum og bølgeskvulp. */
+  /* Støybufferne gjenbrukes. Før ble det fylt ~24 000 tilfeldige tall på nytt
+   * hver gang bilen kjørte – altså ved hvert riktige svar. Umerkelig på en PC,
+   * målbart på en gammel iPad. Filtrert og fadet hører man ikke at det er
+   * samme støy hver gang. */
+  var stoybuffere = {};
+
+  function stoybuffer(c, lengde) {
+    var nokkel = String(lengde);
+    var b = stoybuffere[nokkel];
+    if (b && b.sampleRate === c.sampleRate) return b;
+    var rammer = Math.max(1, Math.floor(c.sampleRate * lengde));
+    b = c.createBuffer(1, rammer, c.sampleRate);
+    var data = b.getChannelData(0);
+    for (var i = 0; i < rammer; i++) data[i] = Math.random() * 2 - 1;
+    stoybuffere[nokkel] = b;
+    return b;
+  }
+
   function stoy(start_s, lengde, filterHz, styrke, filterSlutt) {
     var c = klar();
     if (!c) return;
     var t = c.currentTime + start_s;
-    var lengdeIRammer = Math.floor(c.sampleRate * lengde);
-    var buffer = c.createBuffer(1, lengdeIRammer, c.sampleRate);
-    var data = buffer.getChannelData(0);
-    for (var i = 0; i < lengdeIRammer; i++) data[i] = Math.random() * 2 - 1;
 
     var kilde = c.createBufferSource();
-    kilde.buffer = buffer;
+    kilde.buffer = stoybuffer(c, lengde);
 
     var filter = c.createBiquadFilter();
     filter.type = 'lowpass';
