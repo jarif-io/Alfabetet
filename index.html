@@ -237,8 +237,10 @@
         <b>På iPhone og iPad:</b> Safari gir nettsider bare de enkle
         systemstemmene. Nora og Henrik i «forbedret» eller «premium» kan lastes
         ned til iPhonen, men Apple lar dem ikke brukes av nettsider — bare av
-        iOS selv. Det er derfor de ikke dukker opp i lista over.
-        På Mac og Windows virker de nedlastede stemmene som de skal.
+        iOS selv, og Apple sier at det er slik det skal være. Det er derfor de
+        ikke dukker opp i lista over, og ingen innstilling her kan hente dem
+        fram. På Mac og Windows virker de nedlastede stemmene som de skal.
+        <b>Veien utenom står under «Lydklipp».</b>
       </p>
       <label class="bryter">
         <input type="checkbox" id="inn-bokstavlyd">
@@ -290,6 +292,36 @@
           kan overstyre valget i lista over.
         </p>
       </details>
+    </section>
+
+    <!-- Språkpakken. Dette er svaret på iPhone-problemet over: alt spillet
+         sier ligger som ferdige lydklipp i lyd/, så vi slipper å be
+         nettleseren snakke. -->
+    <section class="panel-del">
+      <h3>Norsk språkpakke</h3>
+      <p class="merknad">
+        Alt spillet sier er lest inn på forhånd med en norsk nevral stemme og
+        ligger som lydfiler i spillet. Derfor høres det likt ut på iPhone,
+        iPad, Mac, Windows og Android — uten at noen trenger å gjøre noe.
+        Stemmen er trent på Nasjonalbibliotekets talesyntesekorpus.
+      </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-lydbank">
+        <span class="bryter-spor"></span>
+        <span>Bruk språkpakken</span>
+      </label>
+      <p class="ibruk" id="lydbank-status"></p>
+      <p class="merknad">
+        Slår du den av, snakker nettleserens egen talesyntese i stedet — den
+        du velger over.
+      </p>
+      <p class="merknad">
+        To ting kan ikke ligge i en ferdig pakke, og sies derfor alltid av
+        talesyntesen: <b>barnets eget navn</b> til slutt i «Navnet mitt», og
+        <b>bokstavlydene</b> («fff», «sss») — en lyd som skal holdes ut i tid
+        får ikke en lesende stemme til. Gir du figuren et navn du skriver inn
+        selv i stedet for et av forslagene, gjelder det samme rosen.
+      </p>
     </section>
 
     <section class="panel-del">
@@ -420,8 +452,13 @@
 </div>
 
 <script src="js/data.js"></script>
+<script src="js/replikker.js"></script>
 <script src="js/lagring.js"></script>
 <script src="js/figurer.js"></script>
+<!-- Lydbanken: ferdige klipp som brukes i stedet for talesyntesen når vi har
+     dem. manifest.js lages av lag-lydbank.sh og er tom til den er kjørt. -->
+<script src="lyd/manifest.js"></script>
+<script src="js/lydbank.js"></script>
 <script src="js/tale.js"></script>
 <script src="js/lyd.js"></script>
 <script src="js/moduser.js"></script>

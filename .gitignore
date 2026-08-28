@@ -1,2 +1,5 @@
 # Mellomfil for artefaktpublisering, bygges ved behov med bygg-enfil.js
 artefakt-kropp.html
+
+# Stemmemodellen lastes ned av lag-lydpakke.py – 79 MB, ikke i repoet
+stemme/

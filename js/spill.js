@@ -154,6 +154,9 @@ var Spill = (function () {
        * er den brukerhandlingen nettleseren krever før lyd kan spilles. */
       b.addEventListener('click', function () {
         Lyd.lasOpp();
+        /* Språkpakken må også låses opp inne i et ekte trykk, ellers nekter
+         * iOS å spille klippene senere når de starter av seg selv. */
+        Lydbank.lasOpp();
         Lyd.klikk();
         visVerden();
         velgVerden(id);
@@ -534,8 +537,11 @@ var Spill = (function () {
     el('inn-navn-oy').value = Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '';
     el('inn-navn-oy').placeholder = VERDENER.oy.standardnavn;
 
+    el('inn-lydbank').checked = Lagring.innstilling('lydbank') !== false;
+
     tegnNiva();
     tegnStemmevalg();
+    tegnLydbank();
     tegnBokstavvelger();
     tegnStatus();
   }
@@ -628,6 +634,34 @@ var Spill = (function () {
     el('ios-merknad').hidden = !erIOS();
 
     visIBruk();
+  }
+
+  /* ---------- språkpakken ----------
+   *
+   * Her ligger svaret på iPhone-problemet: Apple slipper ikke de nedlastede
+   * stemmene til på nettsider, så i stedet for å be nettleseren snakke
+   * spiller spillet ferdige klipp som følger med. */
+
+  function tegnLydbank() {
+    /* Nevneren er replikkene *denne* familien kan møte, med navnene de har
+     * valgt. Har de skrevet inn et eget navn på figuren, finnes det ikke
+     * klipp for rosen – og da skal ikke tallet late som om alt er dekket. */
+    var liste = Replikker.alle({
+      bane: Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '',
+      oy: Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '',
+      dino: Lagring.harNavn('dino') ? Lagring.navnFor('dino') : '',
+      barn: Lagring.barnenavn()
+    });
+    var har = liste.filter(function (r) { return Lydbank.har(r.tekst); }).length;
+
+    var felt = el('lydbank-status');
+    if (!har) {
+      felt.className = 'ibruk ibruk--advarsel';
+      felt.textContent = 'Språkpakken mangler — spillet bruker talesyntesen.';
+      return;
+    }
+    felt.className = 'ibruk';
+    felt.textContent = har + ' av ' + liste.length + ' replikker har lydklipp.';
   }
 
   /* Viser hvilken stemme som faktisk brukes akkurat nå. Uten dette er det
@@ -854,6 +888,11 @@ var Spill = (function () {
       Tale.prov();
     });
     pa('inn-prov', 'click', function () { visIBruk(); Tale.prov(); });
+
+    pa('inn-lydbank', 'change', function () {
+      Lagring.settInnstilling('lydbank', this.checked);
+      tegnLydbank();
+    });
 
     pa('inn-let', 'click', function () {
       Tale.letEtterStemmer();

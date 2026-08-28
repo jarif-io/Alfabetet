@@ -144,6 +144,30 @@ var MIGRERINGER = {
 Regelen: **endrer du en standardverdi, spør alltid hva som skjer med dem som
 allerede har spilt** – og skriv en test som seeder gammel lagret tilstand.
 
+**Sjekk uttalen på fonemene, ikke på gjetning.** Da spillet fikk en ferdig
+lydpakke i stedet for talesyntese, måtte 300 klipp kontrolleres uten at noen
+kunne høre på dem. Talegjenkjenning på enstavelsesklipp er ubrukelig – den
+hørte «be» som «b», «to» som «2» og «å» som «hå», og det er umulig å skille
+ekte feil fra støy. Lydskriften er derimot fasit: `espeak-ng` sa at bokstaven
+D, skrevet «de», ble lest som pronomenet – `dˈiː`, ikke `dˈeː` – og at «Juice»
+ble `jˈʉɪka`. Fire ekte uttalefeil falt ut på minutter. Legg rettelsene i en
+uttaletabell ved siden av ordene, ikke i teksten på skjermen: det er *lyden*
+som skal endres, ikke det barnet ser.
+
+**En plattformvegg er et svar, ikke en blindvei.** Apple slipper ikke de
+nedlastede stemmene til på nettsider, og har svart at det er meningen. Da er
+riktig trekk å slutte å bruke plattformens talesyntese, ikke å prøve en
+innstilling til: les inn alt på forhånd og legg lyden ved spillet. Løsningen
+ble bedre enn den opprinnelige – lik stemme på alle maskiner, uten at noen må
+gjøre noe.
+
+**Prøv flere veier før du kaller nettet stengt.** `curl https://github.com/…`
+ga 403, men `git clone` mot samme vert virket, og både
+`raw.githubusercontent.com` og nedlastinger fra releases svarte 200. Hadde
+den første 403-en fått stå som konklusjon, hadde hele språkpakken vært
+umulig. Test flere verter og flere protokoller, og les om avvisningen kom fra
+proxyen eller fra tjenesten selv.
+
 **Mål først når animasjonene har lagt seg.** Flisene på menyen flyr inn med en
 kort animasjon. Måler man 400 ms etter at skjermen kom opp, måler man
 posisjoner som ikke finnes et halvsekund senere – i én runde ga det
@@ -266,12 +290,18 @@ være barnesikret.
 
 ## 6. Prosessfeller
 
-**Skriptede tekstredigeringer trenger ankere som sjekkes.** Et skript som gjør
+**Skriptede tekstredigeringer trenger ankere som sjekkes – og i riktig
+rekkefølge.** Et skript som gjør
 `s[s.index(A):s.index(B)]` der B kom før A ga tom streng, og
 `s.replace('', ny)` satte inn teksten mellom hvert eneste tegn – README-en ble
-244 065 linjer. Når du redigerer prosa programmatisk: bruk regex på hele
-seksjoner, sjekk at treffet ikke er tomt, og la skriptet feile høyt i stedet
-for å skrive noe rart. Ellers rediger filen direkte.
+244 065 linjer. Samme felle igjen senere: `s[:i] + s[j:]` skulle
+klippe ut et stykke, men `j` lå *foran* `i` i filen, så kuttet ble et
+innlimingspunkt og koden ble duplisert fire ganger. `node --check` sa
+fortsatt at det var gyldig JavaScript. Når du redigerer programmatisk: bruk
+regex på hele seksjoner, sjekk at treffet ikke er tomt, kontroller at
+startankeret faktisk kommer før sluttankeret, og la skriptet feile høyt i
+stedet for å skrive noe rart. Går det galt likevel, er `git checkout` på
+filen og en ny, ren endring raskere enn å lappe.
 
 **Si fra når noe er umulig i stedet for å «fikse» det videre.** iOS Safari
 eksponerer bare kompakte systemstemmer for websider, så de nedlastede

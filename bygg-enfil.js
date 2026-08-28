@@ -26,7 +26,41 @@ function trygg(tekst) {
 }
 
 function les(relativSti) {
+  if (relativSti === 'lyd/manifest.js') return lydbankInnbakt();
   return fs.readFileSync(sti.join(rot, relativSti), 'utf8');
+}
+
+/* Lydbanken peker normalt på filer i lyd/. I enfil-utgaven finnes ingen mappe
+ * å peke på, så hvert klipp legges inn som en data-URL i stedet. Da virker
+ * den gode stemmen også når filen er AirDropet til en iPad. */
+function lydbankInnbakt() {
+  var kilde = fs.readFileSync(sti.join(rot, 'lyd/manifest.js'), 'utf8');
+  var treff = kilde.match(/var LYDFILER = ([\s\S]*?);\s*$/);
+  if (!treff) return kilde;
+  var kart;
+  try { kart = JSON.parse(treff[1]); } catch (e) { return kilde; }
+
+  var typer = { '.m4a': 'audio/mp4', '.aiff': 'audio/aiff', '.mp3': 'audio/mpeg',
+                '.wav': 'audio/wav', '.caf': 'audio/x-caf' };
+  var ut = {}, tatt = 0, hoppet = 0, bytes = 0;
+  Object.keys(kart).forEach(function (n) {
+    var verdi = kart[n];
+    if (verdi.indexOf('data:') === 0) { ut[n] = verdi; tatt++; return; }
+    var fil = sti.join(rot, 'lyd', verdi);
+    if (!fs.existsSync(fil)) { hoppet++; return; }
+    var data = fs.readFileSync(fil);
+    bytes += data.length;
+    ut[n] = 'data:' + (typer[sti.extname(verdi).toLowerCase()] || 'audio/mp4') +
+            ';base64,' + data.toString('base64');
+    tatt++;
+  });
+  if (tatt) {
+    console.log('lydbank: ' + tatt + ' klipp lagt inn (' +
+                Math.round(bytes / 1024) + ' KB lyd)' +
+                (hoppet ? ', ' + hoppet + ' filer manglet' : ''));
+  }
+  return kilde.slice(0, treff.index) + 'var LYDFILER = ' +
+         JSON.stringify(ut) + ';\n';
 }
 
 /* Bytt <link rel="stylesheet" href="..."> mot <style>…</style> */

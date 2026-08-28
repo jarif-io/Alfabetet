@@ -34,7 +34,7 @@
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-28 · 8';
+var SPILLVERSJON = '2026-08-28 · 9';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -85,6 +85,35 @@ var BOKSTAVLYD = {
 };
 
 function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
+
+/* ================= uttale ================= */
+
+/* Stemmen i språkpakken leser fra skrift, og noen ord blir feil når de leses
+ * som de skrives. Her står hvordan ordet må skrives for at det skal *høres*
+ * riktig ut. Teksten på skjermen er den samme som før – dette gjelder bare
+ * lyden, og bare når lydpakken lages.
+ *
+ * Alle oppføringene er funnet ved å be talesyntesen om lydskriften og
+ * sammenligne med hvordan ordet faktisk sies på norsk. Legger dere til nye
+ * ord i verdenene under, er det verdt å gjøre det samme:
+ *   python3 lag-lydpakke.py --uttale «ordet»
+ */
+var UTTALE = {
+  /* Bokstaven D. Skrevet «de» leser stemmen pronomenet, altså «di». */
+  'de': 'dé',
+  /* Bokstaven R heter «ærr». Skrevet «err» blir det «arr». */
+  'err': 'er',
+  /* Fremmedord som leses bokstavelig hvis de får stå som de skrives. */
+  'juice': 'jus',
+  'yoghurt': 'jogurt',
+  'quiz': 'kviss',
+  'cowboy': 'kauboi'
+};
+
+/* Hvordan ett ord skal skrives for stemmen. Ukjente ord går rett gjennom. */
+function uttaleFor(ord) {
+  return UTTALE[String(ord).toLowerCase()] || ord;
+}
 
 /* ================= tallene ================= */
 

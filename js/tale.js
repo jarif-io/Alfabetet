@@ -101,13 +101,43 @@ var Tale = (function () {
     window.setTimeout(oppdater, 3000);
   }
 
+  /* Spillet kan si noe hvis det finnes en talesyntese – eller hvis vi har
+   * lydklipp. En iPad uten talesyntese er fortsatt stum i dag; med en
+   * lydbank snakker den. */
   function pa() {
-    return stotte && Lagring.innstilling('stemme');
+    if (!Lagring.innstilling('stemme')) return false;
+    if (stotte) return true;
+    return typeof Lydbank !== 'undefined' && Lydbank.antallKlipp() > 0;
   }
 
-  /* Sier én tekst. Løftet innfris når stemmen er ferdig – eller etter en
-   * beregnet maksimaltid, siden enkelte nettlesere glemmer å melde fra. */
+  /* Har vi et ferdig klipp for setningen, spiller vi det i stedet for å be
+   * nettleseren snakke. Det er hele poenget med lydbanken: på iPhone gir
+   * Safari bare de enkle systemstemmene, og de forbedrede stemmene man
+   * laster ned kan ikke velges av en nettside. Et klipp går utenom hele
+   * problemet, og spillet høres likt ut på alle maskiner. */
+  function brukBank() {
+    return typeof Lydbank !== 'undefined' &&
+           Lagring.innstilling('lydbank') !== false;
+  }
+
+  /* Sier én tekst: klipp om vi har det, ellers talesyntesen. */
   function si(tekst) {
+    if (!pa() || !tekst) return Promise.resolve();
+    if (brukBank() && Lydbank.har(tekst)) {
+      return Lydbank.spill(tekst).then(null, function () {
+        /* Klippet lot seg ikke spille – da er en robotstemme bedre enn
+         * stillhet, og barnet merker ingenting annet enn at den ene
+         * setningen hørtes annerledes ut. */
+        return snakk(tekst);
+      });
+    }
+    return snakk(tekst);
+  }
+
+  /* Sier én tekst med nettleserens talesyntese. Løftet innfris når stemmen er
+   * ferdig – eller etter en beregnet maksimaltid, siden enkelte nettlesere
+   * glemmer å melde fra. */
+  function snakk(tekst) {
     return new Promise(function (ferdig) {
       if (!pa() || !tekst) { ferdig(); return; }
 
@@ -187,6 +217,7 @@ var Tale = (function () {
       if (stotte) {
         try { window.speechSynthesis.cancel(); } catch (e) {}
       }
+      if (typeof Lydbank !== 'undefined') Lydbank.stopp();
     },
 
     /* Brukes av foreldremenyen. */

@@ -231,19 +231,83 @@ at `H` skal være «Hest» i stedet for «Hus», så endrer dere den ene linja:
 Bytt gjerne til ordene fra alfabetboka dere leser — da kjenner han dem igjen
 begge veier. Husk bare de to reglene over når dere velger bilde.
 
-## Om stemmen
+## Språkpakken — god norsk overalt, også på iPhone
 
-Spillet bruker nettleserens egen talesyntese. **Kvaliteten kommer fra stemmen
+Spillet bruker **ikke** nettleserens talesyntese når det kan unngås. Alt det
+sier er lest inn på forhånd med en norsk nevral stemme og ligger som lydfiler
+i `lyd/`. Da høres spillet likt ut på iPhone, iPad, Mac, Windows og Android —
+uten at noen trenger å gjøre noe.
+
+Grunnen er iPhone. Safari gir nettsider bare de enkle systemstemmene. De
+forbedrede norske stemmene man laster ned under Innstillinger →
+Tilgjengelighet → Talt innhold kan ikke velges av en nettside i det hele tatt,
+og en Apple-ingeniør har svart at det er slik det skal være. Ingen innstilling
+i spillet kan hente dem fram. Ferdige lydklipp går utenom hele problemet.
+
+**Stemmen** er Piper-modellen `no_NO-talesyntese-medium`, trent på
+[Språkbankens talesyntesekorpus](https://www.nb.no/sprakbanken/en/resource-catalogue/oai-nb-no-sbr-15/)
+fra Nasjonalbiblioteket. Datasettet er CC0.
+
+I foreldremenyen, under **Norsk språkpakke**, står det hvor mange av
+replikkene som har klipp, og en bryter som slår pakken av hvis dere heller vil
+høre nettleserens egen stemme.
+
+### To ting pakken ikke kan dekke
+
+- **Barnets eget navn**, som sies til slutt i «Navnet mitt». Det er ulikt hos
+  hver familie, så det sies av talesyntesen. Det samme gjelder rosen hvis dere
+  skriver inn et eget navn på figuren i stedet for å velge et av forslagene —
+  alle forslagene ligger i pakken.
+- **Bokstavlydene** («fff», «sss»). En stemme som leser skrift lager ikke en
+  lyd som holdes ut i tid; den leser «eff eff eff». Innstillingen er av som
+  standard, og når den er på, sies lydene av talesyntesen.
+
+### Lage pakken på nytt
+
+Klippene ligger i repoet, så dette trengs bare hvis dere endrer ordene i
+`js/data.js`:
+
+```bash
+pip install sherpa-onnx lameenc numpy
+python3 lag-lydpakke.py
+```
+
+Skriptet henter stemmemodellen første gang (~64 MB, havner i `stemme/`, som
+ikke er i repoet), leser inn alle replikkene og skriver `lyd/manifest.js`.
+Kjør `node bygg-enfil.js` etterpå hvis dere bruker enfil-utgaven — den legger
+klippene inn i selve filen, så den fortsatt er én fil som virker uten nett.
+
+### Når et nytt ord blir lest feil
+
+Stemmen leser fra skrift, og noen ord blir feil. «Juice» ble til «juika»,
+«Yoghurt» til «y-og-hurt», og bokstaven D — skrevet «de» — ble lest som
+pronomenet, altså «di». Slikt rettes i tabellen `UTTALE` øverst i
+`js/data.js`: der står hvordan ordet må *skrives* for å bli lest riktig.
+Teksten på skjermen er den samme som før.
+
+Sjekk et ord uten å måtte høre på det:
+
+```bash
+python3 lag-lydpakke.py --uttale juice jus
+#   juice  → jˈʉɪka      ← feil
+#   jus    → jˈʉːs       ← riktig
+```
+
+## Om talesyntesen
+
+Der språkpakken ikke rekker – barnets eget navn, bokstavlydene, eller hvis
+dere slår pakken av – bruker spillet nettleserens egen talesyntese. **Kvaliteten kommer fra stemmen
 operativsystemet har installert, ikke fra spillet.** De gamle innebygde norske
 stemmene er metalliske; de nyere nevrale stemmene er langt bedre, og gratis:
 
 - **Mac:** Systeminnstillinger → Tilgjengelighet → Talt innhold → Systemstemme →
   Tilpass. Last ned **Nora (Premium)**.
-- **iPhone og iPad:** her går det dessverre ikke. Safari gir nettsider bare de
-  enkle systemstemmene. Du kan laste ned Nora og Henrik i «forbedret» eller
-  «premium» til telefonen, men Apple lar dem ikke brukes av nettsider — bare av
-  iOS selv. Derfor dukker de ikke opp i lista, uansett hva spillet gjør. På
-  iPhone er det beste å slå av stemmen med høyttalerknappen og lese selv.
+- **iPhone og iPad:** her går det ikke via talesyntesen. Safari gir nettsider
+  bare de enkle systemstemmene. Du kan laste ned Nora og Henrik i «forbedret»
+  eller «premium» til telefonen, men Apple lar dem ikke brukes av nettsider —
+  bare av iOS selv, og en Apple-ingeniør har svart at det er slik det skal
+  være. Derfor dukker de ikke opp i lista, uansett hva spillet gjør.
+  **Derfor har spillet sin egen språkpakke – se over.**
 - **Windows:** Innstillinger → Tid og språk → Tale → Legg til stemmer → Norsk bokmål.
   Stemmer som heter **Natural** eller **Online** er de nye. Microsoft Edge viser som
   regel flere av dem enn Chrome gjør.
@@ -348,7 +412,11 @@ js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        norsk talesyntese
 js/lyd.js         lydeffekter, laget av nettleseren selv
 js/moduser.js     modusene, felles for bokstaver og tall
+js/replikker.js   alt spillet sier, samlet på ett sted (grunnlaget for lydbanken)
+js/lydbank.js     spiller klipp fra språkpakken i stedet for talesyntese
 js/spill.js       navigasjon, scene, tastatur og foreldremeny
+lag-lydpakke.py   leser inn alle replikkene med en norsk nevral stemme
+lyd/              språkpakken: ett lydklipp per replikk, og manifest.js
 bygg-enfil.js     limer alt sammen til én fil du kan flytte rundt
 ```
 

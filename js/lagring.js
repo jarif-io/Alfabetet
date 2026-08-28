@@ -6,7 +6,7 @@
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
-  var NA_VERSJON = 5;
+  var NA_VERSJON = 6;
 
   var standard = {
     versjon: NA_VERSJON,
@@ -37,7 +37,10 @@ var Lagring = (function () {
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null,  /* null = alle utenom de sjeldne (Q, W, X, Z) */
       visAlleModuser: false, /* av = menyen slipper til én modus om gangen */
-      bokstavlyd: false /* av = si bare bokstavnavnet, ikke selve lyden */
+      bokstavlyd: false, /* av = si bare bokstavnavnet, ikke selve lyden */
+      /* På = spill ferdige lydklipp når vi har dem, i stedet for å be
+       * nettleseren snakke. Det er dette som gir god norsk på iPhone. */
+      lydbank: true
     }
   };
 
@@ -51,13 +54,17 @@ var Lagring = (function () {
     /* 3: menyen viser bare det barnet er klar for. «Første lyd» har hittil
      *    stått der bestandig, så den som allerede har spilt skal ikke
      *    oppleve at en modus plutselig er borte. */
-    3: function (d) { d.laasteOpp = ['forstelyd']; }
+    3: function (d) { d.laasteOpp = ['forstelyd']; },
 
-    /* 4 har ingen steg med vilje. Da ble antallValg og bokstavlyd lagt til,
-     * og begge har standardverdier som er nøyaktig dagens oppførsel – to
+    /* 4 og 5 har ingen steg med vilje. Da ble antallValg og bokstavlyd lagt
+     * til, og begge har standardverdier som er nøyaktig dagens oppførsel – to
      * skilt og ingen bokstavlyd. Samtidig ble Q, W, X og Z tatt ut av
      * standardutvalget; det er en villet endring for alle, ikke noe som
      * skal migreres bort. Har forelderen valgt bokstaver selv, står valget. */
+
+    /* 6: lydbanken kom til. Den som allerede har spilt skal ha den på, ellers
+     *    ville en gammel og en ny installasjon hørt ulike ut. */
+    6: function (d) { d.innstillinger.lydbank = standard.innstillinger.lydbank; }
   };
 
   var maaSkrives = false;

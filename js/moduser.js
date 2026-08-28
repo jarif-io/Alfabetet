@@ -558,8 +558,8 @@ var Moduser = (function () {
       if (okt.talt >= alle) {
         /* Det siste tallordet han sier *er* svaret. Uten den koblingen har han
          * bare ramset opp tallrekka mens han pekte. */
-        Tale.rekke([tellenavn(okt.talt) + '.', 380,
-                    'Det var ' + tellenavn(okt.talt) + ' ' +
+        Tale.rekke([tellenavn(okt.talt) + '.', 380, 'Det var…', 240,
+                    tellenavn(okt.talt) + '.', 200,
                     okt.telleting.ord + '.']);
       } else {
         Tale.rekke([tellenavn(okt.talt) + '.']);
@@ -659,7 +659,11 @@ var Moduser = (function () {
       }
       riktigKnapp.classList.add('pekes');
       Tale.stopp();
-      Tale.rekke(['Her er ' + navnPaTegn(okt.verden, okt.fasit) + '.', 300, 'Trykk på den.']);
+      /* Navnet sies for seg. Det er samme ytring som ellers i spillet, og
+       * kan derfor gjenbruke det samme innspilte klippet – i tillegg til at
+       * det blir en pause rett foran det han skal høre etter. */
+      Tale.rekke(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
+                  300, 'Trykk på den.']);
     }
 
     function riktig(knapp) {
@@ -713,11 +717,11 @@ var Moduser = (function () {
       }
 
       var ros = forsteForsok
-        ? tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!'
-        : 'Der ja! Det er ' + navnPaTegn(okt.verden, okt.fasit) + '.';
+        ? [tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!']
+        : ['Der ja! Det er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.'];
 
       Tale.stopp();
-      Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
+      Tale.rekke(opp ? ros.concat([350, 'Nå prøver vi en vanskeligere en.']) : ros);
 
       var videre = el('oppgave-videre');
       videre.hidden = false;
@@ -824,11 +828,12 @@ var Moduser = (function () {
 
       Lyd.ferdig();
       var hilsen = okt.type === 'navn'
-        ? navnet + '. Det er navnet ditt!'
+        ? [Replikker.navnTilTale(okt.ko) + '.', 300, 'Det er navnet ditt!']
         : okt.nyeMestrede.length
-          ? 'Se her! ' + navnPaTegn(okt.verden, okt.nyeMestrede[0]) + ' kan du nå.'
-          : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
-      window.setTimeout(function () { Tale.rekke([hilsen]); }, 700);
+          ? ['Se her!', 280, navnPaTegn(okt.verden, okt.nyeMestrede[0]) + '.',
+             280, 'Den kan du nå!']
+          : ['Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!'];
+      window.setTimeout(function () { Tale.rekke(hilsen); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
       window.setTimeout(function () { hopp(); }, 400);
 
