@@ -195,6 +195,19 @@ bunnen, og ingenting kan rulles fordi body er `overflow: hidden`. Bruk
 men mekanismen kan simuleres: tving `html, body { height: 740px }` i et vindu
 som er 500 høyt, og se hva som havner utenfor.
 
+**`overflow: hidden` på body gjør enhver høydefeil uopprettelig.** Spillet var
+laget for å fylle skjermen uten rulling, og body var derfor `overflow: hidden`.
+Da regnet en nettleser ut en annen høyde enn vi trodde, havnet nederste flis
+under den faste veien – og *ingenting kunne rulles*. Sperr sideveis rulling om
+du vil, men la loddrett stå åpen: det koster ingenting når alt får plass, og
+er forskjellen på en skjønnhetsfeil og et spill han ikke kommer inn i.
+
+**Legg inn et versjonsmerke som den voksne kan lese opp.** Feilsøking på
+andres telefon er umulig uten å vite hva de faktisk kjører – Safari kan sitte
+på en gammel kopi i timevis, og da retter du feil som allerede er rettet. En
+linje i foreldremenyen med versjonen, og beskjed om at `?ny` bak adressen
+tvinger fram en fersk kopi, sparer en hel runde med gjetting.
+
 **Overlappende media queries i feil rekkefølge.** `max-height: 720px` etter
 `max-height: 520px` overstyrte den siste, og landskapsmodus fikk dobbelt så
 høy bakke som tiltenkt. Gi hver query eksplisitt nedre *og* øvre grense

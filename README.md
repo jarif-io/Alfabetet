@@ -308,6 +308,20 @@ under et minutt.
 
 Framgangen lagres per nettleser, så den følger ikke med mellom maskiner.
 
+## Ser du en gammel versjon?
+
+Nettleseren kan sitte på en gammel kopi av spillet i timevis. Under **For
+voksne**, helt nederst, står versjonen spillet faktisk kjører. Stemmer den ikke
+med den siste, tving fram en fersk kopi slik:
+
+- **iPhone og iPad:** legg noe bak adressen — `…/Alfabetet/?ny`. En annen
+  adresse kan ikke komme fra hurtigbufferen. Neste gang `?ny2`. Alternativt en
+  privat fane, eller Innstillinger → Safari → Avansert → Nettsteddata → slett
+  oppføringen for github.io.
+- **Mac:** ⌘⌥R, eller ⌥⌘E og deretter ⌘R.
+- Har dere lagt spillet på Hjem-skjermen, har ikonet sin egen buffer — slett og
+  legg til på nytt.
+
 ## Om figurene
 
 Lynet McQueen (Disney/Pixar) og Kaptein Sabeltann (Terje Formoe) er beskyttede

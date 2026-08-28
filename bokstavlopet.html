@@ -184,7 +184,12 @@ button, .teller, .bokstav, .skilt, .kort, .flis, .verdenkort, .navnbrikke {
    havner under veien, og siden kan ikke rulles fordi body er overflow:hidden.
    dvh følger det synlige feltet, så layouten og den faste veien er enige.
    vh står først som reserve for eldre nettlesere som ikke kjenner dvh. */
-html { height: 100vh; height: 100dvh; margin: 0; }
+html {
+  height: 100vh;                    /* eldste nettlesere */
+  height: -webkit-fill-available;   /* Safari før dvh: det synlige feltet */
+  height: 100dvh;                   /* nyere: følger adresselinja */
+  margin: 0;
+}
 body { height: 100%; margin: 0; }
 
 body {
@@ -195,7 +200,14 @@ body {
   background: var(--himmel-bunn);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* Sideveis rulling skal aldri skje – da er noe galt med layouten.
+     Loddrett er en annen sak: hver skjerm har sitt eget rullefelt og skal
+     normalt få plass, men regner nettleseren ut en annen høyde enn vi tror,
+     må siden kunne rulles. Med overflow:hidden ble den feilen umulig å komme
+     seg ut av – nederste flis lå under veien og ingenting rørte seg. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -575,6 +587,13 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   display: flex;
   min-height: 0;
   padding: 8px 24px calc(var(--grunn-h) + 2px);
+  /* Sikringsnett. Hver skjerm har sitt eget rullefelt og skal normalt få plass,
+     men regner nettleseren ut en annen høyde enn vi tror – som iOS gjør med
+     adresselinja – skal innholdet fortsatt kunne nås. Uten dette ble nederste
+     flis liggende under veien uten at noe lot seg rulle. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .skjerm {
@@ -1533,6 +1552,14 @@ body[data-verden="oy"] .skilt::after {
   border-radius: 999px;
   background: linear-gradient(to right, var(--god), #4aa87a);
   transition: width 900ms cubic-bezier(.2, .8, .3, 1);
+}
+
+/* Versjonslinja i foreldremenyen. Liten og grå – den er til feilsøking, ikke
+   noe den voksne trenger å forholde seg til til vanlig. */
+.versjonslinje {
+  font-size: .85rem;
+  color: var(--blekk-svak);
+  font-variant-numeric: tabular-nums;
 }
 
 .samling-rutenett {
@@ -2550,7 +2577,19 @@ body[data-verden="oy"] .skilt::after {
       <div class="navnrad">
         <label>Racerbilen<input type="text" id="inn-navn-bane" maxlength="20"></label>
         <label>Kapteinen<input type="text" id="inn-navn-oy" maxlength="20"></label>
+        <label>Dinosauren<input type="text" id="inn-navn-dino" maxlength="20"></label>
       </div>
+    </section>
+
+    <section class="panel-del">
+      <h3>Om denne versjonen</h3>
+      <p class="merknad">
+        Nettleseren kan sitte på en gammel kopi av spillet. Stemmer ikke
+        versjonen under med den siste jeg har gitt deg, har du en gammel
+        versjon i hurtigbufferen — legg <code>?ny</code> bak adressen, så
+        laster den ferskt.
+      </p>
+      <p class="versjonslinje" id="versjon"></p>
     </section>
 
     </div>
@@ -2603,6 +2642,11 @@ body[data-verden="oy"] .skilt::after {
  *
  * Spillet sier «L … L for Løve» – samme formel som alfabetbøkene bruker.
  */
+
+/* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
+ * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
+ * på en gammel kopi i timevis. Bump denne ved hver publisering. */
+var SPILLVERSJON = '2026-08-28 · 6';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -5453,6 +5497,11 @@ var Spill = (function () {
     el('inn-barnenavn').value = Lagring.barnenavn();
     visBarnenavn();
 
+    el('versjon').textContent = 'Versjon ' + SPILLVERSJON;
+
+    el('inn-navn-dino').value = Lagring.harNavn('dino') ? Lagring.navnFor('dino') : '';
+    el('inn-navn-dino').placeholder = VERDENER.dino.standardnavn;
+
     el('inn-navn-bane').value = Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '';
     el('inn-navn-bane').placeholder = VERDENER.bane.standardnavn;
     el('inn-navn-oy').value = Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '';
@@ -5634,6 +5683,7 @@ var Spill = (function () {
      * Plassholderen lover det, så feltet skal oppføre seg slik. */
     Lagring.settNavn('bane', el('inn-navn-bane').value.trim());
     Lagring.settNavn('oy', el('inn-navn-oy').value.trim());
+    Lagring.settNavn('dino', el('inn-navn-dino').value.trim());
     /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
      * bort «Navnet mitt» igjen. */
     Lagring.settBarnenavn(el('inn-barnenavn').value);

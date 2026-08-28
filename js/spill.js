@@ -463,6 +463,11 @@ var Spill = (function () {
     el('inn-barnenavn').value = Lagring.barnenavn();
     visBarnenavn();
 
+    el('versjon').textContent = 'Versjon ' + SPILLVERSJON;
+
+    el('inn-navn-dino').value = Lagring.harNavn('dino') ? Lagring.navnFor('dino') : '';
+    el('inn-navn-dino').placeholder = VERDENER.dino.standardnavn;
+
     el('inn-navn-bane').value = Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '';
     el('inn-navn-bane').placeholder = VERDENER.bane.standardnavn;
     el('inn-navn-oy').value = Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '';
@@ -644,6 +649,7 @@ var Spill = (function () {
      * Plassholderen lover det, så feltet skal oppføre seg slik. */
     Lagring.settNavn('bane', el('inn-navn-bane').value.trim());
     Lagring.settNavn('oy', el('inn-navn-oy').value.trim());
+    Lagring.settNavn('dino', el('inn-navn-dino').value.trim());
     /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
      * bort «Navnet mitt» igjen. */
     Lagring.settBarnenavn(el('inn-barnenavn').value);
