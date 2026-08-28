@@ -138,7 +138,14 @@ button, .teller, .bokstav, .skilt, .kort, .flis, .verdenkort, .navnbrikke {
   touch-action: manipulation;
 }
 
-html, body { height: 100%; margin: 0; }
+/* iOS Safari lar html og body få høyden til den STORE viewporten – den uten
+   adresselinje – mens position:fixed måles mot det som faktisk vises. Med
+   adresselinja framme blir siden derfor høyere enn skjermen, nederste flis
+   havner under veien, og siden kan ikke rulles fordi body er overflow:hidden.
+   dvh følger det synlige feltet, så layouten og den faste veien er enige.
+   vh står først som reserve for eldre nettlesere som ikke kjenner dvh. */
+html { height: 100vh; height: 100dvh; margin: 0; }
+body { height: 100%; margin: 0; }
 
 body {
   font-family: var(--font-ui);

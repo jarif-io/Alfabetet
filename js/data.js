@@ -97,6 +97,25 @@ var TALLNAVN = {
 
 function tallnavnFor(tall) { return TALLNAVN[tall] || tall; }
 
+/* Tingene «Tell» teller. Trekkes tilfeldig for hver oppgave, og med vilje ikke
+ * fra tallets egen oppføring: hadde ballene alltid vært tre, kunne han svart
+ * riktig ved å kjenne igjen ballen i stedet for å telle. Her sier tingen
+ * ingenting om svaret. */
+var TELLETING = [
+  { ord: 'egg',      ikon: '🥚' },
+  { ord: 'baller',   ikon: '⚽' },
+  { ord: 'biler',    ikon: '🚗' },
+  { ord: 'epler',    ikon: '🍎' },
+  { ord: 'fisker',   ikon: '🐟' },
+  { ord: 'blomster', ikon: '🌸' },
+  { ord: 'stjerner', ikon: '⭐' },
+  { ord: 'bananer',  ikon: '🍌' },
+  { ord: 'jordbær',  ikon: '🍓' },
+  { ord: 'bøtter',   ikon: '🪣' },
+  { ord: 'ballonger', ikon: '🎈' },
+  { ord: 'sko',      ikon: '👟' }
+];
+
 /* Å telle høyt: «én, to, tre …». Egen liste fordi barnet teller fra én,
  * og fordi det er formen han hører når vi teller sammen med ham. */
 function tellenavn(n) { return TALLNAVN[String(n)] || String(n); }
@@ -221,8 +240,13 @@ var VERDENER = {
    * raskere enn noen forklaring.
    *
    * Her betyr «ord» navnet på tingen som telles, i den formen som passer
-   * akkurat det tallet – «to egg», men «tre bregner». Spillet setter sammen
-   * tallnavnet og ordet selv: «fire … fire bein». */
+   * akkurat det tallet – «to egg», men «tre baller». Spillet setter sammen
+   * tallnavnet og ordet selv: «fire … fire biler».
+   *
+   * Hvert tall har sin egen ting, så Reiret og Tallrekka blir variert. Ordene
+   * er hverdagsord en treåring sier selv – ball, bil, eple – ikke ord han
+   * må lære for å skjønne oppgaven. Alle emojiene er enkle kodepunkt, så de
+   * ikke faller fra hverandre på eldre telefoner. */
   dino: {
     id: 'dino',
     navn: 'Dinodalen',
@@ -240,16 +264,16 @@ var VERDENER = {
     oppdrag: 'Tramp til',
     ros: ['Kjempebra', 'Bra trampet', 'Så flink du er', 'Det klarte du'],
     ord: {
-      '1':  { ord: 'dinosaur', ikon: '🦕' },
-      '2':  { ord: 'egg',      ikon: '🥚' },
-      '3':  { ord: 'bregner',  ikon: '🌿' },
-      '4':  { ord: 'bein',     ikon: '🦴' },
-      '5':  { ord: 'spor',     ikon: '🐾' },
-      '6':  { ord: 'egg',      ikon: '🥚' },
-      '7':  { ord: 'bregner',  ikon: '🌿' },
-      '8':  { ord: 'bein',     ikon: '🦴' },
-      '9':  { ord: 'spor',     ikon: '🐾' },
-      '10': { ord: 'egg',      ikon: '🥚' }
+      '1':  { ord: 'dinosaur',  ikon: '🦕' },
+      '2':  { ord: 'egg',       ikon: '🥚' },
+      '3':  { ord: 'baller',    ikon: '⚽' },
+      '4':  { ord: 'biler',     ikon: '🚗' },
+      '5':  { ord: 'epler',     ikon: '🍎' },
+      '6':  { ord: 'fisker',    ikon: '🐟' },
+      '7':  { ord: 'blomster',  ikon: '🌸' },
+      '8':  { ord: 'stjerner',  ikon: '⭐' },
+      '9':  { ord: 'bananer',   ikon: '🍌' },
+      '10': { ord: 'jordbær',   ikon: '🍓' }
     }
   }
 };

@@ -53,7 +53,7 @@ bilen kjører, og alt annet fungerer som i bokstavverdenene.
 
 | | Hva det er |
 | --- | --- |
-| **Reiret** | Trykk på et tall og hør det. Ved siden av tallet står like mange ting som tallet sier — trykker han på 4, ser han fire bein. Ingen oppgaver, ingen feil. |
+| **Reiret** | Trykk på et tall og hør det. Ved siden av tallet står like mange ting som tallet sier — trykker han på 4, ser han fire biler. Hvert tall har sin egen ting, så det er variasjon å se på. Ingen oppgaver, ingen feil. |
 | **Tallrekka** | Fra 1 til 10, ett trykk om gangen, med mengden ved siden av. Samme rolige tur som Alfabetløypa. |
 | **Tell** | Et antall ting vises. Han **trykker på hver enkelt**, og spillet teller høyt: «én … to … tre». Så velger han tallet. |
 | **Finn tallet** | Hør tallet, og velg riktig skilt. Kommer når tre tall sitter — å kjenne igjen tallsymbolet er vanskeligere enn å telle ting. |
@@ -63,9 +63,13 @@ telle: å peke på hver ting nøyaktig én gang og sette ett tallord til hver. �
 en haug og gjette tallet er noe annet, og bærer ikke lenger enn til tre–fire
 ting. Tingen han har talt får en grønn ring og et nummer, så han ikke teller den
 samme to ganger — som er nettopp det telling handler om å unngå. Og når han er
-ferdig, sier spillet tallet om igjen: «Det var fem spor.» Det siste tallordet
+ferdig, sier spillet tallet om igjen: «Det var fem epler.» Det siste tallordet
 han sier *er* svaret, og uten den koblingen har han bare ramset opp tallrekka
 mens han pekte.
+
+**Tingene i «Tell» trekkes tilfeldig**, og med vilje ikke fra tallets egen
+oppføring. Hadde ballene alltid vært tre, kunne han svart riktig ved å kjenne
+igjen ballen i stedet for å telle — da måler vi hukommelse, ikke telling.
 
 **På tastaturet** velger sifrene tallet direkte. `0` står for 10.
 

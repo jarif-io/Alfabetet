@@ -449,8 +449,8 @@ var Moduser = (function () {
           : ['Så kommer…', 300, bokstavnavnFor(okt.fasit) + '.'];
       }
       if (okt.type === 'tell') {
-        var o = ordFor(okt.verden, okt.fasit);
-        return ['Hvor mange ' + o.ord + '?', 400, 'Trykk på hver enkelt og tell.'];
+        return ['Hvor mange ' + okt.telleting.ord + '?', 400,
+                'Trykk på hver enkelt og tell.'];
       }
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
@@ -520,10 +520,14 @@ var Moduser = (function () {
      * at tellingen går videre. Rekkefølgen er fri; det er antallet trykkede
      * ting som bestemmer hva som sies. */
     function tegnTelleting() {
-      var oppslag = ordFor(okt.verden, okt.fasit);
       var antall = antallFor(okt.verden, okt.fasit);
+      /* Tingen trekkes tilfeldig, ikke fra tallets egen oppføring. Var det
+       * alltid tre baller, kunne han svart riktig ved å kjenne igjen ballen
+       * i stedet for å telle – og da måler vi hukommelse, ikke telling. */
+      okt.telleting = tilfeldig(TELLETING);
       okt.talt = 0;
-      tegnMengde(el('oppgave-mal'), oppslag.ikon, antall, 'oppdrag-mal oppdrag-mal--tell mengde');
+      tegnMengde(el('oppgave-mal'), okt.telleting.ikon, antall,
+                 'oppdrag-mal oppdrag-mal--tell mengde');
 
       var ting = el('oppgave-mal').querySelectorAll('.ting');
       for (var i = 0; i < ting.length; i++) {
@@ -556,7 +560,7 @@ var Moduser = (function () {
          * bare ramset opp tallrekka mens han pekte. */
         Tale.rekke([tellenavn(okt.talt) + '.', 380,
                     'Det var ' + tellenavn(okt.talt) + ' ' +
-                    ordFor(okt.verden, okt.fasit).ord + '.']);
+                    okt.telleting.ord + '.']);
       } else {
         Tale.rekke([tellenavn(okt.talt) + '.']);
       }

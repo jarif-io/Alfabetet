@@ -186,6 +186,15 @@ kunne hoppe over hver eneste oppgave. Legg inn eksplisitt
 `.knapp[hidden] { display: none; }`, og ha en test som feiler hvis et element
 med `[hidden]` har `offsetWidth > 0`.
 
+**`height: 100%` er ikke skjermhøyden på telefon.** iOS Safari lar html og body
+få høyden til den *store* viewporten – den uten adresselinje – mens
+`position: fixed` måles mot det som faktisk vises. Med adresselinja framme blir
+siden høyere enn skjermen, nederste element havner under det som er festet i
+bunnen, og ingenting kan rulles fordi body er `overflow: hidden`. Bruk
+`100dvh` med `100vh` som reserve. Det er ikke mulig å reprodusere i Playwright,
+men mekanismen kan simuleres: tving `html, body { height: 740px }` i et vindu
+som er 500 høyt, og se hva som havner utenfor.
+
 **Overlappende media queries i feil rekkefølge.** `max-height: 720px` etter
 `max-height: 520px` overstyrte den siste, og landskapsmodus fikk dobbelt så
 høy bakke som tiltenkt. Gi hver query eksplisitt nedre *og* øvre grense

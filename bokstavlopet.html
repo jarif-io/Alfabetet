@@ -178,7 +178,14 @@ button, .teller, .bokstav, .skilt, .kort, .flis, .verdenkort, .navnbrikke {
   touch-action: manipulation;
 }
 
-html, body { height: 100%; margin: 0; }
+/* iOS Safari lar html og body få høyden til den STORE viewporten – den uten
+   adresselinje – mens position:fixed måles mot det som faktisk vises. Med
+   adresselinja framme blir siden derfor høyere enn skjermen, nederste flis
+   havner under veien, og siden kan ikke rulles fordi body er overflow:hidden.
+   dvh følger det synlige feltet, så layouten og den faste veien er enige.
+   vh står først som reserve for eldre nettlesere som ikke kjenner dvh. */
+html { height: 100vh; height: 100dvh; margin: 0; }
+body { height: 100%; margin: 0; }
 
 body {
   font-family: var(--font-ui);
@@ -2663,6 +2670,25 @@ var TALLNAVN = {
 
 function tallnavnFor(tall) { return TALLNAVN[tall] || tall; }
 
+/* Tingene «Tell» teller. Trekkes tilfeldig for hver oppgave, og med vilje ikke
+ * fra tallets egen oppføring: hadde ballene alltid vært tre, kunne han svart
+ * riktig ved å kjenne igjen ballen i stedet for å telle. Her sier tingen
+ * ingenting om svaret. */
+var TELLETING = [
+  { ord: 'egg',      ikon: '🥚' },
+  { ord: 'baller',   ikon: '⚽' },
+  { ord: 'biler',    ikon: '🚗' },
+  { ord: 'epler',    ikon: '🍎' },
+  { ord: 'fisker',   ikon: '🐟' },
+  { ord: 'blomster', ikon: '🌸' },
+  { ord: 'stjerner', ikon: '⭐' },
+  { ord: 'bananer',  ikon: '🍌' },
+  { ord: 'jordbær',  ikon: '🍓' },
+  { ord: 'bøtter',   ikon: '🪣' },
+  { ord: 'ballonger', ikon: '🎈' },
+  { ord: 'sko',      ikon: '👟' }
+];
+
 /* Å telle høyt: «én, to, tre …». Egen liste fordi barnet teller fra én,
  * og fordi det er formen han hører når vi teller sammen med ham. */
 function tellenavn(n) { return TALLNAVN[String(n)] || String(n); }
@@ -2787,8 +2813,13 @@ var VERDENER = {
    * raskere enn noen forklaring.
    *
    * Her betyr «ord» navnet på tingen som telles, i den formen som passer
-   * akkurat det tallet – «to egg», men «tre bregner». Spillet setter sammen
-   * tallnavnet og ordet selv: «fire … fire bein». */
+   * akkurat det tallet – «to egg», men «tre baller». Spillet setter sammen
+   * tallnavnet og ordet selv: «fire … fire biler».
+   *
+   * Hvert tall har sin egen ting, så Reiret og Tallrekka blir variert. Ordene
+   * er hverdagsord en treåring sier selv – ball, bil, eple – ikke ord han
+   * må lære for å skjønne oppgaven. Alle emojiene er enkle kodepunkt, så de
+   * ikke faller fra hverandre på eldre telefoner. */
   dino: {
     id: 'dino',
     navn: 'Dinodalen',
@@ -2806,16 +2837,16 @@ var VERDENER = {
     oppdrag: 'Tramp til',
     ros: ['Kjempebra', 'Bra trampet', 'Så flink du er', 'Det klarte du'],
     ord: {
-      '1':  { ord: 'dinosaur', ikon: '🦕' },
-      '2':  { ord: 'egg',      ikon: '🥚' },
-      '3':  { ord: 'bregner',  ikon: '🌿' },
-      '4':  { ord: 'bein',     ikon: '🦴' },
-      '5':  { ord: 'spor',     ikon: '🐾' },
-      '6':  { ord: 'egg',      ikon: '🥚' },
-      '7':  { ord: 'bregner',  ikon: '🌿' },
-      '8':  { ord: 'bein',     ikon: '🦴' },
-      '9':  { ord: 'spor',     ikon: '🐾' },
-      '10': { ord: 'egg',      ikon: '🥚' }
+      '1':  { ord: 'dinosaur',  ikon: '🦕' },
+      '2':  { ord: 'egg',       ikon: '🥚' },
+      '3':  { ord: 'baller',    ikon: '⚽' },
+      '4':  { ord: 'biler',     ikon: '🚗' },
+      '5':  { ord: 'epler',     ikon: '🍎' },
+      '6':  { ord: 'fisker',    ikon: '🐟' },
+      '7':  { ord: 'blomster',  ikon: '🌸' },
+      '8':  { ord: 'stjerner',  ikon: '⭐' },
+      '9':  { ord: 'bananer',   ikon: '🍌' },
+      '10': { ord: 'jordbær',   ikon: '🍓' }
     }
   }
 };
@@ -4389,8 +4420,8 @@ var Moduser = (function () {
           : ['Så kommer…', 300, bokstavnavnFor(okt.fasit) + '.'];
       }
       if (okt.type === 'tell') {
-        var o = ordFor(okt.verden, okt.fasit);
-        return ['Hvor mange ' + o.ord + '?', 400, 'Trykk på hver enkelt og tell.'];
+        return ['Hvor mange ' + okt.telleting.ord + '?', 400,
+                'Trykk på hver enkelt og tell.'];
       }
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
@@ -4460,10 +4491,14 @@ var Moduser = (function () {
      * at tellingen går videre. Rekkefølgen er fri; det er antallet trykkede
      * ting som bestemmer hva som sies. */
     function tegnTelleting() {
-      var oppslag = ordFor(okt.verden, okt.fasit);
       var antall = antallFor(okt.verden, okt.fasit);
+      /* Tingen trekkes tilfeldig, ikke fra tallets egen oppføring. Var det
+       * alltid tre baller, kunne han svart riktig ved å kjenne igjen ballen
+       * i stedet for å telle – og da måler vi hukommelse, ikke telling. */
+      okt.telleting = tilfeldig(TELLETING);
       okt.talt = 0;
-      tegnMengde(el('oppgave-mal'), oppslag.ikon, antall, 'oppdrag-mal oppdrag-mal--tell mengde');
+      tegnMengde(el('oppgave-mal'), okt.telleting.ikon, antall,
+                 'oppdrag-mal oppdrag-mal--tell mengde');
 
       var ting = el('oppgave-mal').querySelectorAll('.ting');
       for (var i = 0; i < ting.length; i++) {
@@ -4496,7 +4531,7 @@ var Moduser = (function () {
          * bare ramset opp tallrekka mens han pekte. */
         Tale.rekke([tellenavn(okt.talt) + '.', 380,
                     'Det var ' + tellenavn(okt.talt) + ' ' +
-                    ordFor(okt.verden, okt.fasit).ord + '.']);
+                    okt.telleting.ord + '.']);
       } else {
         Tale.rekke([tellenavn(okt.talt) + '.']);
       }
