@@ -6,18 +6,18 @@
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
-  var NA_VERSJON = 4;
+  var NA_VERSJON = 5;
 
   var standard = {
     versjon: NA_VERSJON,
-    navn: { bane: '', oy: '' },
+    navn: { bane: '', oy: '', dino: '' },
     /* Hvor mange skilt han får å velge mellom. Dette må overleve runden:
      * settes det tilbake til to hver gang, rykker han aldri varig opp, og
      * vanskegraden er bygget uten at noen merker den. */
-    antallValg: { bane: 2, oy: 2 },
+    antallValg: { bane: 2, oy: 2, dino: 2 },
     /* Runder på rad der under halvparten satt på første forsøk. To slike
      * betyr at det ble for vanskelig, og han rykker ned igjen. */
-    svakeRunder: { bane: 0, oy: 0 },
+    svakeRunder: { bane: 0, oy: 0, dino: 0 },
     /* Barnets eget navn. Tomt = «Navnet mitt» er ikke tilgjengelig ennå. */
     barnenavn: '',
     /* Moduser som har dukket opp på menyen. Låsingen går bare én vei: en
@@ -72,12 +72,17 @@ var Lagring = (function () {
       var lest = JSON.parse(rå);
       /* Slå sammen med standard, så nye felter ikke mangler i gamle lagringer. */
       var ut = kopi(standard);
-      if (lest.navn) ut.navn = { bane: lest.navn.bane || '', oy: lest.navn.oy || '' };
+      /* Går over verdenene som finnes, ikke en hardkodet liste: kommer det
+       * en verden til, skal navnet og vanskegraden hennes ikke falle bort. */
+      var verdener = Object.keys(VERDENER);
+      if (lest.navn) {
+        verdener.forEach(function (v) { ut.navn[v] = lest.navn[v] || ''; });
+      }
       if (typeof lest.barnenavn === 'string') ut.barnenavn = lest.barnenavn;
       if (lest.laasteOpp instanceof Array) ut.laasteOpp = lest.laasteOpp.slice();
       ['antallValg', 'svakeRunder'].forEach(function (felt) {
         if (!lest[felt]) return;
-        ['bane', 'oy'].forEach(function (v) {
+        verdener.forEach(function (v) {
           if (typeof lest[felt][v] === 'number') ut[felt][v] = lest[felt][v];
         });
       });
@@ -120,11 +125,13 @@ var Lagring = (function () {
   }
   function to(n) { return (n < 10 ? '0' : '') + n; }
 
-  function forBokstav(bokstav) {
-    if (!data.framgang[bokstav]) {
-      data.framgang[bokstav] = { riktig: 0, feil: 0, dager: [] };
+  /* Framgangen lagres per tegn – både bokstaver og tall ligger her. Nøklene
+   * kolliderer ikke: «A» og «4» er forskjellige strenger. */
+  function forTegn(tegn) {
+    if (!data.framgang[tegn]) {
+      data.framgang[tegn] = { riktig: 0, feil: 0, dager: [] };
     }
-    return data.framgang[bokstav];
+    return data.framgang[tegn];
   }
 
   return {
@@ -138,7 +145,7 @@ var Lagring = (function () {
      * Treffet i seg selv telles uansett – det er dagene som er kriteriet.
      * Dager som allerede ligger lagret røres ikke; regelen gjelder framover. */
     registrerRiktig: function (bokstav, antallValg) {
-      var f = forBokstav(bokstav);
+      var f = forTegn(bokstav);
       f.riktig += 1;
       if (antallValg === undefined || antallValg >= 3) {
         var dag = idag();
@@ -148,7 +155,7 @@ var Lagring = (function () {
     },
 
     registrerFeil: function (bokstav) {
-      var f = forBokstav(bokstav);
+      var f = forTegn(bokstav);
       f.feil += 1;
       skriv();
     },
@@ -169,10 +176,19 @@ var Lagring = (function () {
       return f ? f.dager.length : 0;
     },
 
-    /* Bare bokstaver som er i bruk nå. Har forelderen begrenset utvalget til
-     * fem, ville det vært rart om telleren viste sju mestrede av fem. */
-    mestrede: function () {
-      var aktive = this.aktiveBokstaver();
+    /* Tegnene verdenen øver på nå. Bokstavverdenene deler bokstavutvalget
+     * foreldrene har satt; tallverdenen har sine ti tall og bryr seg ikke om
+     * hvilke bokstaver som er huket av. */
+    aktiveTegn: function (verdenId) {
+      if (verdenId && domeneFor(verdenId) === 'tall') return tegnFor(verdenId).slice();
+      return this.aktiveBokstaver();
+    },
+
+    /* Bare tegn som er i bruk i denne verdenen. Har forelderen begrenset
+     * utvalget til fem bokstaver, ville det vært rart om telleren viste sju
+     * mestrede av fem – og tallene skal ikke telles med blant bokstavene. */
+    mestrede: function (verdenId) {
+      var aktive = this.aktiveTegn(verdenId);
       var ut = [];
       for (var i = 0; i < aktive.length; i++) {
         if (this.erMestret(aktive[i])) ut.push(aktive[i]);

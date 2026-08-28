@@ -120,6 +120,91 @@ var Figurer = (function () {
     '</svg>';
   }
 
+  /* ---------- dinosauren ---------- */
+
+  /* Vår egen dinosaur – en rolig, rund planteeter med plater på ryggen.
+   * Samme oppskrift som bilen og skipet: ingen andres figur, og barnet gir
+   * den navn selv. */
+  function dino() {
+    var gHud = unik('hud'), gPlate = unik('plate');
+    return '' +
+    '<svg class="fig fig--dino" viewBox="0 0 200 130" role="img" aria-label="Dinosaur">' +
+      '<defs>' +
+        '<linearGradient id="' + gHud + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#7cc48a"/>' +
+          '<stop offset="0.6" stop-color="#4f9e63"/>' +
+          '<stop offset="1" stop-color="#357a49"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="' + gPlate + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#e0a127"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+
+      '<ellipse class="fig-skygge" cx="100" cy="122" rx="74" ry="7"/>' +
+
+      /* Hale – bakerst, altså til venstre, siden dinoen ser mot høyre.
+         Tykk der den møter kroppen, spiss ytterst. */
+      '<path d="M56 88C36 92 18 88 4 74c16 2 26-2 32-10 6-8 14-12 24-10z"' +
+            ' fill="url(#' + gHud + ')"/>' +
+
+      /* Bakbein bak kroppen, så dyret får dybde. */
+      '<rect class="dino-bein dino-bein--bak" x="62" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
+      '<rect class="dino-bein dino-bein--bak" x="104" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
+
+      /* Kropp – én rund form, så silhuetten er lett å kjenne igjen. */
+      '<ellipse cx="94" cy="76" rx="52" ry="34" fill="url(#' + gHud + ')"/>' +
+
+      /* Buk. Holdes godt innenfor kroppen, ellers leses den som en bjelke. */
+      '<ellipse cx="96" cy="88" rx="34" ry="16" fill="#b6e2bd" opacity=".55"/>' +
+
+      /* Forbein foran kroppen. */
+      '<rect class="dino-bein dino-bein--fram" x="74" y="92" width="21" height="30" rx="10.5" fill="#3f8b53"/>' +
+      '<rect class="dino-bein dino-bein--fram" x="112" y="92" width="21" height="30" rx="10.5" fill="#3f8b53"/>' +
+
+      /* Rygglater langs ryggen. */
+      '<g fill="url(#' + gPlate + ')">' +
+        '<path d="M62 56l7-15 8 13z"/>' +
+        '<path d="M80 47l9-17 9 15z"/>' +
+        '<path d="M100 45l10-15 8 16z"/>' +
+        '<path d="M120 50l9-12 6 14z"/>' +
+      '</g>' +
+
+      /* Hals og hode. */
+      '<path d="M132 62c0-18 10-30 26-32 6-1 10 2 10 8v26z" fill="url(#' + gHud + ')"/>' +
+      '<ellipse cx="168" cy="42" rx="24" ry="19" fill="url(#' + gHud + ')"/>' +
+      '<path d="M186 44h10a5 5 0 0 1 0 10h-8z" fill="#4f9e63"/>' +
+      '<circle cx="172" cy="36" r="5.5" fill="#243528"/>' +
+      '<circle cx="174" cy="34" r="2" fill="#fff" opacity=".95"/>' +
+      '<path d="M172 52c6 3 12 2 16-2" fill="none" stroke="#243528"' +
+            ' stroke-width="2.6" stroke-linecap="round"/>' +
+      /* to små nesebor */
+      '<g fill="#2e6b40"><circle cx="188" cy="40" r="1.7"/></g>' +
+
+    '</svg>';
+  }
+
+  /* Dinodalen: bregneskog og en vulkan i det fjerne. */
+  function dal() {
+    return '' +
+    '<svg class="lag lag--fjern" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
+      /* Vulkanen. Rolig, uten utbrudd – bakgrunnen skal ikke stjele blikket. */
+      '<path d="M812 240l108-150 108 150z" fill="var(--as-fjern)"/>' +
+      '<path d="M884 128h72l-16 18h-40z" fill="var(--as-bak)" opacity=".7"/>' +
+      '<path d="M0 240V128c80-30 160-32 240-6s170 20 250-8 180-26 270 4v122z" fill="var(--as-fjern)"/>' +
+    '</svg>' +
+    '<svg class="lag lag--bak" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M0 240V158c96-42 176-32 244 4s154 38 240 0 172-38 256-4 152 30 232-10v92z" fill="var(--as-bak)"/>' +
+    '</svg>' +
+    '<svg class="lag lag--fram" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M0 200v-58c116-48 200-30 272 12s150 40 240 0 178-30 252 10 148 28 236-18v54z" fill="var(--as-fram)"/>' +
+      /* Bregner i to grupper – dinosaurenes skog. */
+      '<g fill="var(--bregne, #3f8f5a)">' +
+        '<path d="M150 168c-30-6-46-26-44-52 22 6 38 22 44 52zM150 168c30-6 46-26 44-52-22 6-38 22-44 52zM150 168c-4-30 4-52 22-64-6 24-8 44-6 64z"/>' +
+        '<path d="M1040 172c-24-5-38-22-36-43 18 5 31 18 36 43zM1040 172c24-5 38-22 36-43-18 5-31 18-36 43z"/>' +
+      '</g>' +
+    '</svg>';
+  }
+
   /* ---------- landskapet bak ---------- */
 
   /* Åser i to lag gir dybde uten å ta oppmerksomhet. */
@@ -206,6 +291,28 @@ var Figurer = (function () {
           '<rect x="21" y="16" width="6" height="6"/><rect x="33" y="15" width="4" height="7"/>' +
         '</g>' +
       '</svg>',
+    /* Reiret: tre egg i et rede. */
+    reir:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<ellipse cx="24" cy="34" rx="19" ry="9" fill="none" stroke="var(--aksent)" stroke-width="3.4"/>' +
+        '<g fill="#fffdf8" stroke="var(--aksent)" stroke-width="2.4">' +
+          '<ellipse cx="16" cy="27" rx="6" ry="7.5"/>' +
+          '<ellipse cx="32" cy="27" rx="6" ry="7.5"/>' +
+          '<ellipse cx="24" cy="22" rx="6.5" ry="8"/>' +
+        '</g>' +
+      '</svg>',
+    /* Tell: tre ting og en pekefinger. */
+    tell:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<g fill="var(--aksent)">' +
+          '<circle cx="12" cy="16" r="7"/><circle cx="26" cy="16" r="7"/><circle cx="40" cy="16" r="7"/>' +
+        '</g>' +
+        '<g fill="none" stroke="var(--aksent-mork)" stroke-width="3" stroke-linecap="round">' +
+          '<path d="M12 30v4M26 30v4M40 30v4"/>' +
+        '</g>' +
+        '<path d="M20 44l8-8 4 4" fill="none" stroke="var(--aksent-mork)"' +
+          ' stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>',
     /* Alfabetløypa: en vei som svinger fra start til mål. */
     loype:
       '<svg viewBox="0 0 48 48" aria-hidden="true">' +
@@ -279,10 +386,15 @@ var Figurer = (function () {
     skip: skip,
     ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
-      return VERDENER[verdenId].figur === 'skip' ? skip() : bil();
+      var f = VERDENER[verdenId].figur;
+      if (f === 'skip') return skip();
+      if (f === 'dino') return dino();
+      return bil();
     },
     landskapFor: function (verdenId) {
-      return verdenId === 'oy' ? oy() : aser();
+      if (verdenId === 'oy') return oy();
+      if (verdenId === 'dino') return dal();
+      return aser();
     }
   };
 })();

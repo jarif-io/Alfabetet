@@ -48,9 +48,12 @@ var Spill = (function () {
    * øyeblikk. Fire av fire er en seier; fire av 29 ser ut som nesten ingenting. */
   function oppdaterTeller(medSmell) {
     var teller = el('stjerneteller');
-    var antall = Lagring.mestrede().length;
+    /* Telleren gjelder verdenen han står i. Tall og bokstaver samles hver for
+     * seg – ti tall blandet inn blant bokstavene ville gjort begge tallene
+     * meningsløse. */
+    var antall = Lagring.mestrede(naVerden).length;
     el('teller-tall').textContent = antall;
-    el('teller-av').textContent = '/' + Lagring.aktiveBokstaver().length;
+    el('teller-av').textContent = '/' + Lagring.aktiveTegn(naVerden).length;
     if (medSmell) {
       teller.classList.remove('smell');
       void teller.offsetWidth;
@@ -122,7 +125,7 @@ var Spill = (function () {
 
     var felt = el('verden-valg');
     felt.innerHTML = '';
-    ['bane', 'oy'].forEach(function (id) {
+    Object.keys(VERDENER).forEach(function (id) {
       var v = VERDENER[id];
       var b = document.createElement('button');
       b.type = 'button';
@@ -141,7 +144,7 @@ var Spill = (function () {
        * gå i stykker – derfor textContent i stedet for konkatenering. */
       b.querySelector('.verdenkort-tekst').textContent = Lagring.harNavn(id)
         ? 'Sammen med ' + Lagring.navnFor(id)
-        : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter');
+        : VERDENER[id].undertekst;
       b.addEventListener('click', function () { Lyd.klikk(); velgVerden(id); });
       felt.appendChild(b);
     });
@@ -235,9 +238,10 @@ var Spill = (function () {
       flis(Figurer.ikon(m.ikon), m.navn, m.tekst, m.start);
     });
 
-    var antall = Lagring.mestrede().length;
+    var antall = Lagring.mestrede(naVerden).length;
+    var ordet = domeneFor(naVerden) === 'tall' ? 'tall' : 'bokstaver';
     flis(Figurer.ikon('stjerne'), 'Samlingen din',
-      antall + ' av ' + Lagring.aktiveBokstaver().length + ' bokstaver er dine',
+      antall + ' av ' + Lagring.aktiveTegn(naVerden).length + ' ' + ordet + ' er dine',
       function () { Lyd.klikk(); visSamling(); });
 
     /* Menyen var den eneste skjermen som ikke sa noe. For en som ikke leser,
@@ -250,6 +254,63 @@ var Spill = (function () {
   /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
    * dem slipper til. */
   function moduser() {
+    return domeneFor(naVerden) === 'tall' ? tallmoduser() : bokstavmoduser();
+  }
+
+  /* Dinodalen. Samme maskineri som bokstavverdenene – utforsk, løype, finn –
+   * pluss «Tell», som er den egentlige telleferdigheten. */
+  function tallmoduser() {
+    var v = VERDENER[naVerden];
+    return [
+      {
+        id: 'reiret',
+        ikon: 'reir',
+        navn: v.utforsk,
+        tekst: 'Trykk på et tall og se hvor mange det er',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
+          Moduser.Utforsk.start(naVerden);
+        }
+      },
+      {
+        id: 'tallrekka',
+        ikon: 'loype',
+        navn: 'Tallrekka',
+        tekst: 'Fra 1 til 10, ett trykk om gangen',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Loype.stopp(); visMeny(); };
+          Moduser.Loype.start(naVerden, function () {
+            Moduser.Loype.stopp();
+            visMeny();
+          });
+        }
+      },
+      {
+        id: 'tell',
+        ikon: 'tell',
+        navn: 'Tell',
+        tekst: 'Trykk på hver ting og tell dem, og velg tallet',
+        apen: function () { return true; },
+        start: function () { Lyd.klikk(); startOppgave('tell'); }
+      },
+      {
+        id: 'finntall',
+        ikon: 'finn',
+        navn: 'Finn tallet',
+        tekst: 'Hør tallet, og velg riktig skilt',
+        /* Å kjenne igjen tallsymbolet er vanskeligere enn å telle ting, så
+         * den kommer når han har talt seg gjennom noen runder. */
+        apen: function () { return Lagring.mestrede('dino').length >= 3; },
+        start: function () { Lyd.klikk(); startOppgave('finn'); }
+      }
+    ];
+  }
+
+  function bokstavmoduser() {
     var v = VERDENER[naVerden];
     return [
       {
@@ -333,15 +394,16 @@ var Spill = (function () {
     settTopp(v.navn + ' · ' + Lagring.navnFor(naVerden), true);
     visSkjerm('skjerm-samling');
 
-    var mestrede = Lagring.mestrede();
+    var mestrede = Lagring.mestrede(naVerden);
     /* Veggen viser bokstavene som er i bruk nå. Er utvalget begrenset til
      * fem, er det de fem som er målet – ikke 29 ruter der 24 aldri kan
      * fylles. */
-    var aktive = Lagring.aktiveBokstaver();
+    var aktive = Lagring.aktiveTegn(naVerden);
+    var ordet = domeneFor(naVerden) === 'tall' ? 'tall' : 'bokstaver';
     el('samling-tittel').textContent = v.samling;
     el('samling-undertekst').textContent = mestrede.length === 0
-      ? 'Her samler du bokstavene du klarer.'
-      : 'Du har ' + mestrede.length + ' av ' + aktive.length + ' bokstaver.';
+      ? 'Her samler du ' + (ordet === 'tall' ? 'tallene' : 'bokstavene') + ' du klarer.'
+      : 'Du har ' + mestrede.length + ' av ' + aktive.length + ' ' + ordet + '.';
 
     var felt = el('samling-rutenett');
     felt.innerHTML = '';
@@ -820,8 +882,13 @@ var Spill = (function () {
        * på hverandre. */
       if (e.repeat) return;
 
+      /* I tallverdenen er det sifrene som gjelder – 0 står for 10, slik det
+       * gjør på et tastatur der 10 ikke har egen tast. */
       var tegn = (e.key || '').toUpperCase();
-      if (tegn.length === 1 && ALFABET.indexOf(tegn) !== -1 && tastLytter) {
+      if (naVerden && domeneFor(naVerden) === 'tall') {
+        if (tegn === '0') tegn = '10';
+      }
+      if (tastLytter && tegnFor(naVerden || 'bane').indexOf(tegn) !== -1) {
         e.preventDefault();
         var na = Date.now();
         if (na - sisteTast < 400) return;

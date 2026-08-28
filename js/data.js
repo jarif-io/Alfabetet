@@ -81,6 +81,26 @@ var BOKSTAVLYD = {
 
 function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
 
+/* ================= tallene ================= */
+
+/* Dinodalen bruker tall i stedet for bokstaver. Vi starter på 1–10: det er
+ * så langt en treåring kommer med å telle ting han kan se på én gang, og
+ * ti er et mål han kan nå. */
+var TALL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+/* Tallnavnene skrevet ut, av samme grunn som bokstavnavnene: talesyntesen
+ * kan lese «10» som «ti», men også som «en null» avhengig av stemme. */
+var TALLNAVN = {
+  '1': 'én', '2': 'to',  '3': 'tre', '4': 'fire', '5': 'fem',
+  '6': 'seks', '7': 'sju', '8': 'åtte', '9': 'ni', '10': 'ti'
+};
+
+function tallnavnFor(tall) { return TALLNAVN[tall] || tall; }
+
+/* Å telle høyt: «én, to, tre …». Egen liste fordi barnet teller fra én,
+ * og fordi det er formen han hører når vi teller sammen med ham. */
+function tellenavn(n) { return TALLNAVN[String(n)] || String(n); }
+
 /* Gjør barnets navn om til bokstavene «Navnet mitt» skal bygge.
  *
  * Bare det første leddet brukes: «Ida Marie» blir IDA og «Ole-Martin» blir
@@ -105,6 +125,7 @@ var VERDENER = {
   bane: {
     id: 'bane',
     navn: 'Racerbanen',
+    undertekst: 'Bokstaver med biler og motor',
     ikon: '🏁',
     figur: 'bil',
     figurOrd: 'bilen',
@@ -151,6 +172,7 @@ var VERDENER = {
   oy: {
     id: 'oy',
     navn: 'Sjørøverøya',
+    undertekst: 'Bokstaver med skip og skatter',
     ikon: '🏴‍☠️',
     figur: 'skip',
     figurOrd: 'skipet',
@@ -192,10 +214,81 @@ var VERDENER = {
       'Ø': { ord: 'Øy',           ikon: '🏝️' },
       'Å': { ord: 'Åtte',         ikon: '8️⃣' }
     }
+  },
+
+  /* Tallverdenen. Den ligger for seg selv med vilje: tall og bokstaver skal
+   * ikke blandes på samme skjerm, og et barn skjønner «her bor tallene»
+   * raskere enn noen forklaring.
+   *
+   * Her betyr «ord» navnet på tingen som telles, i den formen som passer
+   * akkurat det tallet – «to egg», men «tre bregner». Spillet setter sammen
+   * tallnavnet og ordet selv: «fire … fire bein». */
+  dino: {
+    id: 'dino',
+    navn: 'Dinodalen',
+    undertekst: 'Tall og telling med dinosaurer',
+    domene: 'tall',
+    tegn: TALL,
+    ikon: '🦕',
+    figur: 'dino',
+    figurOrd: 'dinosauren',
+    standardnavn: 'Rex',
+    navneforslag: ['Rex', 'Tass', 'Brumle', 'Piggen'],
+    navnesporsmal: 'Hva skal dinosauren hete?',
+    utforsk: 'Reiret',
+    samling: 'Eggsamlingen',
+    oppdrag: 'Tramp til',
+    ros: ['Kjempebra', 'Bra trampet', 'Så flink du er', 'Det klarte du'],
+    ord: {
+      '1':  { ord: 'dinosaur', ikon: '🦕' },
+      '2':  { ord: 'egg',      ikon: '🥚' },
+      '3':  { ord: 'bregner',  ikon: '🌿' },
+      '4':  { ord: 'bein',     ikon: '🦴' },
+      '5':  { ord: 'spor',     ikon: '🐾' },
+      '6':  { ord: 'egg',      ikon: '🥚' },
+      '7':  { ord: 'bregner',  ikon: '🌿' },
+      '8':  { ord: 'bein',     ikon: '🦴' },
+      '9':  { ord: 'spor',     ikon: '🐾' },
+      '10': { ord: 'egg',      ikon: '🥚' }
+    }
   }
 };
 
-/* Henter oppslaget for én bokstav i én verden. */
-function ordFor(verdenId, bokstav) {
-  return VERDENER[verdenId].ord[bokstav];
+/* ---------- verdenen som helhet ---------- */
+
+/* «bokstav» eller «tall». Alt som skiller de to verdenstypene henger på
+ * denne, så modusene kan være felles. */
+function domeneFor(verdenId) {
+  return VERDENER[verdenId].domene || 'bokstav';
+}
+
+/* Tegnsettet verdenen øver på: alfabetet, eller tallene. */
+function tegnFor(verdenId) {
+  return VERDENER[verdenId].tegn || ALFABET;
+}
+
+/* Hva tegnet heter når det sies høyt: «ell» eller «fire». */
+function navnPaTegn(verdenId, tegn) {
+  return domeneFor(verdenId) === 'tall'
+    ? tallnavnFor(tegn)
+    : bokstavnavnFor(tegn);
+}
+
+/* Hvor mange ting tegnet står for. Bokstaver teller ingenting. */
+function antallFor(verdenId, tegn) {
+  return domeneFor(verdenId) === 'tall' ? parseInt(tegn, 10) : 0;
+}
+
+/* Henter oppslaget for ett tegn i én verden – en bokstav eller et tall. */
+function ordFor(verdenId, tegn) {
+  return VERDENER[verdenId].ord[tegn];
+}
+
+/* Teksten under bildet: «Lastebil» i bokstavverdenene, «fire bein» i
+ * tallverdenen, der ordet alene ikke sier noe uten tallet foran. */
+function visningsordFor(verdenId, tegn) {
+  var oppslag = ordFor(verdenId, tegn);
+  if (!oppslag) return '';
+  if (domeneFor(verdenId) !== 'tall') return oppslag.ord;
+  return tallnavnFor(tegn) + ' ' + oppslag.ord;
 }

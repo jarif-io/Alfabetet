@@ -146,6 +146,27 @@ body[data-verden="oy"] {
   --lakk-mork: #8f2f1c;
 }
 
+/* Dinodalen: frodig grønt under en varm urtidshimmel. Aksenten er grønn, så
+   barnet ser med én gang at han er et annet sted enn på racerbanen. */
+body[data-verden="dino"] {
+  --himmel-topp: #9ad9de;
+  --himmel-bunn: #ffd9a8;
+  --sol: rgba(255, 226, 168, .9);
+  --as-fjern: #a8c9b0;
+  --as-bak: #7fae86;
+  --as-fram: #5c9468;
+  --bregne: #3f8f5a;
+  --grunn-topp: #7a6a4a;
+  --grunn-bunn: #5b4e35;
+  --stripe: transparent;
+  --aksent: #2f8f52;
+  --aksent-mork: #1d6437;
+  --aksent-svak: #e6f4ea;
+  --lakk: #4f9e63;
+  --lakk-lys: #7cc48a;
+  --lakk-mork: #357a49;
+}
+
 * { box-sizing: border-box; }
 
 /* Uten dette markerer iOS tekst og åpner hurtigmeny når man trykker litt
@@ -272,6 +293,26 @@ body[data-verden="bane"] .scene-grunn::before {
     transparent 62px 124px);
   opacity: .8;
   border-radius: 4px;
+}
+
+/* Jordbakken i Dinodalen: en lysere kant og noen steiner. */
+body[data-verden="dino"] .scene-grunn::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 4px;
+  height: 6px;
+  background: rgba(255, 255, 255, .2);
+  border-radius: 3px;
+}
+body[data-verden="dino"] .scene-grunn::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 26px;
+  height: 44px;
+  background-repeat: repeat-x;
+  background-size: 380px 44px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='44'%3E%3Cg fill='%23ffffff' fill-opacity='.1'%3E%3Cellipse cx='58' cy='16' rx='16' ry='6'/%3E%3Cellipse cx='196' cy='30' rx='22' ry='7'/%3E%3Cellipse cx='302' cy='12' rx='13' ry='5'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* Bølgetopper i havet. */
@@ -1203,6 +1244,20 @@ body[data-verden="oy"] .skilt::after {
 }
 .fig--skip { transform-origin: 50% 80%; }
 
+/* Dinosauren trasker: beina går i utakt, og kroppen dupper litt. */
+.dino-bein { transform-box: fill-box; transform-origin: 50% 0; }
+.figur.kjorer .dino-bein--bak { animation: tramp 540ms ease-in-out infinite; }
+.figur.kjorer .dino-bein--fram { animation: tramp 540ms ease-in-out infinite 270ms; }
+@keyframes tramp {
+  0%, 100% { transform: rotate(-11deg); }
+  50% { transform: rotate(11deg); }
+}
+.figur.kjorer .fig--dino { animation: dupp 540ms ease-in-out infinite; }
+@keyframes dupp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
 .stov { position: absolute; inset: 0; }
 .stov span {
   position: absolute;
@@ -1303,6 +1358,98 @@ body[data-verden="oy"] .skilt::after {
   color: var(--blekk-svak);
   text-align: center;
   max-width: 34em;
+}
+
+/* ============================================================
+   11a. Mengder som skal telles
+   ============================================================ */
+
+/* Tingene står på rekke, ikke strødd utover. Skal han telle dem, må han kunne
+   peke på dem én etter én uten å miste oversikten – og en fast rekkefølge er
+   det som gjør det mulig. */
+.mengde {
+  --ting: 34px;
+  --ting-gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ting-gap);
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+/* Over seks ting brytes rekka i to. En rad på ti blir enten bittesmå ting
+   eller for lang til å holde tellingen i. Bredden regnes ut fra tingene, ikke
+   fra skriftstørrelsen – ellers brytes rekka på feil sted når tingene vokser. */
+.mengde--to-rader { max-width: calc(5 * var(--ting) + 4 * var(--ting-gap)); }
+
+.ting {
+  width: var(--ting);
+  height: var(--ting);
+  font-size: calc(var(--ting) * .62);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 22%;
+  animation: trinn-inn 340ms cubic-bezier(.2, .8, .3, 1) backwards;
+}
+
+/* I «Tell» er tingene selve oppgaven, og da må de være det største på
+   skjermen – større enn tallskiltene han svarer med. Ellers peker hierarkiet
+   motsatt vei av det han skal gjøre. Hver ting er dessuten en trykkflate for
+   en treårsfinger. */
+.oppdrag-mal--tell {
+  --ting: 84px;
+  --ting-gap: 10px;
+  width: auto; height: auto;
+  padding: 14px 18px;
+  cursor: default;
+  background: rgba(255, 253, 248, .92);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sk-2);
+  max-width: min(620px, 94vw);
+}
+.oppdrag-mal--tell .ting {
+  position: relative;
+  cursor: pointer;
+  background: var(--flate-2);
+  box-shadow: inset 0 0 0 3px rgba(40, 30, 15, .1);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.oppdrag-mal--tell .ting:hover { transform: translateY(-3px); }
+.oppdrag-mal--tell .ting:active { transform: translateY(1px) scale(.97); }
+
+/* Den han har talt, får et tydelig merke – ellers mister han oversikten og
+   teller den samme to ganger, som er nettopp det telling handler om. */
+.oppdrag-mal--tell .ting.talt {
+  background: var(--aksent-svak);
+  box-shadow: inset 0 0 0 4px var(--aksent);
+}
+/* Nummeret tingen fikk blir stående, så han ser hvor langt han kom. */
+.oppdrag-mal--tell .ting.talt::after {
+  content: attr(data-talltall);
+  position: absolute;
+  right: -6px; top: -6px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  color: #fff;
+  background: var(--aksent);
+  width: 26px; height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: var(--sk-1);
+}
+.ting.teller { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
+
+/* Ordkortet i Reiret og Tallrekka viser mengden i stedet for ett bilde. */
+.ordkort-ikon.mengde {
+  --ting: 30px;
+  width: auto;
+  min-width: 92px;
+  height: auto;
+  min-height: 92px;
+  padding: 8px;
 }
 
 /* ============================================================
@@ -1766,6 +1913,7 @@ body[data-verden="oy"] .skilt::after {
   .ordkort-ord { font-size: 1.5rem; }
   .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
   .oppdrag-mal--bokstav { width: 124px; height: 124px; font-size: 4.4rem; border-radius: 24px; }
+  .oppdrag-mal--tell { --ting: 72px; --ting-gap: 9px; padding: 12px 14px; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
   .verdenkort { width: min(320px, 86vw); }
@@ -1803,6 +1951,9 @@ body[data-verden="oy"] .skilt::after {
   .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: 20px; }
   .skilt::after { height: 22px; width: 12px; }
   .oppdrag-mal--bokstav { width: 110px; height: 110px; font-size: 4rem; border-radius: 22px; }
+  .oppdrag-mal--tell { --ting: 58px; --ting-gap: 7px; padding: 10px 12px; }
+  .oppdrag-mal--tell .ting.talt::after { width: 21px; height: 21px; font-size: .82rem; right: -4px; top: -4px; }
+  .ordkort-ikon.mengde { --ting: 24px; min-width: 62px; min-height: 62px; padding: 6px; }
   .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: 18px; }
   .oppdrag-mal .mal-ord { font-size: 1.5rem; }
   .oppdrag-tekst { font-size: 1.1rem; }
@@ -1925,7 +2076,13 @@ body[data-verden="oy"] .skilt::after {
   }
   .oppdrag-tekst { width: 100%; text-align: center; }
   .oppdrag-tekst { font-size: .95rem; }
-  .oppdrag-mal--bokstav { width: 80px; height: 80px; font-size: 3rem; border-radius: 18px; }
+  /* På en skjerm som bare er 360 piksler høy er det ikke plass til både et
+     stort merke og en rad skilt. Merket er fortsatt større enn skiltene –
+     hierarkiet står – men begge krymper så de ikke møtes. */
+  .oppdrag-mal--bokstav { width: 70px; height: 70px; font-size: 2.7rem; border-radius: 17px; }
+  .oppdrag-mal--tell { --ting: 42px; --ting-gap: 5px; padding: 6px 9px; }
+  .oppdrag-mal--tell .ting.talt::after { width: 18px; height: 18px; font-size: .72rem; right: -3px; top: -3px; }
+  .ordkort-ikon.mengde { --ting: 20px; min-width: 46px; min-height: 46px; padding: 4px; }
   .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }
   .oppdrag-mal .mal-ord { font-size: 1.1rem; }
   .lytt-tekst { display: none; }
@@ -1959,7 +2116,7 @@ body[data-verden="oy"] .skilt::after {
   .oppdrag-mal--navn { gap: 6px; }
   .loype-teller { font-size: .85rem; }
 
-  .skilt { width: 74px; height: 74px; font-size: 2.2rem; border-radius: 16px; }
+  .skilt { width: 66px; height: 66px; font-size: 2rem; border-radius: 15px; }
   .skilt::after { height: 18px; width: 10px; }
   .valg { gap: 14px; }
   .knapp--stor { font-size: 1.05rem; padding: 12px 24px 10px; }
@@ -2468,6 +2625,26 @@ var BOKSTAVLYD = {
 
 function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
 
+/* ================= tallene ================= */
+
+/* Dinodalen bruker tall i stedet for bokstaver. Vi starter på 1–10: det er
+ * så langt en treåring kommer med å telle ting han kan se på én gang, og
+ * ti er et mål han kan nå. */
+var TALL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+/* Tallnavnene skrevet ut, av samme grunn som bokstavnavnene: talesyntesen
+ * kan lese «10» som «ti», men også som «en null» avhengig av stemme. */
+var TALLNAVN = {
+  '1': 'én', '2': 'to',  '3': 'tre', '4': 'fire', '5': 'fem',
+  '6': 'seks', '7': 'sju', '8': 'åtte', '9': 'ni', '10': 'ti'
+};
+
+function tallnavnFor(tall) { return TALLNAVN[tall] || tall; }
+
+/* Å telle høyt: «én, to, tre …». Egen liste fordi barnet teller fra én,
+ * og fordi det er formen han hører når vi teller sammen med ham. */
+function tellenavn(n) { return TALLNAVN[String(n)] || String(n); }
+
 /* Gjør barnets navn om til bokstavene «Navnet mitt» skal bygge.
  *
  * Bare det første leddet brukes: «Ida Marie» blir IDA og «Ole-Martin» blir
@@ -2492,6 +2669,7 @@ var VERDENER = {
   bane: {
     id: 'bane',
     navn: 'Racerbanen',
+    undertekst: 'Bokstaver med biler og motor',
     ikon: '🏁',
     figur: 'bil',
     figurOrd: 'bilen',
@@ -2538,6 +2716,7 @@ var VERDENER = {
   oy: {
     id: 'oy',
     navn: 'Sjørøverøya',
+    undertekst: 'Bokstaver med skip og skatter',
     ikon: '🏴‍☠️',
     figur: 'skip',
     figurOrd: 'skipet',
@@ -2579,12 +2758,83 @@ var VERDENER = {
       'Ø': { ord: 'Øy',           ikon: '🏝️' },
       'Å': { ord: 'Åtte',         ikon: '8️⃣' }
     }
+  },
+
+  /* Tallverdenen. Den ligger for seg selv med vilje: tall og bokstaver skal
+   * ikke blandes på samme skjerm, og et barn skjønner «her bor tallene»
+   * raskere enn noen forklaring.
+   *
+   * Her betyr «ord» navnet på tingen som telles, i den formen som passer
+   * akkurat det tallet – «to egg», men «tre bregner». Spillet setter sammen
+   * tallnavnet og ordet selv: «fire … fire bein». */
+  dino: {
+    id: 'dino',
+    navn: 'Dinodalen',
+    undertekst: 'Tall og telling med dinosaurer',
+    domene: 'tall',
+    tegn: TALL,
+    ikon: '🦕',
+    figur: 'dino',
+    figurOrd: 'dinosauren',
+    standardnavn: 'Rex',
+    navneforslag: ['Rex', 'Tass', 'Brumle', 'Piggen'],
+    navnesporsmal: 'Hva skal dinosauren hete?',
+    utforsk: 'Reiret',
+    samling: 'Eggsamlingen',
+    oppdrag: 'Tramp til',
+    ros: ['Kjempebra', 'Bra trampet', 'Så flink du er', 'Det klarte du'],
+    ord: {
+      '1':  { ord: 'dinosaur', ikon: '🦕' },
+      '2':  { ord: 'egg',      ikon: '🥚' },
+      '3':  { ord: 'bregner',  ikon: '🌿' },
+      '4':  { ord: 'bein',     ikon: '🦴' },
+      '5':  { ord: 'spor',     ikon: '🐾' },
+      '6':  { ord: 'egg',      ikon: '🥚' },
+      '7':  { ord: 'bregner',  ikon: '🌿' },
+      '8':  { ord: 'bein',     ikon: '🦴' },
+      '9':  { ord: 'spor',     ikon: '🐾' },
+      '10': { ord: 'egg',      ikon: '🥚' }
+    }
   }
 };
 
-/* Henter oppslaget for én bokstav i én verden. */
-function ordFor(verdenId, bokstav) {
-  return VERDENER[verdenId].ord[bokstav];
+/* ---------- verdenen som helhet ---------- */
+
+/* «bokstav» eller «tall». Alt som skiller de to verdenstypene henger på
+ * denne, så modusene kan være felles. */
+function domeneFor(verdenId) {
+  return VERDENER[verdenId].domene || 'bokstav';
+}
+
+/* Tegnsettet verdenen øver på: alfabetet, eller tallene. */
+function tegnFor(verdenId) {
+  return VERDENER[verdenId].tegn || ALFABET;
+}
+
+/* Hva tegnet heter når det sies høyt: «ell» eller «fire». */
+function navnPaTegn(verdenId, tegn) {
+  return domeneFor(verdenId) === 'tall'
+    ? tallnavnFor(tegn)
+    : bokstavnavnFor(tegn);
+}
+
+/* Hvor mange ting tegnet står for. Bokstaver teller ingenting. */
+function antallFor(verdenId, tegn) {
+  return domeneFor(verdenId) === 'tall' ? parseInt(tegn, 10) : 0;
+}
+
+/* Henter oppslaget for ett tegn i én verden – en bokstav eller et tall. */
+function ordFor(verdenId, tegn) {
+  return VERDENER[verdenId].ord[tegn];
+}
+
+/* Teksten under bildet: «Lastebil» i bokstavverdenene, «fire bein» i
+ * tallverdenen, der ordet alene ikke sier noe uten tallet foran. */
+function visningsordFor(verdenId, tegn) {
+  var oppslag = ordFor(verdenId, tegn);
+  if (!oppslag) return '';
+  if (domeneFor(verdenId) !== 'tall') return oppslag.ord;
+  return tallnavnFor(tegn) + ' ' + oppslag.ord;
 }
 
 </script>
@@ -2598,18 +2848,18 @@ function ordFor(verdenId, bokstav) {
 
 var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
-  var NA_VERSJON = 4;
+  var NA_VERSJON = 5;
 
   var standard = {
     versjon: NA_VERSJON,
-    navn: { bane: '', oy: '' },
+    navn: { bane: '', oy: '', dino: '' },
     /* Hvor mange skilt han får å velge mellom. Dette må overleve runden:
      * settes det tilbake til to hver gang, rykker han aldri varig opp, og
      * vanskegraden er bygget uten at noen merker den. */
-    antallValg: { bane: 2, oy: 2 },
+    antallValg: { bane: 2, oy: 2, dino: 2 },
     /* Runder på rad der under halvparten satt på første forsøk. To slike
      * betyr at det ble for vanskelig, og han rykker ned igjen. */
-    svakeRunder: { bane: 0, oy: 0 },
+    svakeRunder: { bane: 0, oy: 0, dino: 0 },
     /* Barnets eget navn. Tomt = «Navnet mitt» er ikke tilgjengelig ennå. */
     barnenavn: '',
     /* Moduser som har dukket opp på menyen. Låsingen går bare én vei: en
@@ -2664,12 +2914,17 @@ var Lagring = (function () {
       var lest = JSON.parse(rå);
       /* Slå sammen med standard, så nye felter ikke mangler i gamle lagringer. */
       var ut = kopi(standard);
-      if (lest.navn) ut.navn = { bane: lest.navn.bane || '', oy: lest.navn.oy || '' };
+      /* Går over verdenene som finnes, ikke en hardkodet liste: kommer det
+       * en verden til, skal navnet og vanskegraden hennes ikke falle bort. */
+      var verdener = Object.keys(VERDENER);
+      if (lest.navn) {
+        verdener.forEach(function (v) { ut.navn[v] = lest.navn[v] || ''; });
+      }
       if (typeof lest.barnenavn === 'string') ut.barnenavn = lest.barnenavn;
       if (lest.laasteOpp instanceof Array) ut.laasteOpp = lest.laasteOpp.slice();
       ['antallValg', 'svakeRunder'].forEach(function (felt) {
         if (!lest[felt]) return;
-        ['bane', 'oy'].forEach(function (v) {
+        verdener.forEach(function (v) {
           if (typeof lest[felt][v] === 'number') ut[felt][v] = lest[felt][v];
         });
       });
@@ -2712,11 +2967,13 @@ var Lagring = (function () {
   }
   function to(n) { return (n < 10 ? '0' : '') + n; }
 
-  function forBokstav(bokstav) {
-    if (!data.framgang[bokstav]) {
-      data.framgang[bokstav] = { riktig: 0, feil: 0, dager: [] };
+  /* Framgangen lagres per tegn – både bokstaver og tall ligger her. Nøklene
+   * kolliderer ikke: «A» og «4» er forskjellige strenger. */
+  function forTegn(tegn) {
+    if (!data.framgang[tegn]) {
+      data.framgang[tegn] = { riktig: 0, feil: 0, dager: [] };
     }
-    return data.framgang[bokstav];
+    return data.framgang[tegn];
   }
 
   return {
@@ -2730,7 +2987,7 @@ var Lagring = (function () {
      * Treffet i seg selv telles uansett – det er dagene som er kriteriet.
      * Dager som allerede ligger lagret røres ikke; regelen gjelder framover. */
     registrerRiktig: function (bokstav, antallValg) {
-      var f = forBokstav(bokstav);
+      var f = forTegn(bokstav);
       f.riktig += 1;
       if (antallValg === undefined || antallValg >= 3) {
         var dag = idag();
@@ -2740,7 +2997,7 @@ var Lagring = (function () {
     },
 
     registrerFeil: function (bokstav) {
-      var f = forBokstav(bokstav);
+      var f = forTegn(bokstav);
       f.feil += 1;
       skriv();
     },
@@ -2761,10 +3018,19 @@ var Lagring = (function () {
       return f ? f.dager.length : 0;
     },
 
-    /* Bare bokstaver som er i bruk nå. Har forelderen begrenset utvalget til
-     * fem, ville det vært rart om telleren viste sju mestrede av fem. */
-    mestrede: function () {
-      var aktive = this.aktiveBokstaver();
+    /* Tegnene verdenen øver på nå. Bokstavverdenene deler bokstavutvalget
+     * foreldrene har satt; tallverdenen har sine ti tall og bryr seg ikke om
+     * hvilke bokstaver som er huket av. */
+    aktiveTegn: function (verdenId) {
+      if (verdenId && domeneFor(verdenId) === 'tall') return tegnFor(verdenId).slice();
+      return this.aktiveBokstaver();
+    },
+
+    /* Bare tegn som er i bruk i denne verdenen. Har forelderen begrenset
+     * utvalget til fem bokstaver, ville det vært rart om telleren viste sju
+     * mestrede av fem – og tallene skal ikke telles med blant bokstavene. */
+    mestrede: function (verdenId) {
+      var aktive = this.aktiveTegn(verdenId);
       var ut = [];
       for (var i = 0; i < aktive.length; i++) {
         if (this.erMestret(aktive[i])) ut.push(aktive[i]);
@@ -2995,6 +3261,91 @@ var Figurer = (function () {
     '</svg>';
   }
 
+  /* ---------- dinosauren ---------- */
+
+  /* Vår egen dinosaur – en rolig, rund planteeter med plater på ryggen.
+   * Samme oppskrift som bilen og skipet: ingen andres figur, og barnet gir
+   * den navn selv. */
+  function dino() {
+    var gHud = unik('hud'), gPlate = unik('plate');
+    return '' +
+    '<svg class="fig fig--dino" viewBox="0 0 200 130" role="img" aria-label="Dinosaur">' +
+      '<defs>' +
+        '<linearGradient id="' + gHud + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#7cc48a"/>' +
+          '<stop offset="0.6" stop-color="#4f9e63"/>' +
+          '<stop offset="1" stop-color="#357a49"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="' + gPlate + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#e0a127"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+
+      '<ellipse class="fig-skygge" cx="100" cy="122" rx="74" ry="7"/>' +
+
+      /* Hale – bakerst, altså til venstre, siden dinoen ser mot høyre.
+         Tykk der den møter kroppen, spiss ytterst. */
+      '<path d="M56 88C36 92 18 88 4 74c16 2 26-2 32-10 6-8 14-12 24-10z"' +
+            ' fill="url(#' + gHud + ')"/>' +
+
+      /* Bakbein bak kroppen, så dyret får dybde. */
+      '<rect class="dino-bein dino-bein--bak" x="62" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
+      '<rect class="dino-bein dino-bein--bak" x="104" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
+
+      /* Kropp – én rund form, så silhuetten er lett å kjenne igjen. */
+      '<ellipse cx="94" cy="76" rx="52" ry="34" fill="url(#' + gHud + ')"/>' +
+
+      /* Buk. Holdes godt innenfor kroppen, ellers leses den som en bjelke. */
+      '<ellipse cx="96" cy="88" rx="34" ry="16" fill="#b6e2bd" opacity=".55"/>' +
+
+      /* Forbein foran kroppen. */
+      '<rect class="dino-bein dino-bein--fram" x="74" y="92" width="21" height="30" rx="10.5" fill="#3f8b53"/>' +
+      '<rect class="dino-bein dino-bein--fram" x="112" y="92" width="21" height="30" rx="10.5" fill="#3f8b53"/>' +
+
+      /* Rygglater langs ryggen. */
+      '<g fill="url(#' + gPlate + ')">' +
+        '<path d="M62 56l7-15 8 13z"/>' +
+        '<path d="M80 47l9-17 9 15z"/>' +
+        '<path d="M100 45l10-15 8 16z"/>' +
+        '<path d="M120 50l9-12 6 14z"/>' +
+      '</g>' +
+
+      /* Hals og hode. */
+      '<path d="M132 62c0-18 10-30 26-32 6-1 10 2 10 8v26z" fill="url(#' + gHud + ')"/>' +
+      '<ellipse cx="168" cy="42" rx="24" ry="19" fill="url(#' + gHud + ')"/>' +
+      '<path d="M186 44h10a5 5 0 0 1 0 10h-8z" fill="#4f9e63"/>' +
+      '<circle cx="172" cy="36" r="5.5" fill="#243528"/>' +
+      '<circle cx="174" cy="34" r="2" fill="#fff" opacity=".95"/>' +
+      '<path d="M172 52c6 3 12 2 16-2" fill="none" stroke="#243528"' +
+            ' stroke-width="2.6" stroke-linecap="round"/>' +
+      /* to små nesebor */
+      '<g fill="#2e6b40"><circle cx="188" cy="40" r="1.7"/></g>' +
+
+    '</svg>';
+  }
+
+  /* Dinodalen: bregneskog og en vulkan i det fjerne. */
+  function dal() {
+    return '' +
+    '<svg class="lag lag--fjern" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
+      /* Vulkanen. Rolig, uten utbrudd – bakgrunnen skal ikke stjele blikket. */
+      '<path d="M812 240l108-150 108 150z" fill="var(--as-fjern)"/>' +
+      '<path d="M884 128h72l-16 18h-40z" fill="var(--as-bak)" opacity=".7"/>' +
+      '<path d="M0 240V128c80-30 160-32 240-6s170 20 250-8 180-26 270 4v122z" fill="var(--as-fjern)"/>' +
+    '</svg>' +
+    '<svg class="lag lag--bak" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M0 240V158c96-42 176-32 244 4s154 38 240 0 172-38 256-4 152 30 232-10v92z" fill="var(--as-bak)"/>' +
+    '</svg>' +
+    '<svg class="lag lag--fram" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M0 200v-58c116-48 200-30 272 12s150 40 240 0 178-30 252 10 148 28 236-18v54z" fill="var(--as-fram)"/>' +
+      /* Bregner i to grupper – dinosaurenes skog. */
+      '<g fill="var(--bregne, #3f8f5a)">' +
+        '<path d="M150 168c-30-6-46-26-44-52 22 6 38 22 44 52zM150 168c30-6 46-26 44-52-22 6-38 22-44 52zM150 168c-4-30 4-52 22-64-6 24-8 44-6 64z"/>' +
+        '<path d="M1040 172c-24-5-38-22-36-43 18 5 31 18 36 43zM1040 172c24-5 38-22 36-43-18 5-31 18-36 43z"/>' +
+      '</g>' +
+    '</svg>';
+  }
+
   /* ---------- landskapet bak ---------- */
 
   /* Åser i to lag gir dybde uten å ta oppmerksomhet. */
@@ -3081,6 +3432,28 @@ var Figurer = (function () {
           '<rect x="21" y="16" width="6" height="6"/><rect x="33" y="15" width="4" height="7"/>' +
         '</g>' +
       '</svg>',
+    /* Reiret: tre egg i et rede. */
+    reir:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<ellipse cx="24" cy="34" rx="19" ry="9" fill="none" stroke="var(--aksent)" stroke-width="3.4"/>' +
+        '<g fill="#fffdf8" stroke="var(--aksent)" stroke-width="2.4">' +
+          '<ellipse cx="16" cy="27" rx="6" ry="7.5"/>' +
+          '<ellipse cx="32" cy="27" rx="6" ry="7.5"/>' +
+          '<ellipse cx="24" cy="22" rx="6.5" ry="8"/>' +
+        '</g>' +
+      '</svg>',
+    /* Tell: tre ting og en pekefinger. */
+    tell:
+      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
+        '<g fill="var(--aksent)">' +
+          '<circle cx="12" cy="16" r="7"/><circle cx="26" cy="16" r="7"/><circle cx="40" cy="16" r="7"/>' +
+        '</g>' +
+        '<g fill="none" stroke="var(--aksent-mork)" stroke-width="3" stroke-linecap="round">' +
+          '<path d="M12 30v4M26 30v4M40 30v4"/>' +
+        '</g>' +
+        '<path d="M20 44l8-8 4 4" fill="none" stroke="var(--aksent-mork)"' +
+          ' stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>',
     /* Alfabetløypa: en vei som svinger fra start til mål. */
     loype:
       '<svg viewBox="0 0 48 48" aria-hidden="true">' +
@@ -3154,10 +3527,15 @@ var Figurer = (function () {
     skip: skip,
     ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
-      return VERDENER[verdenId].figur === 'skip' ? skip() : bil();
+      var f = VERDENER[verdenId].figur;
+      if (f === 'skip') return skip();
+      if (f === 'dino') return dino();
+      return bil();
     },
     landskapFor: function (verdenId) {
-      return verdenId === 'oy' ? oy() : aser();
+      if (verdenId === 'oy') return oy();
+      if (verdenId === 'dino') return dal();
+      return aser();
     }
   };
 })();
@@ -3584,12 +3962,41 @@ var Moduser = (function () {
    * ell for Løve». Uten den hører han ingen sammenheng mellom navnet på
    * konsonanten, som begynner på en vokal, og lyden den lager i ordet – og
    * det er nettopp den sammenhengen «Første lyd» forutsetter. */
-  function bokstavrekke(bokstav, oppslag) {
-    var navn = bokstavnavnFor(bokstav);
-    var lyd = Lagring.innstilling('bokstavlyd') ? bokstavlydFor(bokstav) : null;
+  function tegnrekke(verdenId, tegn, oppslag) {
+    var navn = navnPaTegn(verdenId, tegn);
+    /* Tallene sier «fire … fire bein». «fire for bein» ville vært tull, og
+     * det er sammenhengen mellom tallet og mengden som er poenget. */
+    if (domeneFor(verdenId) === 'tall') {
+      return [navn + '.', 450, visningsordFor(verdenId, tegn) + '.'];
+    }
+    var lyd = Lagring.innstilling('bokstavlyd') ? bokstavlydFor(tegn) : null;
     var rekke = [navn + '.', 450];
     if (lyd) rekke = rekke.concat([lyd + '.', 450]);
     return rekke.concat([navn + ' for ' + tilTale(oppslag.ord) + '.']);
+  }
+
+  /* Hva merket heter når vi omtaler det: «Bokstaven» eller «Tallet». */
+  function merkeNavn(verdenId) {
+    return domeneFor(verdenId) === 'tall' ? 'Tallet' : 'Bokstaven';
+  }
+
+  /* Tegner en mengde ting å telle. Tingene står på rekke og rad i en fast
+   * rekkefølge, ikke strødd utover: skal han telle dem, må han kunne peke på
+   * dem én etter én uten å miste tellingen. */
+  function tegnMengde(vertEl, ikon, antall, klasse) {
+    vertEl.innerHTML = '';
+    vertEl.className = klasse || 'mengde';
+    /* Over seks ting brytes rekka i to, ellers blir tingene bittesmå på en
+     * telefon – og en rad på ti er uansett for lang til å holde oversikt i. */
+    vertEl.classList.toggle('mengde--to-rader', antall > 6);
+    for (var i = 0; i < antall; i++) {
+      var t = document.createElement('span');
+      t.className = 'ting';
+      t.dataset.nummer = String(i + 1);
+      t.textContent = ikon;
+      t.style.animationDelay = (i * 55) + 'ms';
+      vertEl.appendChild(t);
+    }
   }
 
   /* Kort animasjon som kan spilles om igjen: klassen må fjernes først. */
@@ -3762,30 +4169,35 @@ var Moduser = (function () {
       rutenett.innerHTML = '';
       /* Bildet under bokstaven gjør veggen mulig å navigere for en som ikke
        * kan lese: han finner traktoren, og lærer at den bor på T. */
-      Lagring.aktiveBokstaver().forEach(function (bokstav, i) {
+      Lagring.aktiveTegn(verdenId).forEach(function (bokstav, i) {
         var oppslag = ordFor(verdenId, bokstav);
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'bokstav' + (Lagring.erMestret(bokstav) ? ' mestret' : '');
         b.dataset.bokstav = bokstav;
-        b.title = bokstav + ' som i ' + oppslag.ord;
+        var beskrivelse = domeneFor(verdenId) === 'tall'
+          ? visningsordFor(verdenId, bokstav)
+          : bokstav + ' som i ' + oppslag.ord;
+        b.title = beskrivelse;
         b.innerHTML = '<span class="bokstav-tegn">' + bokstav + '</span>' +
                       '<span class="bokstav-bilde" aria-hidden="true">' + oppslag.ikon + '</span>';
-        b.setAttribute('aria-label', bokstav + ' som i ' + oppslag.ord);
+        b.setAttribute('aria-label', beskrivelse);
         b.style.animation = 'trinn-inn 320ms cubic-bezier(.2,.8,.3,1) ' + (i * 12) + 'ms backwards';
         b.addEventListener('click', function () { velg(bokstav); });
         rutenett.appendChild(b);
       });
 
       el('utforsk-bokstav').textContent = '?';
+      el('utforsk-ikon').className = 'ordkort-ikon';
       el('utforsk-ikon').textContent = VERDENER[verdenId].ikon;
-      el('utforsk-ord').textContent = 'Trykk på en bokstav';
+      el('utforsk-ord').textContent = domeneFor(verdenId) === 'tall'
+        ? 'Trykk på et tall' : 'Trykk på en bokstav';
       el('utforsk-lytt').hidden = true;
       sisteBokstav = null;
     }
 
     function velg(bokstav) {
-      var aktive = Lagring.aktiveBokstaver();
+      var aktive = Lagring.aktiveTegn(verdenId);
       if (aktive.indexOf(bokstav) === -1) return;
 
       var oppslag = ordFor(verdenId, bokstav);
@@ -3797,8 +4209,8 @@ var Moduser = (function () {
       }
 
       el('utforsk-bokstav').textContent = bokstav;
-      el('utforsk-ikon').textContent = oppslag.ikon;
-      el('utforsk-ord').textContent = oppslag.ord;
+      visIkonfelt(el('utforsk-ikon'), bokstav, oppslag);
+      el('utforsk-ord').textContent = visningsordFor(verdenId, bokstav);
       el('utforsk-lytt').hidden = false;
       spillOm(el('utforsk-bokstav'), 'bytter', 460);
       spillOm(el('utforsk-kort').querySelector('.ordkort-innhold'), 'bytter', 420);
@@ -3810,9 +4222,20 @@ var Moduser = (function () {
       si(bokstav, oppslag);
     }
 
+    /* Bokstavene har ett bilde. Tallene har like mange bilder som tallet sier
+     * – det er hele poenget: han skal se at 4 betyr fire ting. */
+    function visIkonfelt(vertEl, tegn, oppslag) {
+      if (domeneFor(verdenId) !== 'tall') {
+        vertEl.className = 'ordkort-ikon';
+        vertEl.textContent = oppslag.ikon;
+        return;
+      }
+      tegnMengde(vertEl, oppslag.ikon, antallFor(verdenId, tegn), 'ordkort-ikon mengde');
+    }
+
     function si(bokstav, oppslag) {
       Tale.stopp();
-      Tale.rekke(bokstavrekke(bokstav, oppslag));
+      Tale.rekke(tegnrekke(verdenId, bokstav, oppslag));
     }
 
     return {
@@ -3846,7 +4269,8 @@ var Moduser = (function () {
   var MODUSTITTEL = {
     finn: 'Finn bokstaven',
     forstelyd: 'Første lyd',
-    navn: 'Navnet mitt'
+    navn: 'Navnet mitt',
+    tell: 'Tell'
   };
 
   var Oppgave = (function () {
@@ -3854,8 +4278,8 @@ var Moduser = (function () {
 
     /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
      * noen kjente blandes inn som hvilepunkter. */
-    function byggKo(antall) {
-      var aktive = Lagring.aktiveBokstaver();
+    function byggKo(verdenId, antall) {
+      var aktive = Lagring.aktiveTegn(verdenId);
       var sortert = aktive.slice().sort(function (a, b) {
         var da = Lagring.dagerFor(a), db = Lagring.dagerFor(b);
         if (da !== db) return da - db;
@@ -3918,7 +4342,7 @@ var Moduser = (function () {
      * bokstaver alltid være med: har foreldrene snevret inn til fire
      * bokstaver, ville runden ellers vært uspillbar. */
     function utvalg() {
-      var aktive = Lagring.aktiveBokstaver();
+      var aktive = Lagring.aktiveTegn(okt.verden);
       if (okt.type !== 'navn') return aktive;
       var ut = aktive.slice();
       okt.ko.forEach(function (b) { if (ut.indexOf(b) === -1) ut.push(b); });
@@ -3933,7 +4357,7 @@ var Moduser = (function () {
     function sporsmalstale() {
       var v = VERDENER[okt.verden];
       if (okt.type === 'finn') {
-        return [v.oppdrag + '…', 280, bokstavnavnFor(okt.fasit) + '.'];
+        return [v.oppdrag + '…', 280, navnPaTegn(okt.verden, okt.fasit) + '.'];
       }
       if (okt.type === 'navn') {
         /* Første rute knytter oppgaven til navnet hans; resten holder tempoet
@@ -3941,6 +4365,10 @@ var Moduser = (function () {
         return okt.indeks === 0
           ? ['Navnet ditt begynner med…', 320, bokstavnavnFor(okt.fasit) + '.']
           : ['Så kommer…', 300, bokstavnavnFor(okt.fasit) + '.'];
+      }
+      if (okt.type === 'tell') {
+        var o = ordFor(okt.verden, okt.fasit);
+        return ['Hvor mange ' + o.ord + '?', 400, 'Trykk på hver enkelt og tell.'];
       }
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
@@ -3958,8 +4386,12 @@ var Moduser = (function () {
 
       var mal = el('oppgave-mal');
       mal.className = 'oppdrag-mal oppdrag-mal--' +
-        (okt.type === 'finn' ? 'bokstav' : okt.type === 'navn' ? 'navn' : 'ord');
-      if (okt.type === 'finn' || okt.type === 'navn') {
+        (okt.type === 'finn' ? 'bokstav' : okt.type === 'navn' ? 'navn'
+          : okt.type === 'tell' ? 'tell' : 'ord');
+      if (okt.type === 'tell') {
+        el('oppgave-tekst').textContent = 'Hvor mange?';
+        tegnTelleting();
+      } else if (okt.type === 'finn' || okt.type === 'navn') {
         el('oppgave-tekst').textContent =
           okt.type === 'navn' ? 'Navnet ditt' : v.oppdrag;
         /* Bokstaven er skjult, ellers er oppgaven bare å finne to like.
@@ -3996,6 +4428,58 @@ var Moduser = (function () {
       Tale.rekke(sporsmalstale());
     }
 
+    /* «Tell»: tingene han skal telle. Han kan trykke på hver enkelt, og da
+     * sier spillet «én … to … tre». Det er dette som *er* å telle – å peke på
+     * hver ting nøyaktig én gang og sette ett tallord til hver. Å bare se en
+     * haug og gjette tallet er noe helt annet, og går ikke lenger enn til
+     * tre–fire ting.
+     *
+     * Trykker han på nytt på en han allerede har tatt, sies tallet igjen uten
+     * at tellingen går videre. Rekkefølgen er fri; det er antallet trykkede
+     * ting som bestemmer hva som sies. */
+    function tegnTelleting() {
+      var oppslag = ordFor(okt.verden, okt.fasit);
+      var antall = antallFor(okt.verden, okt.fasit);
+      okt.talt = 0;
+      tegnMengde(el('oppgave-mal'), oppslag.ikon, antall, 'oppdrag-mal oppdrag-mal--tell mengde');
+
+      var ting = el('oppgave-mal').querySelectorAll('.ting');
+      for (var i = 0; i < ting.length; i++) {
+        (function (t) {
+          t.addEventListener('click', function (e) {
+            e.stopPropagation();
+            tellTing(t);
+          });
+        })(ting[i]);
+      }
+    }
+
+    function tellTing(t) {
+      if (t.classList.contains('talt')) {
+        /* Allerede talt: si tallet den fikk, uten å telle den om igjen. */
+        Tale.stopp();
+        Tale.rekke([tellenavn(t.dataset.talltall) + '.']);
+        return;
+      }
+      okt.talt += 1;
+      t.classList.add('talt');
+      t.dataset.talltall = String(okt.talt);
+      spillOm(t, 'teller', 420);
+      Lyd.klikk();
+      Tale.stopp();
+
+      var alle = antallFor(okt.verden, okt.fasit);
+      if (okt.talt >= alle) {
+        /* Det siste tallordet han sier *er* svaret. Uten den koblingen har han
+         * bare ramset opp tallrekka mens han pekte. */
+        Tale.rekke([tellenavn(okt.talt) + '.', 380,
+                    'Det var ' + tellenavn(okt.talt) + ' ' +
+                    ordFor(okt.verden, okt.fasit).ord + '.']);
+      } else {
+        Tale.rekke([tellenavn(okt.talt) + '.']);
+      }
+    }
+
     /* Tegner oppdragsmerket: enten et spørsmålstegn å trykke på, eller
      * bokstaven når den er avslørt. */
     function tegnMal() {
@@ -4004,8 +4488,8 @@ var Moduser = (function () {
         mal.classList.toggle('skjult', !okt.malVist);
         mal.textContent = okt.malVist ? okt.fasit : '?';
         mal.setAttribute('aria-label', okt.malVist
-          ? 'Bokstaven er ' + bokstavnavnFor(okt.fasit)
-          : 'Trykk for å se bokstaven');
+          ? merkeNavn(okt.verden) + ' er ' + navnPaTegn(okt.verden, okt.fasit)
+          : 'Trykk for å se ' + merkeNavn(okt.verden).toLowerCase());
         return;
       }
       if (okt.type !== 'navn') return;
@@ -4022,12 +4506,13 @@ var Moduser = (function () {
         return '<span class="navnrute"></span>';
       }).join('');
       mal.setAttribute('aria-label', okt.malVist
-        ? 'Bokstaven er ' + bokstavnavnFor(okt.fasit)
-        : 'Trykk for å se bokstaven');
+        ? merkeNavn(okt.verden) + ' er ' + navnPaTegn(okt.verden, okt.fasit)
+        : 'Trykk for å se ' + merkeNavn(okt.verden).toLowerCase());
     }
 
     function visMal() {
-      if (!okt || okt.type === 'forstelyd' || okt.malVist) return false;
+      if (!okt || okt.type === 'forstelyd' || okt.type === 'tell') return false;
+      if (okt.malVist) return false;
       okt.malVist = true;
       tegnMal();
       spillOm(el('oppgave-mal'), 'bytter', 460);
@@ -4088,7 +4573,7 @@ var Moduser = (function () {
       }
       riktigKnapp.classList.add('pekes');
       Tale.stopp();
-      Tale.rekke(['Her er ' + bokstavnavnFor(okt.fasit) + '.', 300, 'Trykk på den.']);
+      Tale.rekke(['Her er ' + navnPaTegn(okt.verden, okt.fasit) + '.', 300, 'Trykk på den.']);
     }
 
     function riktig(knapp) {
@@ -4143,7 +4628,7 @@ var Moduser = (function () {
 
       var ros = forsteForsok
         ? tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!'
-        : 'Der ja! Det er ' + bokstavnavnFor(okt.fasit) + '.';
+        : 'Der ja! Det er ' + navnPaTegn(okt.verden, okt.fasit) + '.';
 
       Tale.stopp();
       Tale.rekke(opp ? [ros, 350, 'Nå prøver vi en vanskeligere en.'] : [ros]);
@@ -4255,7 +4740,7 @@ var Moduser = (function () {
       var hilsen = okt.type === 'navn'
         ? navnet + '. Det er navnet ditt!'
         : okt.nyeMestrede.length
-          ? 'Se her! ' + bokstavnavnFor(okt.nyeMestrede[0]) + ' kan du nå.'
+          ? 'Se her! ' + navnPaTegn(okt.verden, okt.nyeMestrede[0]) + ' kan du nå.'
           : 'Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!';
       window.setTimeout(function () { Tale.rekke([hilsen]); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
@@ -4280,7 +4765,7 @@ var Moduser = (function () {
             opprykk: opps.opprykk
           };
         } else {
-          ko = byggKo(opps.antall);
+          ko = byggKo(verdenId, opps.antall);
         }
 
         okt = {
@@ -4303,7 +4788,10 @@ var Moduser = (function () {
         };
 
         Spill.visSkjerm('skjerm-oppgave');
-        Spill.settTopp(MODUSTITTEL[type] || 'Finn bokstaven', true);
+        /* «Finn bokstaven» heter «Finn tallet» i Dinodalen. */
+        var tittel = MODUSTITTEL[type] || 'Finn bokstaven';
+        if (type === 'finn' && domeneFor(verdenId) === 'tall') tittel = 'Finn tallet';
+        Spill.settTopp(tittel, true);
         stillFigurTilStart();
         Spill.settTastLytter(tastesvar);
         visOppgave();
@@ -4335,10 +4823,14 @@ var Moduser = (function () {
     var ferdig = false;
     var naarFerdig = null;
 
+    /* Løypa går gjennom hele tegnsettet, også de sjeldne bokstavene: her er
+     * det ingen oppgave, bare en tur fra start til slutt. */
+    function rekka() { return tegnFor(verdenId); }
+
     function si() {
-      var b = ALFABET[indeks];
+      var b = rekka()[indeks];
       Tale.stopp();
-      Tale.rekke(bokstavrekke(b, ordFor(verdenId, b)));
+      Tale.rekke(tegnrekke(verdenId, b, ordFor(verdenId, b)));
     }
 
     function settKnapp(ikon, tekst) {
@@ -4348,45 +4840,54 @@ var Moduser = (function () {
     }
 
     function tegn() {
-      var b = ALFABET[indeks];
+      var b = rekka()[indeks];
       var oppslag = ordFor(verdenId, b);
-      var siste = indeks + 1 >= ALFABET.length;
+      var siste = indeks + 1 >= rekka().length;
 
       el('loype-bokstav').textContent = b;
       el('loype-bokstav').classList.remove('smal');
-      el('loype-ikon').textContent = oppslag.ikon;
-      el('loype-ord').textContent = oppslag.ord;
-      el('loype-teller').textContent = (indeks + 1) + ' av ' + ALFABET.length;
+      if (domeneFor(verdenId) === 'tall') {
+        tegnMengde(el('loype-ikon'), oppslag.ikon, antallFor(verdenId, b), 'ordkort-ikon mengde');
+      } else {
+        el('loype-ikon').className = 'ordkort-ikon';
+        el('loype-ikon').textContent = oppslag.ikon;
+      }
+      el('loype-ord').textContent = visningsordFor(verdenId, b);
+      el('loype-teller').textContent = (indeks + 1) + ' av ' + rekka().length;
       el('loype-fyll').style.width =
-        ((indeks + 1) / ALFABET.length * 100) + '%';
+        ((indeks + 1) / rekka().length * 100) + '%';
       spillOm(el('loype-kort'), 'bytter', 460);
       settKnapp(siste ? 'malflagg' : 'pil', siste ? 'Se hvor langt du kom' : 'Neste');
 
       /* Figuren står der i alfabetet han er – framdriften synes i scenen. */
-      kjorTil(verdenId, indeks / (ALFABET.length - 1));
+      kjorTil(verdenId, indeks / Math.max(1, rekka().length - 1));
       si();
       el('loype-videre').focus();
     }
 
     function avslutt() {
       ferdig = true;
-      el('loype-bokstav').textContent = 'A–Å';
+      el('loype-bokstav').textContent = domeneFor(verdenId) === 'tall' ? '1–10' : 'A–Å';
       el('loype-bokstav').classList.add('smal');
-      el('loype-ikon').textContent = verdenId === 'oy' ? '🏝️' : '🏁';
-      el('loype-ord').textContent = 'Hele alfabetet!';
-      el('loype-teller').textContent = ALFABET.length + ' av ' + ALFABET.length;
+      el('loype-ikon').className = 'ordkort-ikon';
+      el('loype-ikon').textContent = VERDENER[verdenId].ikon;
+      el('loype-ord').textContent = domeneFor(verdenId) === 'tall'
+        ? 'Alle tallene!' : 'Hele alfabetet!';
+      el('loype-teller').textContent = rekka().length + ' av ' + rekka().length;
       spillOm(el('loype-kort'), 'bytter', 460);
       settKnapp('malflagg', 'Tilbake');
       Spill.settTastLytter(null);
       Lyd.ferdig();
       hopp();
       Tale.stopp();
-      Tale.rekke(['Der var hele alfabetet! Fra a til å.']);
+      Tale.rekke([domeneFor(verdenId) === 'tall'
+        ? 'Der var alle tallene! Fra én til ti.'
+        : 'Der var hele alfabetet! Fra a til å.']);
     }
 
     function videre() {
       if (ferdig) { if (naarFerdig) naarFerdig(); return; }
-      if (indeks + 1 >= ALFABET.length) { avslutt(); return; }
+      if (indeks + 1 >= rekka().length) { avslutt(); return; }
       indeks += 1;
       tegn();
     }
@@ -4394,7 +4895,7 @@ var Moduser = (function () {
     /* Trykker han på en bokstavtast, hopper løypa dit. Samme kobling mellom
      * tast og tegn som i Garasjen. */
     function hoppTil(bokstav) {
-      var n = ALFABET.indexOf(bokstav);
+      var n = rekka().indexOf(bokstav);
       if (n === -1 || ferdig) return;
       indeks = n;
       tegn();
@@ -4407,7 +4908,7 @@ var Moduser = (function () {
         ferdig = false;
         naarFerdig = ferdigHandling || null;
         Spill.visSkjerm('skjerm-loype');
-        Spill.settTopp('Alfabetløypa', true);
+        Spill.settTopp(domeneFor(id) === 'tall' ? 'Tallrekka' : 'Alfabetløypa', true);
         stillFigurTilStart();
         Spill.settTastLytter(hoppTil);
         tegn();
@@ -4480,9 +4981,12 @@ var Spill = (function () {
    * øyeblikk. Fire av fire er en seier; fire av 29 ser ut som nesten ingenting. */
   function oppdaterTeller(medSmell) {
     var teller = el('stjerneteller');
-    var antall = Lagring.mestrede().length;
+    /* Telleren gjelder verdenen han står i. Tall og bokstaver samles hver for
+     * seg – ti tall blandet inn blant bokstavene ville gjort begge tallene
+     * meningsløse. */
+    var antall = Lagring.mestrede(naVerden).length;
     el('teller-tall').textContent = antall;
-    el('teller-av').textContent = '/' + Lagring.aktiveBokstaver().length;
+    el('teller-av').textContent = '/' + Lagring.aktiveTegn(naVerden).length;
     if (medSmell) {
       teller.classList.remove('smell');
       void teller.offsetWidth;
@@ -4554,7 +5058,7 @@ var Spill = (function () {
 
     var felt = el('verden-valg');
     felt.innerHTML = '';
-    ['bane', 'oy'].forEach(function (id) {
+    Object.keys(VERDENER).forEach(function (id) {
       var v = VERDENER[id];
       var b = document.createElement('button');
       b.type = 'button';
@@ -4573,7 +5077,7 @@ var Spill = (function () {
        * gå i stykker – derfor textContent i stedet for konkatenering. */
       b.querySelector('.verdenkort-tekst').textContent = Lagring.harNavn(id)
         ? 'Sammen med ' + Lagring.navnFor(id)
-        : 'Bokstaver med ' + (id === 'bane' ? 'biler og motor' : 'skip og skatter');
+        : VERDENER[id].undertekst;
       b.addEventListener('click', function () { Lyd.klikk(); velgVerden(id); });
       felt.appendChild(b);
     });
@@ -4667,9 +5171,10 @@ var Spill = (function () {
       flis(Figurer.ikon(m.ikon), m.navn, m.tekst, m.start);
     });
 
-    var antall = Lagring.mestrede().length;
+    var antall = Lagring.mestrede(naVerden).length;
+    var ordet = domeneFor(naVerden) === 'tall' ? 'tall' : 'bokstaver';
     flis(Figurer.ikon('stjerne'), 'Samlingen din',
-      antall + ' av ' + Lagring.aktiveBokstaver().length + ' bokstaver er dine',
+      antall + ' av ' + Lagring.aktiveTegn(naVerden).length + ' ' + ordet + ' er dine',
       function () { Lyd.klikk(); visSamling(); });
 
     /* Menyen var den eneste skjermen som ikke sa noe. For en som ikke leser,
@@ -4682,6 +5187,63 @@ var Spill = (function () {
   /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
    * dem slipper til. */
   function moduser() {
+    return domeneFor(naVerden) === 'tall' ? tallmoduser() : bokstavmoduser();
+  }
+
+  /* Dinodalen. Samme maskineri som bokstavverdenene – utforsk, løype, finn –
+   * pluss «Tell», som er den egentlige telleferdigheten. */
+  function tallmoduser() {
+    var v = VERDENER[naVerden];
+    return [
+      {
+        id: 'reiret',
+        ikon: 'reir',
+        navn: v.utforsk,
+        tekst: 'Trykk på et tall og se hvor mange det er',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
+          Moduser.Utforsk.start(naVerden);
+        }
+      },
+      {
+        id: 'tallrekka',
+        ikon: 'loype',
+        navn: 'Tallrekka',
+        tekst: 'Fra 1 til 10, ett trykk om gangen',
+        apen: function () { return true; },
+        start: function () {
+          Lyd.klikk();
+          tilbakeHandling = function () { Moduser.Loype.stopp(); visMeny(); };
+          Moduser.Loype.start(naVerden, function () {
+            Moduser.Loype.stopp();
+            visMeny();
+          });
+        }
+      },
+      {
+        id: 'tell',
+        ikon: 'tell',
+        navn: 'Tell',
+        tekst: 'Trykk på hver ting og tell dem, og velg tallet',
+        apen: function () { return true; },
+        start: function () { Lyd.klikk(); startOppgave('tell'); }
+      },
+      {
+        id: 'finntall',
+        ikon: 'finn',
+        navn: 'Finn tallet',
+        tekst: 'Hør tallet, og velg riktig skilt',
+        /* Å kjenne igjen tallsymbolet er vanskeligere enn å telle ting, så
+         * den kommer når han har talt seg gjennom noen runder. */
+        apen: function () { return Lagring.mestrede('dino').length >= 3; },
+        start: function () { Lyd.klikk(); startOppgave('finn'); }
+      }
+    ];
+  }
+
+  function bokstavmoduser() {
     var v = VERDENER[naVerden];
     return [
       {
@@ -4765,15 +5327,16 @@ var Spill = (function () {
     settTopp(v.navn + ' · ' + Lagring.navnFor(naVerden), true);
     visSkjerm('skjerm-samling');
 
-    var mestrede = Lagring.mestrede();
+    var mestrede = Lagring.mestrede(naVerden);
     /* Veggen viser bokstavene som er i bruk nå. Er utvalget begrenset til
      * fem, er det de fem som er målet – ikke 29 ruter der 24 aldri kan
      * fylles. */
-    var aktive = Lagring.aktiveBokstaver();
+    var aktive = Lagring.aktiveTegn(naVerden);
+    var ordet = domeneFor(naVerden) === 'tall' ? 'tall' : 'bokstaver';
     el('samling-tittel').textContent = v.samling;
     el('samling-undertekst').textContent = mestrede.length === 0
-      ? 'Her samler du bokstavene du klarer.'
-      : 'Du har ' + mestrede.length + ' av ' + aktive.length + ' bokstaver.';
+      ? 'Her samler du ' + (ordet === 'tall' ? 'tallene' : 'bokstavene') + ' du klarer.'
+      : 'Du har ' + mestrede.length + ' av ' + aktive.length + ' ' + ordet + '.';
 
     var felt = el('samling-rutenett');
     felt.innerHTML = '';
@@ -5252,8 +5815,13 @@ var Spill = (function () {
        * på hverandre. */
       if (e.repeat) return;
 
+      /* I tallverdenen er det sifrene som gjelder – 0 står for 10, slik det
+       * gjør på et tastatur der 10 ikke har egen tast. */
       var tegn = (e.key || '').toUpperCase();
-      if (tegn.length === 1 && ALFABET.indexOf(tegn) !== -1 && tastLytter) {
+      if (naVerden && domeneFor(naVerden) === 'tall') {
+        if (tegn === '0') tegn = '10';
+      }
+      if (tastLytter && tegnFor(naVerden || 'bane').indexOf(tegn) !== -1) {
         e.preventDefault();
         var na = Date.now();
         if (na - sisteTast < 400) return;

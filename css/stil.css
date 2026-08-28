@@ -106,6 +106,27 @@ body[data-verden="oy"] {
   --lakk-mork: #8f2f1c;
 }
 
+/* Dinodalen: frodig grønt under en varm urtidshimmel. Aksenten er grønn, så
+   barnet ser med én gang at han er et annet sted enn på racerbanen. */
+body[data-verden="dino"] {
+  --himmel-topp: #9ad9de;
+  --himmel-bunn: #ffd9a8;
+  --sol: rgba(255, 226, 168, .9);
+  --as-fjern: #a8c9b0;
+  --as-bak: #7fae86;
+  --as-fram: #5c9468;
+  --bregne: #3f8f5a;
+  --grunn-topp: #7a6a4a;
+  --grunn-bunn: #5b4e35;
+  --stripe: transparent;
+  --aksent: #2f8f52;
+  --aksent-mork: #1d6437;
+  --aksent-svak: #e6f4ea;
+  --lakk: #4f9e63;
+  --lakk-lys: #7cc48a;
+  --lakk-mork: #357a49;
+}
+
 * { box-sizing: border-box; }
 
 /* Uten dette markerer iOS tekst og åpner hurtigmeny når man trykker litt
@@ -232,6 +253,26 @@ body[data-verden="bane"] .scene-grunn::before {
     transparent 62px 124px);
   opacity: .8;
   border-radius: 4px;
+}
+
+/* Jordbakken i Dinodalen: en lysere kant og noen steiner. */
+body[data-verden="dino"] .scene-grunn::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 4px;
+  height: 6px;
+  background: rgba(255, 255, 255, .2);
+  border-radius: 3px;
+}
+body[data-verden="dino"] .scene-grunn::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 26px;
+  height: 44px;
+  background-repeat: repeat-x;
+  background-size: 380px 44px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='44'%3E%3Cg fill='%23ffffff' fill-opacity='.1'%3E%3Cellipse cx='58' cy='16' rx='16' ry='6'/%3E%3Cellipse cx='196' cy='30' rx='22' ry='7'/%3E%3Cellipse cx='302' cy='12' rx='13' ry='5'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* Bølgetopper i havet. */
@@ -1163,6 +1204,20 @@ body[data-verden="oy"] .skilt::after {
 }
 .fig--skip { transform-origin: 50% 80%; }
 
+/* Dinosauren trasker: beina går i utakt, og kroppen dupper litt. */
+.dino-bein { transform-box: fill-box; transform-origin: 50% 0; }
+.figur.kjorer .dino-bein--bak { animation: tramp 540ms ease-in-out infinite; }
+.figur.kjorer .dino-bein--fram { animation: tramp 540ms ease-in-out infinite 270ms; }
+@keyframes tramp {
+  0%, 100% { transform: rotate(-11deg); }
+  50% { transform: rotate(11deg); }
+}
+.figur.kjorer .fig--dino { animation: dupp 540ms ease-in-out infinite; }
+@keyframes dupp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
 .stov { position: absolute; inset: 0; }
 .stov span {
   position: absolute;
@@ -1263,6 +1318,98 @@ body[data-verden="oy"] .skilt::after {
   color: var(--blekk-svak);
   text-align: center;
   max-width: 34em;
+}
+
+/* ============================================================
+   11a. Mengder som skal telles
+   ============================================================ */
+
+/* Tingene står på rekke, ikke strødd utover. Skal han telle dem, må han kunne
+   peke på dem én etter én uten å miste oversikten – og en fast rekkefølge er
+   det som gjør det mulig. */
+.mengde {
+  --ting: 34px;
+  --ting-gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ting-gap);
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+/* Over seks ting brytes rekka i to. En rad på ti blir enten bittesmå ting
+   eller for lang til å holde tellingen i. Bredden regnes ut fra tingene, ikke
+   fra skriftstørrelsen – ellers brytes rekka på feil sted når tingene vokser. */
+.mengde--to-rader { max-width: calc(5 * var(--ting) + 4 * var(--ting-gap)); }
+
+.ting {
+  width: var(--ting);
+  height: var(--ting);
+  font-size: calc(var(--ting) * .62);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 22%;
+  animation: trinn-inn 340ms cubic-bezier(.2, .8, .3, 1) backwards;
+}
+
+/* I «Tell» er tingene selve oppgaven, og da må de være det største på
+   skjermen – større enn tallskiltene han svarer med. Ellers peker hierarkiet
+   motsatt vei av det han skal gjøre. Hver ting er dessuten en trykkflate for
+   en treårsfinger. */
+.oppdrag-mal--tell {
+  --ting: 84px;
+  --ting-gap: 10px;
+  width: auto; height: auto;
+  padding: 14px 18px;
+  cursor: default;
+  background: rgba(255, 253, 248, .92);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sk-2);
+  max-width: min(620px, 94vw);
+}
+.oppdrag-mal--tell .ting {
+  position: relative;
+  cursor: pointer;
+  background: var(--flate-2);
+  box-shadow: inset 0 0 0 3px rgba(40, 30, 15, .1);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.oppdrag-mal--tell .ting:hover { transform: translateY(-3px); }
+.oppdrag-mal--tell .ting:active { transform: translateY(1px) scale(.97); }
+
+/* Den han har talt, får et tydelig merke – ellers mister han oversikten og
+   teller den samme to ganger, som er nettopp det telling handler om. */
+.oppdrag-mal--tell .ting.talt {
+  background: var(--aksent-svak);
+  box-shadow: inset 0 0 0 4px var(--aksent);
+}
+/* Nummeret tingen fikk blir stående, så han ser hvor langt han kom. */
+.oppdrag-mal--tell .ting.talt::after {
+  content: attr(data-talltall);
+  position: absolute;
+  right: -6px; top: -6px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  color: #fff;
+  background: var(--aksent);
+  width: 26px; height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: var(--sk-1);
+}
+.ting.teller { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
+
+/* Ordkortet i Reiret og Tallrekka viser mengden i stedet for ett bilde. */
+.ordkort-ikon.mengde {
+  --ting: 30px;
+  width: auto;
+  min-width: 92px;
+  height: auto;
+  min-height: 92px;
+  padding: 8px;
 }
 
 /* ============================================================
@@ -1726,6 +1873,7 @@ body[data-verden="oy"] .skilt::after {
   .ordkort-ord { font-size: 1.5rem; }
   .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
   .oppdrag-mal--bokstav { width: 124px; height: 124px; font-size: 4.4rem; border-radius: 24px; }
+  .oppdrag-mal--tell { --ting: 72px; --ting-gap: 9px; padding: 12px 14px; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
   .verdenkort { width: min(320px, 86vw); }
@@ -1763,6 +1911,9 @@ body[data-verden="oy"] .skilt::after {
   .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: 20px; }
   .skilt::after { height: 22px; width: 12px; }
   .oppdrag-mal--bokstav { width: 110px; height: 110px; font-size: 4rem; border-radius: 22px; }
+  .oppdrag-mal--tell { --ting: 58px; --ting-gap: 7px; padding: 10px 12px; }
+  .oppdrag-mal--tell .ting.talt::after { width: 21px; height: 21px; font-size: .82rem; right: -4px; top: -4px; }
+  .ordkort-ikon.mengde { --ting: 24px; min-width: 62px; min-height: 62px; padding: 6px; }
   .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: 18px; }
   .oppdrag-mal .mal-ord { font-size: 1.5rem; }
   .oppdrag-tekst { font-size: 1.1rem; }
@@ -1885,7 +2036,13 @@ body[data-verden="oy"] .skilt::after {
   }
   .oppdrag-tekst { width: 100%; text-align: center; }
   .oppdrag-tekst { font-size: .95rem; }
-  .oppdrag-mal--bokstav { width: 80px; height: 80px; font-size: 3rem; border-radius: 18px; }
+  /* På en skjerm som bare er 360 piksler høy er det ikke plass til både et
+     stort merke og en rad skilt. Merket er fortsatt større enn skiltene –
+     hierarkiet står – men begge krymper så de ikke møtes. */
+  .oppdrag-mal--bokstav { width: 70px; height: 70px; font-size: 2.7rem; border-radius: 17px; }
+  .oppdrag-mal--tell { --ting: 42px; --ting-gap: 5px; padding: 6px 9px; }
+  .oppdrag-mal--tell .ting.talt::after { width: 18px; height: 18px; font-size: .72rem; right: -3px; top: -3px; }
+  .ordkort-ikon.mengde { --ting: 20px; min-width: 46px; min-height: 46px; padding: 4px; }
   .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }
   .oppdrag-mal .mal-ord { font-size: 1.1rem; }
   .lytt-tekst { display: none; }
@@ -1919,7 +2076,7 @@ body[data-verden="oy"] .skilt::after {
   .oppdrag-mal--navn { gap: 6px; }
   .loype-teller { font-size: .85rem; }
 
-  .skilt { width: 74px; height: 74px; font-size: 2.2rem; border-radius: 16px; }
+  .skilt { width: 66px; height: 66px; font-size: 2rem; border-radius: 15px; }
   .skilt::after { height: 18px; width: 10px; }
   .valg { gap: 14px; }
   .knapp--stor { font-size: 1.05rem; padding: 12px 24px 10px; }

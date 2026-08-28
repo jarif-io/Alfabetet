@@ -25,10 +25,18 @@ krever det, og det er derfor knappen er der.
 
 ## Slik spiller han
 
-Han velger først en verden — **Racerbanen** eller **Sjørøverøya** — og gir figuren
-sin et navn. Navnet brukes gjennom hele spillet.
+Han velger først en verden — **Racerbanen**, **Sjørøverøya** eller **Dinodalen** —
+og gir figuren sin et navn. Navnet brukes gjennom hele spillet.
 
-Så er det fem ting å gjøre, ordnet fra lettest til vanskeligst:
+De to første handler om bokstaver. **Dinodalen handler om tall**, og ligger for
+seg selv med vilje: tall og bokstaver skal ikke blandes på samme skjerm, og et
+barn skjønner «her bor tallene» raskere enn noen forklaring. Telleren i toppen,
+samlingen og vanskegraden holdes også hver for seg, så ti tall ikke blandes inn
+blant 25 bokstaver.
+
+### I bokstavverdenene
+
+Fem ting å gjøre, ordnet fra lettest til vanskeligst:
 
 | | Hva det er |
 | --- | --- |
@@ -37,6 +45,29 @@ Så er det fem ting å gjøre, ordnet fra lettest til vanskeligst:
 | **Navnet mitt** | Han bygger sitt eget navn, bokstav for bokstav. Rutene fylles fra venstre, og runden er akkurat så lang som navnet. Skriv inn fornavnet under **For voksne** for å få den fram. |
 | **Finn bokstaven** | Spillet sier en bokstav, og han velger blant skiltene. Bokstaven er skjult bak et spørsmålstegn han kan trykke på hvis han trenger å se den — ellers ville oppgaven bare vært å finne to like. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? Dette er den vanskeligste, og den kommer ofte først rundt fire år. |
+
+### I Dinodalen
+
+Her er tallene fra **1 til 10**. Dinosauren trasker bortover på samme måte som
+bilen kjører, og alt annet fungerer som i bokstavverdenene.
+
+| | Hva det er |
+| --- | --- |
+| **Reiret** | Trykk på et tall og hør det. Ved siden av tallet står like mange ting som tallet sier — trykker han på 4, ser han fire bein. Ingen oppgaver, ingen feil. |
+| **Tallrekka** | Fra 1 til 10, ett trykk om gangen, med mengden ved siden av. Samme rolige tur som Alfabetløypa. |
+| **Tell** | Et antall ting vises. Han **trykker på hver enkelt**, og spillet teller høyt: «én … to … tre». Så velger han tallet. |
+| **Finn tallet** | Hør tallet, og velg riktig skilt. Kommer når tre tall sitter — å kjenne igjen tallsymbolet er vanskeligere enn å telle ting. |
+
+**Hvorfor må han trykke på hver ting i «Tell»?** Fordi det er dette som *er* å
+telle: å peke på hver ting nøyaktig én gang og sette ett tallord til hver. Å se
+en haug og gjette tallet er noe annet, og bærer ikke lenger enn til tre–fire
+ting. Tingen han har talt får en grønn ring og et nummer, så han ikke teller den
+samme to ganger — som er nettopp det telling handler om å unngå. Og når han er
+ferdig, sier spillet tallet om igjen: «Det var fem spor.» Det siste tallordet
+han sier *er* svaret, og uten den koblingen har han bare ramset opp tallrekka
+mens han pekte.
+
+**På tastaturet** velger sifrene tallet direkte. `0` står for 10.
 
 **Hvorfor navnet hans?** Barn lærer bokstavene i sitt eget navn først, raskest og
 mest varig — de betyr noe. Et navn på fire–seks bokstaver er dessuten akkurat én
@@ -285,12 +316,12 @@ samme ånd, og barnet gir dem navn selv.
 index.html        hele skjermen: scenen, de ni skjermbildene og foreldremenyen
 css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
-js/data.js        bokstavene, ordene og navneforslagene  ← denne kan dere endre
-js/figurer.js     bil, skip og landskap, tegnet som SVG
+js/data.js        bokstavene, tallene, ordene og de tre verdenene  ← denne kan dere endre
+js/figurer.js     bil, skip, dinosaur og landskap, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        norsk talesyntese
 js/lyd.js         lydeffekter, laget av nettleseren selv
-js/moduser.js     de fem modusene
+js/moduser.js     modusene, felles for bokstaver og tall
 js/spill.js       navigasjon, scene, tastatur og foreldremeny
 bygg-enfil.js     limer alt sammen til én fil du kan flytte rundt
 ```
