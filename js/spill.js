@@ -1,4 +1,4 @@
-/* Bokstavløpet – navigasjon og oppsett
+/* Oppdagerøya – navigasjon og oppsett
  *
  * Holder styr på hvilken skjerm som vises, hvilken verden som er valgt,
  * scenen bak, tastaturet og foreldremenyen.
@@ -35,6 +35,9 @@ var Spill = (function () {
      * heller. Uten dette sto det over hundre piksler tomt nederst på
      * forsiden og verdensvelgeren – plass det tredje verdenskortet trengte. */
     document.body.classList.toggle('uten-bakke', !medFigur);
+    /* Forsiden er ett bilde: havet dekker hele skjermen, og øya ligger midt
+     * i det. Da slås himmel, landskap og bakke av. */
+    document.body.classList.toggle('pa-havet', id === 'skjerm-start');
     visStemmeknapp();
   }
 
@@ -114,7 +117,7 @@ var Spill = (function () {
     settScene(null);
     tegnStartskjerm();
     oppdaterTeller(false);
-    settTopp('Bokstavløpet', false);
+    settTopp('Oppdagerøya', false);
     visSkjerm('skjerm-start');
   }
 
@@ -178,7 +181,7 @@ var Spill = (function () {
     naVerden = null;
     settScene(null);
     oppdaterTeller(false);
-    settTopp('Bokstavløpet', true);
+    settTopp('Oppdagerøya', true);
     visSkjerm('skjerm-verden');
 
     var felt = el('verden-valg');
@@ -733,7 +736,7 @@ var Spill = (function () {
   function pa(id, hendelse, fn, valg) {
     var e = el(id);
     if (!e) {
-      if (window.console) window.console.warn('Bokstavløpet: fant ikke #' + id);
+      if (window.console) window.console.warn('Oppdagerøya: fant ikke #' + id);
       return null;
     }
     e.addEventListener(hendelse, fn, valg);
@@ -747,13 +750,6 @@ var Spill = (function () {
     for (var i = 0; i < lyttIkoner.length; i++) {
       lyttIkoner[i].innerHTML = Figurer.ikon('stemmePa');
     }
-
-    /* Det første trykket låser opp lyden i nettleseren. */
-    pa('knapp-start', 'click', function () {
-      Lyd.lasOpp();
-      Lyd.klikk();
-      visVerden();
-    });
 
     pa('tilbake', 'click', function () {
       Lyd.klikk();

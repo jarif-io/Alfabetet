@@ -1,12 +1,16 @@
-# Bokstavløpet
+# Oppdagerøya
 
-Et rolig alfabetspill på norsk, laget for en treåring som holder på å bli kjent med
-bokstavene og som liker biler og sjørøvere. Det kjører i nettleseren, virker uten
-internett, og lagrer framgangen lokalt på maskinen.
+Et rolig spill på norsk om **bokstaver og tall**, laget for en treåring som liker
+biler, sjørøvere og dinosaurer. Det kjører i nettleseren, virker uten internett,
+og lagrer framgangen lokalt på maskinen.
 
-Alt er lagt opp for en som **ikke kan lese**: hver bokstav har et bilde han kan
-kjenne igjen og navngi, oppgavene sies høyt, og resultatet vises som stjerner han
-kan telle. Teksten på skjermen er der for den voksne som sitter ved siden av.
+Forsiden er et kart over øya. Racerbanen, Dinodalen og Sjørøverøya ligger som
+steder på kartet, og han trykker rett på det stedet han vil til.
+
+Alt er lagt opp for en som **ikke kan lese**: hver bokstav og hvert tall har et
+bilde han kan kjenne igjen og navngi, oppgavene sies høyt, og resultatet vises
+som stjerner han kan telle. Teksten på skjermen er der for den voksne som sitter
+ved siden av.
 
 ## Slik starter du
 
@@ -20,8 +24,8 @@ spillet åpnes uten adresselinje.
 Vil du heller kjøre det lokalt: dobbeltklikk på **`index.html`**. Det er alt — ingen installasjon, ingen server,
 ingen konto. Spillet fungerer i Chrome, Edge, Safari og Firefox.
 
-Første trykk på **Start** er også det som slår på lyden. Det er nettleseren som
-krever det, og det er derfor knappen er der.
+Det første trykket på kartet er også det som slår på lyden. Det er nettleseren
+som krever et trykk før den vil spille noe.
 
 ## Slik spiller han
 
@@ -284,7 +288,7 @@ trenger.
 node bygg-enfil.js
 ```
 
-Det lager **`bokstavlopet.html`** — hele spillet i én fil på rundt 220 KB, med
+Det lager **`oppdageroya.html`** — hele spillet i én fil på rundt 220 KB, med
 skriftene og alt annet inni. Den kan sendes på e-post, AirDropes til en iPad,
 legges på en minnepinne eller åpnes rett fra Nedlastinger. Ingen server, ingen
 mapper som må følge med, virker uten nett.
@@ -306,7 +310,7 @@ igjen, slutter adressen å virke.
 
 ### Slippe filen et sted uten å gjøre repoet offentlig
 
-`bokstavlopet.html` kan dras rett inn på **Netlify Drop** (netlify.com/drop)
+`oppdageroya.html` kan dras rett inn på **Netlify Drop** (netlify.com/drop)
 eller **Cloudflare Pages**. Begge tar imot en enkeltfil og gir deg en URL på
 under et minutt.
 

@@ -1,4 +1,4 @@
-/* Bokstavløpet – tegningene
+/* Oppdagerøya – tegningene
  *
  * Alt er SVG som legges rett inn i siden, slik at delene kan animeres hver
  * for seg: hjulene roterer, seilet vaier, flagget blafrer. Fargene styres
@@ -280,14 +280,16 @@ var Figurer = (function () {
     '<svg class="kart-flate" viewBox="0 0 1000 820" role="img"' +
         ' aria-label="Kart over øya">' +
 
-      /* Havet, og ringene inn mot land. */
-      '<rect width="1000" height="820" fill="#4fbcc0"/>' +
+      /* Ringene inn mot land. Selve havet males av siden bak kartet, slik
+         at det dekker hele skjermen og øya flyter midt i det. */
       kystlag(1.34, 0, '#63c7c9') +
       kystlag(1.21, 0, '#80d4d1') +
       kystlag(1.10, 0, '#a4e2dc') +
 
       /* Stranda, og den brune kanten under landet. */
-      kystlag(1.00, 0, '#f4dcaa') +
+      /* Kystlinja får en klasse, så en test kan spørre tegningen selv om et
+         punkt ligger på øya eller i vannet. */
+      kystlag(1.00, 0, '#f4dcaa', ' class="kart-kyst"') +
       kystlag(0.925, 9, '#b07a44') +
       kystlag(0.925, 0, '#6bb567') +
 

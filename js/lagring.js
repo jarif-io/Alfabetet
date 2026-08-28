@@ -1,4 +1,4 @@
-/* Bokstavløpet – lagring
+/* Oppdagerøya – lagring
  *
  * Alt lagres lokalt i nettleseren (localStorage). Ingenting sendes noe sted,
  * og det kreves ingen innlogging. Tømmer man nettleserdata, nullstilles spillet.

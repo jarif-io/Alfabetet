@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bokstavløpet</title>
+<title>Oppdagerøya — bokstaver og tall</title>
 <style>
 /* css/fonter.css */
-/* Bokstavløpet – fonter
+/* Oppdagerøya – fonter
  *
  * To variable fonter, lagt inn direkte i filen som base64. Grunnen er at
  * spillet skal virke uten internett: leses index.html rett fra disk, finnes
@@ -38,7 +38,7 @@
 </style>
 <style>
 /* css/stil.css */
-/* Bokstavløpet – utseende
+/* Oppdagerøya – utseende
  *
  * Spillet skal se ut som et sted, ikke som et skjema. Derfor ligger det en
  * sammenhengende scene bak alt – himmel, landskap og bakke – og figuren
@@ -262,6 +262,30 @@ body {
 }
 
 body.bevegelse .scene-skyer { animation: driv 190s linear infinite; }
+
+/* Forsiden er ett sammenhengende bilde. Himmelen males om til hav, sola,
+   landskapet og bakken slås av, og skylaget bytter til bølger som driver
+   like sakte som skyene ellers gjør. */
+body.pa-havet .scene-himmel {
+  inset: 0;
+  background: linear-gradient(to bottom, #4fbec2 0%, #2f9aa8 100%);
+}
+body.pa-havet .scene-sol,
+body.pa-havet .scene-landskap,
+body.pa-havet .scene-grunn { display: none; }
+body.pa-havet .scene-skyer {
+  inset: 0;
+  opacity: .55;
+  background-position: 0 0;
+  background-size: 420px 220px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='220'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='6' stroke-linecap='round' opacity='.5'%3E%3Cpath d='M40 44c9-8 18-8 27 0 9 8 18 8 27 0'/%3E%3Cpath d='M244 96c9-8 18-8 27 0 9 8 18 8 27 0'/%3E%3Cpath d='M126 158c9-8 18-8 27 0 9 8 18 8 27 0'/%3E%3Cpath d='M330 198c9-8 18-8 27 0 9 8 18 8 27 0'/%3E%3C/g%3E%3C/svg%3E");
+}
+body.pa-havet.bevegelse .scene-skyer { animation: sjodriv 150s linear infinite; }
+@keyframes sjodriv {
+  to { background-position: -420px 0; }
+}
+
 
 @keyframes driv {
   to { background-position: -760px 0, -1100px 0; }
@@ -601,6 +625,10 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
    forsvant ut nederst. */
 body.uten-bakke #app { padding-bottom: 14px; }
 
+/* På forsiden er kartet bildet. Da skal det få hele bredden, ikke stå
+   innenfor sidemargene som en illustrasjon i en tekst. */
+body.pa-havet #app { padding-left: 0; padding-right: 0; }
+
 .skjerm {
   flex: 1 1 auto;
   display: flex;
@@ -647,6 +675,12 @@ body.uten-bakke #app { padding-bottom: 14px; }
   color: var(--blekk-svak);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 }
+/* Over havet blir den grå teksten borte. Der står den lys, med en mørk
+   skygge i stedet for en lys. */
+body.pa-havet .ingress {
+  color: #eafaf8;
+  text-shadow: 0 2px 6px rgba(12, 70, 76, .45);
+}
 
 /* ---------- forsiden ---------- */
 
@@ -659,19 +693,19 @@ body.uten-bakke #app { padding-bottom: 14px; }
    kartet ut av en liggende telefon. */
 .kart {
   position: relative;
-  width: min(100%, 620px, 78vh);
-  width: min(100%, 620px, 78dvh);
+  width: min(100%, 700px, 76vh);
+  width: min(100%, 700px, 76dvh);
   aspect-ratio: 1000 / 820;
   margin: 0 auto;
   /* Navnelappene stikker litt utenfor stedene sine – de skal ikke klippes. */
   overflow: visible;
 }
+/* Ingen ramme og ingen skygge: kartet skal ikke se ut som et kort som
+   ligger oppå noe, det skal være det samme havet som resten av skjermen. */
 .kart-flate {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: var(--r-lg);
-  box-shadow: var(--sk-2);
 }
 
 /* Et sted på kartet: figuren med navnet under, festet i sitt punkt.
@@ -2405,7 +2439,7 @@ body[data-verden="oy"] .skilt::after {
   </button>
 
   <div id="topp-midt">
-    <span id="topp-tittel">Bokstavløpet</span>
+    <span id="topp-tittel">Oppdagerøya</span>
   </div>
 
   <div class="topp-hoyre">
@@ -2441,7 +2475,7 @@ body[data-verden="oy"] .skilt::after {
        uansett på dinosauren, og da skal det skje noe. -->
   <section class="skjerm skjerm--midt" id="skjerm-start">
     <div class="stabel startstabel">
-      <h1 class="titteltekst trinn">Bokstavløpet</h1>
+      <h1 class="titteltekst trinn">Oppdagerøya</h1>
       <p class="ingress trinn">Trykk på et sted på kartet</p>
 
       <!-- Forsiden er et øykart. De tre stedene legges oppå av spill.js. -->
@@ -2449,10 +2483,6 @@ body[data-verden="oy"] .skilt::after {
 
       <!-- Smakebiter på det han skal lære, i spillets eget formspråk. -->
       <div class="startbrikker trinn" id="start-brikker" aria-hidden="true"></div>
-
-      <button class="knapp knapp--stor trinn" id="knapp-start" type="button">
-        <span>Start</span>
-      </button>
     </div>
   </section>
 
@@ -2805,7 +2835,7 @@ body[data-verden="oy"] .skilt::after {
 
 <script>
 /* js/data.js */
-/* Bokstavløpet – data
+/* Oppdagerøya – data
  *
  * Dette er filen dere kan endre. Vil dere bytte ut et ord med et ord fra boka
  * dere leser, så bytt bare "ord" og "ikon" på riktig bokstav. Ingenting annet
@@ -2841,7 +2871,7 @@ body[data-verden="oy"] .skilt::after {
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-28 · 7';
+var SPILLVERSJON = '2026-08-28 · 8';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -3132,7 +3162,7 @@ function visningsordFor(verdenId, tegn) {
 </script>
 <script>
 /* js/lagring.js */
-/* Bokstavløpet – lagring
+/* Oppdagerøya – lagring
  *
  * Alt lagres lokalt i nettleseren (localStorage). Ingenting sendes noe sted,
  * og det kreves ingen innlogging. Tømmer man nettleserdata, nullstilles spillet.
@@ -3431,7 +3461,7 @@ var Lagring = (function () {
 </script>
 <script>
 /* js/figurer.js */
-/* Bokstavløpet – tegningene
+/* Oppdagerøya – tegningene
  *
  * Alt er SVG som legges rett inn i siden, slik at delene kan animeres hver
  * for seg: hjulene roterer, seilet vaier, flagget blafrer. Fargene styres
@@ -3713,14 +3743,16 @@ var Figurer = (function () {
     '<svg class="kart-flate" viewBox="0 0 1000 820" role="img"' +
         ' aria-label="Kart over øya">' +
 
-      /* Havet, og ringene inn mot land. */
-      '<rect width="1000" height="820" fill="#4fbcc0"/>' +
+      /* Ringene inn mot land. Selve havet males av siden bak kartet, slik
+         at det dekker hele skjermen og øya flyter midt i det. */
       kystlag(1.34, 0, '#63c7c9') +
       kystlag(1.21, 0, '#80d4d1') +
       kystlag(1.10, 0, '#a4e2dc') +
 
       /* Stranda, og den brune kanten under landet. */
-      kystlag(1.00, 0, '#f4dcaa') +
+      /* Kystlinja får en klasse, så en test kan spørre tegningen selv om et
+         punkt ligger på øya eller i vannet. */
+      kystlag(1.00, 0, '#f4dcaa', ' class="kart-kyst"') +
       kystlag(0.925, 9, '#b07a44') +
       kystlag(0.925, 0, '#6bb567') +
 
@@ -4012,7 +4044,7 @@ var Figurer = (function () {
 </script>
 <script>
 /* js/tale.js */
-/* Bokstavløpet – tale
+/* Oppdagerøya – tale
  *
  * Bruker nettleserens egen talesyntese (speechSynthesis). Ingen lydfiler,
  * ingen nedlasting, ingen nettforbindelse. Vi leter etter en norsk stemme;
@@ -4235,7 +4267,7 @@ var Tale = (function () {
 </script>
 <script>
 /* js/lyd.js */
-/* Bokstavløpet – lydeffekter
+/* Oppdagerøya – lydeffekter
  *
  * Alle lyder lages av nettleseren selv (Web Audio), så det finnes ingen
  * lydfiler å laste ned. Lydene er med vilje korte, myke og lave: de skal
@@ -4385,7 +4417,7 @@ var Lyd = (function () {
 </script>
 <script>
 /* js/moduser.js */
-/* Bokstavløpet – de tre modusene
+/* Oppdagerøya – de tre modusene
  *
  * Alle tre deler samme regel: ingenting skjer av seg selv. Barnet trykker,
  * spillet svarer i under ett sekund, og så står skjermen stille igjen.
@@ -5404,7 +5436,7 @@ var Moduser = (function () {
 </script>
 <script>
 /* js/spill.js */
-/* Bokstavløpet – navigasjon og oppsett
+/* Oppdagerøya – navigasjon og oppsett
  *
  * Holder styr på hvilken skjerm som vises, hvilken verden som er valgt,
  * scenen bak, tastaturet og foreldremenyen.
@@ -5441,6 +5473,9 @@ var Spill = (function () {
      * heller. Uten dette sto det over hundre piksler tomt nederst på
      * forsiden og verdensvelgeren – plass det tredje verdenskortet trengte. */
     document.body.classList.toggle('uten-bakke', !medFigur);
+    /* Forsiden er ett bilde: havet dekker hele skjermen, og øya ligger midt
+     * i det. Da slås himmel, landskap og bakke av. */
+    document.body.classList.toggle('pa-havet', id === 'skjerm-start');
     visStemmeknapp();
   }
 
@@ -5520,7 +5555,7 @@ var Spill = (function () {
     settScene(null);
     tegnStartskjerm();
     oppdaterTeller(false);
-    settTopp('Bokstavløpet', false);
+    settTopp('Oppdagerøya', false);
     visSkjerm('skjerm-start');
   }
 
@@ -5584,7 +5619,7 @@ var Spill = (function () {
     naVerden = null;
     settScene(null);
     oppdaterTeller(false);
-    settTopp('Bokstavløpet', true);
+    settTopp('Oppdagerøya', true);
     visSkjerm('skjerm-verden');
 
     var felt = el('verden-valg');
@@ -6139,7 +6174,7 @@ var Spill = (function () {
   function pa(id, hendelse, fn, valg) {
     var e = el(id);
     if (!e) {
-      if (window.console) window.console.warn('Bokstavløpet: fant ikke #' + id);
+      if (window.console) window.console.warn('Oppdagerøya: fant ikke #' + id);
       return null;
     }
     e.addEventListener(hendelse, fn, valg);
@@ -6153,13 +6188,6 @@ var Spill = (function () {
     for (var i = 0; i < lyttIkoner.length; i++) {
       lyttIkoner[i].innerHTML = Figurer.ikon('stemmePa');
     }
-
-    /* Det første trykket låser opp lyden i nettleseren. */
-    pa('knapp-start', 'click', function () {
-      Lyd.lasOpp();
-      Lyd.klikk();
-      visVerden();
-    });
 
     pa('tilbake', 'click', function () {
       Lyd.klikk();

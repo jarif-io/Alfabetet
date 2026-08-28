@@ -2,7 +2,7 @@
 name: barnespill-i-nettleser
 description: >-
   Arbeidsmåte for å bygge og videreutvikle små læringsspill i nettleseren for
-  barn som ennå ikke kan lese – som Bokstavløpet i dette repoet. Dekker
+  barn som ennå ikke kan lese – som Oppdagerøya i dette repoet. Dekker
   designprinsipper for treåringer, teknisk ramme uten byggesteg, og en
   verifiseringsdisiplin der alt måles i en ekte nettleser med Playwright i
   stedet for å resonneres fram fra kildekoden. Bruk denne når du endrer noe i
@@ -14,7 +14,7 @@ description: >-
 
 # Barnespill i nettleser
 
-Denne ferdigheten oppsummerer hvordan Bokstavløpet ble bygget og feilrettet
+Denne ferdigheten oppsummerer hvordan Oppdagerøya ble bygget og feilrettet
 sammen med en forelder som testet hver versjon på en treåring. Poenget er ikke
 å gjenta akkurat dette spillet, men å arve arbeidsmåten: hvem vi bygger for,
 hvordan vi holder teknikken enkel nok til å overleve, og – viktigst – hvordan

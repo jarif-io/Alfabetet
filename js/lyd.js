@@ -1,4 +1,4 @@
-/* Bokstavløpet – lydeffekter
+/* Oppdagerøya – lydeffekter
  *
  * Alle lyder lages av nettleseren selv (Web Audio), så det finnes ingen
  * lydfiler å laste ned. Lydene er med vilje korte, myke og lave: de skal

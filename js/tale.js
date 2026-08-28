@@ -1,4 +1,4 @@
-/* Bokstavløpet – tale
+/* Oppdagerøya – tale
  *
  * Bruker nettleserens egen talesyntese (speechSynthesis). Ingen lydfiler,
  * ingen nedlasting, ingen nettforbindelse. Vi leter etter en norsk stemme;

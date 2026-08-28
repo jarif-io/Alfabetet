@@ -1,4 +1,4 @@
-/* Bokstavløpet – de tre modusene
+/* Oppdagerøya – de tre modusene
  *
  * Alle tre deler samme regel: ingenting skjer av seg selv. Barnet trykker,
  * spillet svarer i under ett sekund, og så står skjermen stille igjen.

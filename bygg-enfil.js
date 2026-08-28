@@ -1,11 +1,11 @@
-/* Bokstavløpet – bygger én enkelt HTML-fil
+/* Oppdagerøya – bygger én enkelt HTML-fil
  *
  * Spillet består normalt av index.html pluss CSS og JS i egne mapper. Denne
  * lille byggefila limer alt sammen til én fil du kan sende på e-post,
  * AirDrope til en iPad, legge på en minnepinne eller publisere hvor som helst.
  *
  * Kjør:  node bygg-enfil.js
- * Ut:    bokstavlopet.html   – åpnes ved å dobbeltklikke, virker uten nett
+ * Ut:    oppdageroya.html   – åpnes ved å dobbeltklikke, virker uten nett
  *        artefakt-kropp.html – samme innhold uten <html>/<head>/<body>,
  *                              til publisering som Claude-artefakt
  *
@@ -39,7 +39,7 @@ html = html.replace(/[ \t]*<script src="([^"]+)"><\/script>\n?/g, function (_, f
   return '<script>\n/* ' + fil + ' */\n' + trygg(les(fil)) + '\n</script>\n';
 });
 
-fs.writeFileSync(sti.join(rot, 'bokstavlopet.html'), html);
+fs.writeFileSync(sti.join(rot, 'oppdageroya.html'), html);
 
 /* Artefaktversjonen: bare innholdet, uten ytterskallet. Stilene ligger i
  * <head> og må flyttes med, ellers blir siden helt naken. */
@@ -53,11 +53,11 @@ if (!hodeTreff) {
 var hode = hodeTreff[1];
 var stiler = (hode.match(/<style>[\s\S]*?<\/style>/gi) || []).join('\n');
 
-var kropp = '<title>Bokstavløpet</title>\n' + stiler + '\n' +
+var kropp = '<title>Oppdagerøya</title>\n' + stiler + '\n' +
   html.replace(/^[\s\S]*?<body>\n?/i, '').replace(/<\/body>[\s\S]*$/i, '');
 
 fs.writeFileSync(sti.join(rot, 'artefakt-kropp.html'), kropp);
 
 var kb = function (f) { return Math.round(fs.statSync(sti.join(rot, f)).size / 1024) + ' KB'; };
-console.log('bokstavlopet.html   ' + kb('bokstavlopet.html'));
+console.log('oppdageroya.html   ' + kb('oppdageroya.html'));
 console.log('artefakt-kropp.html ' + kb('artefakt-kropp.html'));
