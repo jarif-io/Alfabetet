@@ -596,6 +596,11 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Vises ingen figur på bakken, er det ingen bakke å ta hensyn til. Da får
+   innholdet den plassen i stedet – det var her det tredje verdenskortet
+   forsvant ut nederst. */
+body.uten-bakke #app { padding-bottom: 14px; }
+
 .skjerm {
   flex: 1 1 auto;
   display: flex;
@@ -642,6 +647,118 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   color: var(--blekk-svak);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 }
+
+/* ---------- forsiden ---------- */
+
+.startstabel { gap: 14px; width: 100%; }
+
+/* Kartet. Flaten har nøyaktig samme forhold som tegningens viewBox
+   (1000 × 820), slik at stedene kan plasseres i prosent og lande akkurat der
+   de skal i tegningen. Bredden begrenses av tre ting samtidig: plassen som
+   finnes, en øvre grense på store skjermer, og skjermhøyden – ellers vokser
+   kartet ut av en liggende telefon. */
+.kart {
+  position: relative;
+  width: min(100%, 620px, 78vh);
+  width: min(100%, 620px, 78dvh);
+  aspect-ratio: 1000 / 820;
+  margin: 0 auto;
+  /* Navnelappene stikker litt utenfor stedene sine – de skal ikke klippes. */
+  overflow: visible;
+}
+.kart-flate {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-lg);
+  box-shadow: var(--sk-2);
+}
+
+/* Et sted på kartet: figuren med navnet under, festet i sitt punkt.
+   Bredden er en andel av kartet, så figurene vokser og krymper i takt med
+   tegningen i stedet for å bli små flekker på en stor skjerm. */
+.kartsted {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 22%;
+  font: inherit;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: trinn-inn 520ms cubic-bezier(.2, .8, .3, 1) backwards;
+  transition: transform var(--mykt);
+}
+.kartsted-figur {
+  display: block;
+  width: 100%;
+  filter: drop-shadow(0 8px 10px rgba(30, 50, 45, .3));
+}
+.kartsted-figur svg { display: block; width: 100%; height: auto; }
+
+/* Navnet står på en lys lapp, ellers forsvinner det i kartet. Lappen får lov
+   til å være bredere enn stedet – den skal leses, ikke brekkes. */
+.kartsted-navn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(.68rem, 2.1vw, 1rem);
+  line-height: 1.15;
+  white-space: nowrap;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--blekk);
+  background: rgba(255, 253, 244, .93);
+  box-shadow: var(--sk-1);
+  border-bottom: 3px solid var(--merke, var(--aksent));
+}
+.kartsted:hover { transform: translate(-50%, -50%) scale(1.06); }
+.kartsted:active { transform: translate(-50%, -50%) scale(.98); }
+
+.kartsted--bane { --merke: #dc3327; }
+.kartsted--oy   { --merke: #16788f; }
+.kartsted--dino { --merke: #2f8f52; }
+
+/* Skipet ligger på vannet og skal duve, ikke stå stille som et hus. */
+.kartsted--oy .kartsted-figur {
+  transform-origin: 50% 80%;
+  animation: duv-pa-kartet 4200ms ease-in-out infinite;
+}
+@keyframes duv-pa-kartet {
+  0%, 100% { transform: translateY(0) rotate(-1.6deg); }
+  50%      { transform: translateY(-2%) rotate(1.6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kartsted--oy .kartsted-figur { animation: none; }
+}
+
+/* Smakebiter: tre bokstaver og tre tall, i samme form som brikkene i spillet.
+   Sier uten ord hva dette handler om. */
+.startbrikker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.startbrikke {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 46px; height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(to bottom, #dc3327, #a4200f);
+  box-shadow: var(--sk-1);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+  animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards;
+}
+.startbrikke--tall { background: linear-gradient(to bottom, #4f9e63, #1d6437); }
 
 .helt { width: min(440px, 74vw); filter: drop-shadow(0 16px 22px rgba(40, 30, 15, .28)); }
 .helt--liten { width: min(300px, 58vw); }
@@ -708,6 +825,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   text-align: center;
 }
 .verdenkort:nth-child(2) { animation-delay: 110ms; }
+.verdenkort:nth-child(3) { animation-delay: 220ms; }
 .verdenkort:hover { transform: translateY(-8px); box-shadow: var(--sk-3); }
 .verdenkort:active { transform: translateY(-2px); }
 
@@ -738,6 +856,9 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   --as-fjern: #b6d3ba; --as-bak: #8fbb9c; --as-fram: #6aa47f;
   --tre: #4c8a63; --stamme: #7a5230;
 }
+.verdenkort--dino .verdenkort-bilde {
+  --as-fjern: #a8c9b0; --as-bak: #7fae86; --as-fram: #5c9468; --bregne: #3f8f5a;
+}
 .verdenkort--oy .verdenkort-bilde {
   --as-fjern: #a9c9cf; --as-bak: #cdb98c; --as-fram: #b9a173; --palme: #3f8f6a;
 }
@@ -752,6 +873,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .verdenkort--bane .verdenkort-bilde::after { background: linear-gradient(to bottom, #4a4f5b, #33373f); }
 .verdenkort--oy .verdenkort-bilde { background: linear-gradient(to bottom, #9fd8e8, #ffe3b0); }
 .verdenkort--oy .verdenkort-bilde::after { background: linear-gradient(to bottom, #2b8fa8, #14607a); }
+.verdenkort--dino .verdenkort-bilde { background: linear-gradient(to bottom, #9ad9de, #ffd9a8); }
+.verdenkort--dino .verdenkort-bilde::after { background: linear-gradient(to bottom, #7a6a4a, #5b4e35); }
 
 .verdenkort-under { padding: 18px 22px 24px; }
 .verdenkort-navn {
@@ -1980,6 +2103,27 @@ body[data-verden="oy"] .skilt::after {
    skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får hele
    utvalget plass uten å rulle. */
 @media (max-width: 560px) {
+  /* Tre store kort under hverandre får ikke plass på en telefon, og da måtte
+     han rulle for å oppdage at Dinodalen finnes. Liggende kort tar under
+     halve høyden, og alle tre er synlige med én gang. */
+  .verdenrad { gap: 12px; width: 100%; }
+  .verdenkort {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    align-items: center;
+    text-align: left;
+  }
+  .verdenkort-bilde { height: 100px; padding-bottom: 8px; }
+  .verdenkort-bilde > svg { width: 82%; }
+  .verdenkort-scene .lag { bottom: 20px; }
+  .verdenkort-scene .lag--fjern { height: 56px; }
+  .verdenkort-scene .lag--bak { height: 44px; }
+  .verdenkort-scene .lag--fram { height: 34px; }
+  .verdenkort-bilde::after { height: 20px; }
+  .verdenkort-under { padding: 12px 16px; }
+  .verdenkort-navn { font-size: 1.3rem; }
+  .verdenkort-tekst { font-size: .88rem; }
   :root { --grunn-h: 104px; --rute: 72px; }
   #topp { gap: 8px; padding: 8px 10px; }
   #topp-midt { display: none; }
@@ -2094,6 +2238,37 @@ body[data-verden="oy"] .skilt::after {
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
+/* Telefon på tvers, men med bredde nok til tre kort ved siden av hverandre.
+   Stablet under hverandre får de ikke plass i 360 pikslers høyde, og da måtte
+   han rulle for å se at Dinodalen finnes.
+
+   Merk grensene: uten min-width slår denne inn på smale skjermer også, der
+   tre kort ved siden av hverandre blir 120 piksler brede hver. */
+@media (max-height: 520px) and (min-width: 561px) {
+  .verdenrad { gap: 12px; flex-wrap: nowrap; width: 100%; }
+  .verdenkort { width: min(230px, 31vw); }
+  .verdenkort-bilde { height: 92px; padding-bottom: 6px; }
+  .verdenkort-bilde > svg { width: 78%; }
+  .verdenkort-scene .lag { bottom: 18px; }
+  .verdenkort-scene .lag--fjern { height: 52px; }
+  .verdenkort-scene .lag--bak { height: 40px; }
+  .verdenkort-scene .lag--fram { height: 32px; }
+  .verdenkort-bilde::after { height: 18px; }
+  .verdenkort-under { padding: 8px 12px 10px; }
+  .verdenkort-navn { font-size: 1.1rem; }
+  .verdenkort-tekst { font-size: .78rem; }
+}
+
+/* Smal OG lav – telefon på tvers med lite bredde. Da er liggende kort eneste
+   som får plass, og de må være så lave som mulig. */
+@media (max-height: 520px) and (max-width: 560px) {
+  .verdenrad { gap: 8px; }
+  .verdenkort-bilde { height: 74px; }
+  .verdenkort-under { padding: 8px 12px; }
+  .verdenkort-navn { font-size: 1.1rem; }
+  .verdenkort-tekst { font-size: .78rem; }
+}
+
 /* Bokstavrutene er 72 px på telefon, ikke 62: en treåring treffer bredere enn
    en voksen, og 62 px er så vidt over voksenminimum. På en kort telefon får
    ikke alle bokstavene plass ved 72 px, og da veier det tyngre at han ser hele
@@ -2177,6 +2352,16 @@ body[data-verden="oy"] .skilt::after {
   .valg { gap: 14px; }
   .knapp--stor { font-size: 1.05rem; padding: 12px 24px 10px; }
   .helt { width: min(240px, 34vw); }
+  /* På tvers er høyden det knappe. Kartet krympes hardt, og brikkeraden
+     får mindre plass – Start-knappen skal fortsatt være synlig uten å
+     rulle. */
+  .kart { width: min(100%, 620px, 53vh); width: min(100%, 620px, 53dvh); }
+  .kartsted-navn { font-size: .62rem; padding: 2px 7px; border-bottom-width: 2px; }
+  /* Smakebitene er det første som må vike på tvers – kartet og
+     Start-knappen skal begge få plass uten rulling. */
+  #skjerm-start .startbrikker { display: none; }
+  .startstabel { gap: 6px; }
+  #skjerm-start .ingress { font-size: .88rem; }
   .titteltekst { font-size: clamp(2rem, 6vw, 3rem); }
   .malflagg { font-size: 2.6rem; }
   .panelkort { padding: 18px 26px; }
@@ -2249,12 +2434,22 @@ body[data-verden="oy"] .skilt::after {
 
 <main id="app">
 
-  <!-- 1. Start -->
+  <!-- 1. Start.
+       Forsiden er et øykart. De tre verdenene ligger som steder på kartet –
+       banen på sletta, dinosauren ved vulkanen og skipet ute på sjøen – og
+       hvert sted er samtidig snarveien rett inn dit. En treåring trykker
+       uansett på dinosauren, og da skal det skje noe. -->
   <section class="skjerm skjerm--midt" id="skjerm-start">
-    <div class="stabel">
-      <div class="helt" id="start-figur"></div>
+    <div class="stabel startstabel">
       <h1 class="titteltekst trinn">Bokstavløpet</h1>
-      <p class="ingress trinn">Bokstaver, biler og sjørøvere</p>
+      <p class="ingress trinn">Trykk på et sted på kartet</p>
+
+      <!-- Forsiden er et øykart. De tre stedene legges oppå av spill.js. -->
+      <div class="kart trinn" id="start-kart"></div>
+
+      <!-- Smakebiter på det han skal lære, i spillets eget formspråk. -->
+      <div class="startbrikker trinn" id="start-brikker" aria-hidden="true"></div>
+
       <button class="knapp knapp--stor trinn" id="knapp-start" type="button">
         <span>Start</span>
       </button>
@@ -2646,7 +2841,7 @@ body[data-verden="oy"] .skilt::after {
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-28 · 6';
+var SPILLVERSJON = '2026-08-28 · 7';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -3443,6 +3638,182 @@ var Figurer = (function () {
     '</svg>';
   }
 
+
+  /* ---------- forsidens øykart ---------- */
+
+  /* Kartet på forsiden. Formspråket er flatt og enkelt, som på et tegnet
+   * skattekart: havet legger seg i lysere ringer inn mot stranda, sanden går
+   * rundt hele øya, og der landet stuper ned i sanden står en brun kant.
+   * Kystlinja tegnes derfor bare én gang og gjenbrukes skalert – da følger
+   * alle kantene hverandre slik de gjør på et ekte kart.
+   *
+   * Selve stedene – banen, vulkanen og skipet – legges oppå som knapper i
+   * HTML, ikke i tegningen, slik at de kan trykkes på og få navn. */
+
+  var KYST =
+    'M818 300' +
+    'C842 360 826 420 780 452' +
+    'C726 490 690 520 660 566' +
+    'C620 630 560 668 480 664' +
+    'C400 660 330 634 292 592' +
+    'C240 536 176 496 172 428' +
+    'C168 348 192 268 232 218' +
+    'C282 156 372 130 472 130' +
+    'C586 128 668 148 716 196' +
+    'C756 236 800 252 818 300Z';
+
+  /* Kystlinja én gang til: skalert om øyas midtpunkt og eventuelt flyttet
+   * litt ned, som når kanten skal stikke fram under landet. */
+  function kystlag(skala, dy, farge, ekstra) {
+    var t = 'translate(0,' + (dy || 0) + ') translate(505,398) scale(' +
+            skala + ') translate(-505,-398)';
+    return '<path d="' + KYST + '" transform="' + t + '" fill="' + farge + '"' +
+           (ekstra || '') + '/>';
+  }
+
+  function palme(x, y, s, speil) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' +
+           (speil ? -s : s) + ',' + s + ')">' +
+      '<ellipse cx="1" cy="3" rx="17" ry="5" fill="rgba(52,86,58,.18)"/>' +
+      '<path d="M-4 2c1-15 3-26 8-37l6 2c-6 11-8 22-8 35z" fill="#a9743c"/>' +
+      '<g fill="#3f8f5a">' +
+        '<path d="M9-35c15-7 26-3 30 6-11-5-20-4-29 1z"/>' +
+        '<path d="M9-35c13-13 26-15 34-8-12 0-20 4-28 12z"/>' +
+        '<path d="M7-37c-3-15 4-26 15-29-7 9-9 18-9 28z"/>' +
+        '<path d="M5-35c-14-7-25-3-29 6 11-5 20-4 28 1z"/>' +
+        '<path d="M5-35c-12-12-25-14-33-7 12 0 20 4 28 11z"/>' +
+      '</g>' +
+      '<circle cx="7" cy="-34" r="4" fill="#2f7a49"/>' +
+    '</g>';
+  }
+
+  function stein(x, y, s) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')">' +
+      '<path d="M-24 9c-5-11 2-21 13-23 13-3 24 4 26 15 1 6-3 8-10 8z" fill="#9aa7ad"/>' +
+      '<path d="M-3 0c4-6 11-8 17-5" fill="none" stroke="#c6d1d4" stroke-width="4" stroke-linecap="round"/>' +
+    '</g>';
+  }
+
+  /* Kryssene er kartets «her er det noe» – de peker ikke på noe spillet
+   * bruker, de er der for at det skal være noe å oppdage og peke på. */
+  function kryss(x, y, s) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')"' +
+           ' stroke="#ea7a33" stroke-width="9" stroke-linecap="round">' +
+      '<path d="M-15-15L15 15M15-15L-15 15"/></g>';
+  }
+
+  function bolge(x, y) {
+    return '<path d="M' + x + ' ' + y + 'c9-8 18-8 27 0 9 8 18 8 27 0"' +
+           ' fill="none" stroke="#e6f8f4" stroke-width="6"' +
+           ' stroke-linecap="round" opacity=".75"/>';
+  }
+
+  function kart() {
+    return '' +
+    '<svg class="kart-flate" viewBox="0 0 1000 820" role="img"' +
+        ' aria-label="Kart over øya">' +
+
+      /* Havet, og ringene inn mot land. */
+      '<rect width="1000" height="820" fill="#4fbcc0"/>' +
+      kystlag(1.34, 0, '#63c7c9') +
+      kystlag(1.21, 0, '#80d4d1') +
+      kystlag(1.10, 0, '#a4e2dc') +
+
+      /* Stranda, og den brune kanten under landet. */
+      kystlag(1.00, 0, '#f4dcaa') +
+      kystlag(0.925, 9, '#b07a44') +
+      kystlag(0.925, 0, '#6bb567') +
+
+      /* Sletta i vest, der banen ligger. */
+      '<path d="M210 470c20-92 112-122 212-100s140 98 100 178c-40 78-180 90-250 38' +
+             '-56-42-74-58-62-116z" fill="#7ec471" opacity=".75"/>' +
+
+      /* Høylandet i øst: et platå med brun kant, med vulkanen på toppen. */
+      '<path d="M486 348c0-66 62-122 154-126s138 38 138 100c2 56-52 90-130 90' +
+             '-92 0-162-10-162-64z" transform="translate(0,8)" fill="#b07a44"/>' +
+      '<path d="M486 348c0-66 62-122 154-126s138 38 138 100c2 56-52 90-130 90' +
+             '-92 0-162-10-162-64z" fill="#88c977"/>' +
+
+      /* Vulkanen. Rolig, med bare et pust av glo i toppen. */
+      '<path d="M512 270L584 138h30l76 132z" fill="#8f6b57"/>' +
+      '<path d="M599 138h15l76 132h-56z" fill="#77543f" opacity=".38"/>' +
+      '<path d="M508 270h186l-8 10H516z" fill="#7a5b45" opacity=".3"/>' +
+      '<path d="M578 142h42l11 17c-21 8-45 8-64 0z" fill="#ea7a33"/>' +
+      '<path d="M586 164l-8 30M608 164l7 25M598 168l0 34" stroke="#ea7a33"' +
+            ' stroke-width="6" stroke-linecap="round" fill="none" opacity=".75"/>' +
+
+      /* Racerbanen: asfalt, midtstripe og målstrek. */
+      '<ellipse cx="370" cy="500" rx="123" ry="71" fill="#8ecb7f" opacity=".8"/>' +
+      '<ellipse cx="370" cy="500" rx="140" ry="88" fill="none" stroke="#8d9299" stroke-width="34"/>' +
+      '<ellipse cx="370" cy="500" rx="140" ry="88" fill="none" stroke="#fdfaf2"' +
+             ' stroke-width="3" stroke-dasharray="16 20" opacity=".8"/>' +
+      '<g>' +
+        '<rect x="213" y="484" width="34" height="30" fill="#fdfaf2"/>' +
+        '<g fill="#3a3f45">' +
+          '<rect x="213" y="484" width="11" height="10"/>' +
+          '<rect x="236" y="484" width="11" height="10"/>' +
+          '<rect x="224" y="494" width="11" height="10"/>' +
+          '<rect x="213" y="504" width="11" height="10"/>' +
+          '<rect x="236" y="504" width="11" height="10"/>' +
+        '</g>' +
+      '</g>' +
+
+      /* Stier mellom stedene, prikket som på kart. */
+      '<g fill="none" stroke="#b07a44" stroke-width="8" stroke-linecap="round"' +
+        ' stroke-dasharray="1 22" opacity=".85">' +
+        '<path d="M508 452c46-30 70-74 104-118"/>' +
+        '<path d="M474 566c48 20 100 12 168-16"/>' +
+      '</g>' +
+
+      /* Hytta på sletta, og brygga som peker ut mot skipet. */
+      '<g>' +
+        '<path d="M416 302l34-28 34 28z" fill="#c0763f"/>' +
+        '<rect x="426" y="302" width="48" height="30" rx="5" fill="#f4e5c2"/>' +
+        '<rect x="442" y="313" width="16" height="19" rx="3" fill="#a9743c"/>' +
+      '</g>' +
+      '<g>' +
+        '<path d="M642 542l78 40-8 15-78-40z" fill="#c08a4f"/>' +
+        '<g stroke="#96612f" stroke-width="3.5" stroke-linecap="round">' +
+          '<path d="M652 543l-8 16M670 552l-8 16M688 561l-8 16M706 570l-8 16"/>' +
+        '</g>' +
+        '<g fill="#8d5f31">' +
+          '<rect x="662" y="566" width="6" height="16" rx="3"/>' +
+          '<rect x="700" y="586" width="6" height="16" rx="3"/>' +
+        '</g>' +
+      '</g>' +
+
+      /* Palmer, steiner og kryss – noe å peke på i mellomrommene. */
+      palme(252, 318, 1.05, false) +
+      palme(300, 236, 0.9, true) +
+      palme(432, 196, 0.95, false) +
+      palme(238, 470, 1, true) +
+      palme(322, 622, 1.05, false) +
+      palme(556, 596, 0.95, true) +
+      palme(742, 452, 1, false) +
+      palme(778, 336, 0.85, true) +
+      stein(556, 340, 1) +
+      stein(300, 552, 0.85) +
+      stein(626, 618, 0.9) +
+      kryss(276, 380, 1) +
+      kryss(568, 636, 0.9) +
+      kryss(768, 418, 0.85) +
+
+      /* Havet rundt: skvalpesteiner, bølger og et kompass i hjørnet. */
+      stein(140, 626, 1.1) +
+      stein(902, 206, 1) +
+      bolge(78, 214) +
+      bolge(880, 470) +
+      bolge(430, 736) +
+      bolge(196, 108) +
+      '<g transform="translate(122,714)">' +
+        '<circle r="46" fill="rgba(255,253,244,.88)"/>' +
+        '<circle r="46" fill="none" stroke="#b07a44" stroke-width="4"/>' +
+        '<path d="M-34 0L0-10 34 0 0 10z" fill="#7a5b45" opacity=".7"/>' +
+        '<path d="M0-34L10 0 0 34-10 0z" fill="#ea7a33"/>' +
+      '</g>' +
+    '</svg>';
+  }
+
   /* ---------- landskapet bak ---------- */
 
   /* Åser i to lag gir dybde uten å ta oppmerksomhet. */
@@ -3622,6 +3993,7 @@ var Figurer = (function () {
   return {
     bil: bil,
     skip: skip,
+    kart: kart,
     ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
       var f = VERDENER[verdenId].figur;
@@ -5063,7 +5435,12 @@ var Spill = (function () {
   function visSkjerm(id) {
     var alle = document.querySelectorAll('.skjerm');
     for (var i = 0; i < alle.length; i++) alle[i].hidden = (alle[i].id !== id);
-    el('figurbane').hidden = !MED_FIGUR[id];
+    var medFigur = !!MED_FIGUR[id];
+    el('figurbane').hidden = !medFigur;
+    /* Skjermene uten figur på bakken skal ikke reservere plass til bakken
+     * heller. Uten dette sto det over hundre piksler tomt nederst på
+     * forsiden og verdensvelgeren – plass det tredje verdenskortet trengte. */
+    document.body.classList.toggle('uten-bakke', !medFigur);
     visStemmeknapp();
   }
 
@@ -5141,10 +5518,63 @@ var Spill = (function () {
     tilbakeHandling = null;
     naVerden = null;
     settScene(null);
-    el('start-figur').innerHTML = Figurer.bil();
+    tegnStartskjerm();
     oppdaterTeller(false);
     settTopp('Bokstavløpet', false);
     visSkjerm('skjerm-start');
+  }
+
+  /* Stedene på forsidekartet, i prosent av kartflaten. Tallene følger
+   * tegningen i Figurer.kart(): banen ligger på sletta i vest, dinosauren
+   * ved vulkanen i øst, og skipet ute på åpent hav – på sjøen, der et skip
+   * hører hjemme. */
+  var KARTSTEDER = {
+    bane: { x: 37, y: 61 },
+    dino: { x: 70, y: 33 },
+    oy:   { x: 83.5, y: 78 }
+  };
+
+  /* Forsiden er et kart. Hvert sted er både en tegning å peke på og en
+   * snarvei rett inn i verdenen. Under kartet står en håndfull bokstaver og
+   * tall, så det er tydelig uten å lese hva spillet handler om. */
+  function tegnStartskjerm() {
+    var felt = el('start-kart');
+    felt.innerHTML = Figurer.kart();
+    Object.keys(VERDENER).forEach(function (id, i) {
+      var v = VERDENER[id];
+      var sted = KARTSTEDER[id] || { x: 50, y: 50 };
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'kartsted kartsted--' + id;
+      b.style.left = sted.x + '%';
+      b.style.top = sted.y + '%';
+      b.style.animationDelay = (240 + i * 120) + 'ms';
+      b.setAttribute('aria-label', v.navn);
+      b.innerHTML =
+        '<span class="kartsted-figur">' + Figurer.figurFor(id) + '</span>' +
+        '<span class="kartsted-navn">' + v.navn + '</span>';
+      /* Samme handling som Start-knappen, pluss at vi hopper rett dit. Trykket
+       * er den brukerhandlingen nettleseren krever før lyd kan spilles. */
+      b.addEventListener('click', function () {
+        Lyd.lasOpp();
+        Lyd.klikk();
+        visVerden();
+        velgVerden(id);
+      });
+      felt.appendChild(b);
+    });
+
+    /* Noen bokstaver og tall som smakebit. Faste, ikke tilfeldige – forsiden
+     * skal se lik ut hver gang han kommer hit. */
+    var brikker = el('start-brikker');
+    brikker.innerHTML = '';
+    ['A', 'B', 'C', '1', '2', '3'].forEach(function (tegn, i) {
+      var s = document.createElement('span');
+      s.className = 'startbrikke' + (/\d/.test(tegn) ? ' startbrikke--tall' : '');
+      s.textContent = tegn;
+      s.style.animationDelay = (420 + i * 55) + 'ms';
+      brikker.appendChild(s);
+    });
   }
 
   function visVerden() {

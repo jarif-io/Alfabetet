@@ -34,7 +34,7 @@
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-28 · 6';
+var SPILLVERSJON = '2026-08-28 · 7';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',

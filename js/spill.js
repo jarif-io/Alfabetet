@@ -29,7 +29,12 @@ var Spill = (function () {
   function visSkjerm(id) {
     var alle = document.querySelectorAll('.skjerm');
     for (var i = 0; i < alle.length; i++) alle[i].hidden = (alle[i].id !== id);
-    el('figurbane').hidden = !MED_FIGUR[id];
+    var medFigur = !!MED_FIGUR[id];
+    el('figurbane').hidden = !medFigur;
+    /* Skjermene uten figur på bakken skal ikke reservere plass til bakken
+     * heller. Uten dette sto det over hundre piksler tomt nederst på
+     * forsiden og verdensvelgeren – plass det tredje verdenskortet trengte. */
+    document.body.classList.toggle('uten-bakke', !medFigur);
     visStemmeknapp();
   }
 
@@ -107,10 +112,63 @@ var Spill = (function () {
     tilbakeHandling = null;
     naVerden = null;
     settScene(null);
-    el('start-figur').innerHTML = Figurer.bil();
+    tegnStartskjerm();
     oppdaterTeller(false);
     settTopp('Bokstavløpet', false);
     visSkjerm('skjerm-start');
+  }
+
+  /* Stedene på forsidekartet, i prosent av kartflaten. Tallene følger
+   * tegningen i Figurer.kart(): banen ligger på sletta i vest, dinosauren
+   * ved vulkanen i øst, og skipet ute på åpent hav – på sjøen, der et skip
+   * hører hjemme. */
+  var KARTSTEDER = {
+    bane: { x: 37, y: 61 },
+    dino: { x: 70, y: 33 },
+    oy:   { x: 83.5, y: 78 }
+  };
+
+  /* Forsiden er et kart. Hvert sted er både en tegning å peke på og en
+   * snarvei rett inn i verdenen. Under kartet står en håndfull bokstaver og
+   * tall, så det er tydelig uten å lese hva spillet handler om. */
+  function tegnStartskjerm() {
+    var felt = el('start-kart');
+    felt.innerHTML = Figurer.kart();
+    Object.keys(VERDENER).forEach(function (id, i) {
+      var v = VERDENER[id];
+      var sted = KARTSTEDER[id] || { x: 50, y: 50 };
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'kartsted kartsted--' + id;
+      b.style.left = sted.x + '%';
+      b.style.top = sted.y + '%';
+      b.style.animationDelay = (240 + i * 120) + 'ms';
+      b.setAttribute('aria-label', v.navn);
+      b.innerHTML =
+        '<span class="kartsted-figur">' + Figurer.figurFor(id) + '</span>' +
+        '<span class="kartsted-navn">' + v.navn + '</span>';
+      /* Samme handling som Start-knappen, pluss at vi hopper rett dit. Trykket
+       * er den brukerhandlingen nettleseren krever før lyd kan spilles. */
+      b.addEventListener('click', function () {
+        Lyd.lasOpp();
+        Lyd.klikk();
+        visVerden();
+        velgVerden(id);
+      });
+      felt.appendChild(b);
+    });
+
+    /* Noen bokstaver og tall som smakebit. Faste, ikke tilfeldige – forsiden
+     * skal se lik ut hver gang han kommer hit. */
+    var brikker = el('start-brikker');
+    brikker.innerHTML = '';
+    ['A', 'B', 'C', '1', '2', '3'].forEach(function (tegn, i) {
+      var s = document.createElement('span');
+      s.className = 'startbrikke' + (/\d/.test(tegn) ? ' startbrikke--tall' : '');
+      s.textContent = tegn;
+      s.style.animationDelay = (420 + i * 55) + 'ms';
+      brikker.appendChild(s);
+    });
   }
 
   function visVerden() {

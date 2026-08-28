@@ -156,6 +156,20 @@ i stedet for «sju bregner». Ingenting krasjet, ingenting stakk utenfor, og
 alle overlapp-testene var grønne – teksten var bare borte. Der en tekst
 faktisk skal leses, mål `scrollWidth > clientWidth` og la det være en feil.
 
+**Knapper oppå en tegning: la beholderen ha tegningens forhold.** Forsidekartet
+har stedene som HTML-knapper plassert i prosent oppå en SVG. Det virker bare
+hvis beholderen har nøyaktig samme sideforhold som `viewBox` (`aspect-ratio:
+1000 / 820`) – ellers letterboxer SVG-en inni boksen, og «70 %» treffer et
+annet punkt i tegningen enn i koordinatene du regnet ut. Ha en påstand på det
+forholdet; da fanges det med én gang noen justerer bredden.
+
+**Sjekk hva som ligger *under* et element, ikke bare hvor det er.** «Sjørøveren
+skal være på sjøen» er en påstand om tegningen, ikke om geometri – to
+rektangler kan ligge riktig i forhold til hverandre mens skipet står midt på
+land. Slå av `pointer-events` på knappene et øyeblikk og bruk
+`document.elementFromPoint()` på festepunktet; da svarer nettleseren hvilken
+flate som faktisk males der, og fargen kan sammenlignes med havfargene.
+
 **Skill mellom bokser og det som males.** En vid, gjennomsiktig beholder kan
 godt overlappe en knapp uten at noe ser galt ut. Sammenlign de synlige barna –
 stolpen, teksten – ikke foreldrenoden. Og sjekk med et skjermbilde før du

@@ -556,6 +556,11 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Vises ingen figur på bakken, er det ingen bakke å ta hensyn til. Da får
+   innholdet den plassen i stedet – det var her det tredje verdenskortet
+   forsvant ut nederst. */
+body.uten-bakke #app { padding-bottom: 14px; }
+
 .skjerm {
   flex: 1 1 auto;
   display: flex;
@@ -602,6 +607,118 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   color: var(--blekk-svak);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 }
+
+/* ---------- forsiden ---------- */
+
+.startstabel { gap: 14px; width: 100%; }
+
+/* Kartet. Flaten har nøyaktig samme forhold som tegningens viewBox
+   (1000 × 820), slik at stedene kan plasseres i prosent og lande akkurat der
+   de skal i tegningen. Bredden begrenses av tre ting samtidig: plassen som
+   finnes, en øvre grense på store skjermer, og skjermhøyden – ellers vokser
+   kartet ut av en liggende telefon. */
+.kart {
+  position: relative;
+  width: min(100%, 620px, 78vh);
+  width: min(100%, 620px, 78dvh);
+  aspect-ratio: 1000 / 820;
+  margin: 0 auto;
+  /* Navnelappene stikker litt utenfor stedene sine – de skal ikke klippes. */
+  overflow: visible;
+}
+.kart-flate {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-lg);
+  box-shadow: var(--sk-2);
+}
+
+/* Et sted på kartet: figuren med navnet under, festet i sitt punkt.
+   Bredden er en andel av kartet, så figurene vokser og krymper i takt med
+   tegningen i stedet for å bli små flekker på en stor skjerm. */
+.kartsted {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 22%;
+  font: inherit;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: trinn-inn 520ms cubic-bezier(.2, .8, .3, 1) backwards;
+  transition: transform var(--mykt);
+}
+.kartsted-figur {
+  display: block;
+  width: 100%;
+  filter: drop-shadow(0 8px 10px rgba(30, 50, 45, .3));
+}
+.kartsted-figur svg { display: block; width: 100%; height: auto; }
+
+/* Navnet står på en lys lapp, ellers forsvinner det i kartet. Lappen får lov
+   til å være bredere enn stedet – den skal leses, ikke brekkes. */
+.kartsted-navn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(.68rem, 2.1vw, 1rem);
+  line-height: 1.15;
+  white-space: nowrap;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--blekk);
+  background: rgba(255, 253, 244, .93);
+  box-shadow: var(--sk-1);
+  border-bottom: 3px solid var(--merke, var(--aksent));
+}
+.kartsted:hover { transform: translate(-50%, -50%) scale(1.06); }
+.kartsted:active { transform: translate(-50%, -50%) scale(.98); }
+
+.kartsted--bane { --merke: #dc3327; }
+.kartsted--oy   { --merke: #16788f; }
+.kartsted--dino { --merke: #2f8f52; }
+
+/* Skipet ligger på vannet og skal duve, ikke stå stille som et hus. */
+.kartsted--oy .kartsted-figur {
+  transform-origin: 50% 80%;
+  animation: duv-pa-kartet 4200ms ease-in-out infinite;
+}
+@keyframes duv-pa-kartet {
+  0%, 100% { transform: translateY(0) rotate(-1.6deg); }
+  50%      { transform: translateY(-2%) rotate(1.6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kartsted--oy .kartsted-figur { animation: none; }
+}
+
+/* Smakebiter: tre bokstaver og tre tall, i samme form som brikkene i spillet.
+   Sier uten ord hva dette handler om. */
+.startbrikker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.startbrikke {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 46px; height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(to bottom, #dc3327, #a4200f);
+  box-shadow: var(--sk-1);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+  animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards;
+}
+.startbrikke--tall { background: linear-gradient(to bottom, #4f9e63, #1d6437); }
 
 .helt { width: min(440px, 74vw); filter: drop-shadow(0 16px 22px rgba(40, 30, 15, .28)); }
 .helt--liten { width: min(300px, 58vw); }
@@ -668,6 +785,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   text-align: center;
 }
 .verdenkort:nth-child(2) { animation-delay: 110ms; }
+.verdenkort:nth-child(3) { animation-delay: 220ms; }
 .verdenkort:hover { transform: translateY(-8px); box-shadow: var(--sk-3); }
 .verdenkort:active { transform: translateY(-2px); }
 
@@ -698,6 +816,9 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   --as-fjern: #b6d3ba; --as-bak: #8fbb9c; --as-fram: #6aa47f;
   --tre: #4c8a63; --stamme: #7a5230;
 }
+.verdenkort--dino .verdenkort-bilde {
+  --as-fjern: #a8c9b0; --as-bak: #7fae86; --as-fram: #5c9468; --bregne: #3f8f5a;
+}
 .verdenkort--oy .verdenkort-bilde {
   --as-fjern: #a9c9cf; --as-bak: #cdb98c; --as-fram: #b9a173; --palme: #3f8f6a;
 }
@@ -712,6 +833,8 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .verdenkort--bane .verdenkort-bilde::after { background: linear-gradient(to bottom, #4a4f5b, #33373f); }
 .verdenkort--oy .verdenkort-bilde { background: linear-gradient(to bottom, #9fd8e8, #ffe3b0); }
 .verdenkort--oy .verdenkort-bilde::after { background: linear-gradient(to bottom, #2b8fa8, #14607a); }
+.verdenkort--dino .verdenkort-bilde { background: linear-gradient(to bottom, #9ad9de, #ffd9a8); }
+.verdenkort--dino .verdenkort-bilde::after { background: linear-gradient(to bottom, #7a6a4a, #5b4e35); }
 
 .verdenkort-under { padding: 18px 22px 24px; }
 .verdenkort-navn {
@@ -1940,6 +2063,27 @@ body[data-verden="oy"] .skilt::after {
    skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får hele
    utvalget plass uten å rulle. */
 @media (max-width: 560px) {
+  /* Tre store kort under hverandre får ikke plass på en telefon, og da måtte
+     han rulle for å oppdage at Dinodalen finnes. Liggende kort tar under
+     halve høyden, og alle tre er synlige med én gang. */
+  .verdenrad { gap: 12px; width: 100%; }
+  .verdenkort {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    align-items: center;
+    text-align: left;
+  }
+  .verdenkort-bilde { height: 100px; padding-bottom: 8px; }
+  .verdenkort-bilde > svg { width: 82%; }
+  .verdenkort-scene .lag { bottom: 20px; }
+  .verdenkort-scene .lag--fjern { height: 56px; }
+  .verdenkort-scene .lag--bak { height: 44px; }
+  .verdenkort-scene .lag--fram { height: 34px; }
+  .verdenkort-bilde::after { height: 20px; }
+  .verdenkort-under { padding: 12px 16px; }
+  .verdenkort-navn { font-size: 1.3rem; }
+  .verdenkort-tekst { font-size: .88rem; }
   :root { --grunn-h: 104px; --rute: 72px; }
   #topp { gap: 8px; padding: 8px 10px; }
   #topp-midt { display: none; }
@@ -2054,6 +2198,37 @@ body[data-verden="oy"] .skilt::after {
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
+/* Telefon på tvers, men med bredde nok til tre kort ved siden av hverandre.
+   Stablet under hverandre får de ikke plass i 360 pikslers høyde, og da måtte
+   han rulle for å se at Dinodalen finnes.
+
+   Merk grensene: uten min-width slår denne inn på smale skjermer også, der
+   tre kort ved siden av hverandre blir 120 piksler brede hver. */
+@media (max-height: 520px) and (min-width: 561px) {
+  .verdenrad { gap: 12px; flex-wrap: nowrap; width: 100%; }
+  .verdenkort { width: min(230px, 31vw); }
+  .verdenkort-bilde { height: 92px; padding-bottom: 6px; }
+  .verdenkort-bilde > svg { width: 78%; }
+  .verdenkort-scene .lag { bottom: 18px; }
+  .verdenkort-scene .lag--fjern { height: 52px; }
+  .verdenkort-scene .lag--bak { height: 40px; }
+  .verdenkort-scene .lag--fram { height: 32px; }
+  .verdenkort-bilde::after { height: 18px; }
+  .verdenkort-under { padding: 8px 12px 10px; }
+  .verdenkort-navn { font-size: 1.1rem; }
+  .verdenkort-tekst { font-size: .78rem; }
+}
+
+/* Smal OG lav – telefon på tvers med lite bredde. Da er liggende kort eneste
+   som får plass, og de må være så lave som mulig. */
+@media (max-height: 520px) and (max-width: 560px) {
+  .verdenrad { gap: 8px; }
+  .verdenkort-bilde { height: 74px; }
+  .verdenkort-under { padding: 8px 12px; }
+  .verdenkort-navn { font-size: 1.1rem; }
+  .verdenkort-tekst { font-size: .78rem; }
+}
+
 /* Bokstavrutene er 72 px på telefon, ikke 62: en treåring treffer bredere enn
    en voksen, og 62 px er så vidt over voksenminimum. På en kort telefon får
    ikke alle bokstavene plass ved 72 px, og da veier det tyngre at han ser hele
@@ -2137,6 +2312,16 @@ body[data-verden="oy"] .skilt::after {
   .valg { gap: 14px; }
   .knapp--stor { font-size: 1.05rem; padding: 12px 24px 10px; }
   .helt { width: min(240px, 34vw); }
+  /* På tvers er høyden det knappe. Kartet krympes hardt, og brikkeraden
+     får mindre plass – Start-knappen skal fortsatt være synlig uten å
+     rulle. */
+  .kart { width: min(100%, 620px, 53vh); width: min(100%, 620px, 53dvh); }
+  .kartsted-navn { font-size: .62rem; padding: 2px 7px; border-bottom-width: 2px; }
+  /* Smakebitene er det første som må vike på tvers – kartet og
+     Start-knappen skal begge få plass uten rulling. */
+  #skjerm-start .startbrikker { display: none; }
+  .startstabel { gap: 6px; }
+  #skjerm-start .ingress { font-size: .88rem; }
   .titteltekst { font-size: clamp(2rem, 6vw, 3rem); }
   .malflagg { font-size: 2.6rem; }
   .panelkort { padding: 18px 26px; }

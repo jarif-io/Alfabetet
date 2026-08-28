@@ -25,10 +25,14 @@ krever det, og det er derfor knappen er der.
 
 ## Slik spiller han
 
-Han velger først en verden — **Racerbanen**, **Sjørøverøya** eller **Dinodalen** —
-og gir figuren sin et navn. Navnet brukes gjennom hele spillet.
+Forsiden er et øykart. De tre verdenene ligger som steder på kartet —
+**Racerbanen** på sletta, **Dinodalen** ved vulkanen og **Sjørøverøya** ute på
+sjøen — og han kan trykke rett på det stedet han vil til. Vil han se dem som
+kort i stedet, går Start-knappen til den vanlige verdensvelgeren.
 
-De to første handler om bokstaver. **Dinodalen handler om tall**, og ligger for
+Så gir han figuren sin et navn. Navnet brukes gjennom hele spillet.
+
+Racerbanen og Sjørøverøya handler om bokstaver. **Dinodalen handler om tall**, og ligger for
 seg selv med vilje: tall og bokstaver skal ikke blandes på samme skjerm, og et
 barn skjønner «her bor tallene» raskere enn noen forklaring. Telleren i toppen,
 samlingen og vanskegraden holdes også hver for seg, så ti tall ikke blandes inn
@@ -335,7 +339,7 @@ index.html        hele skjermen: scenen, de ni skjermbildene og foreldremenyen
 css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
 js/data.js        bokstavene, tallene, ordene og de tre verdenene  ← denne kan dere endre
-js/figurer.js     bil, skip, dinosaur og landskap, tegnet som SVG
+js/figurer.js     bil, skip, dinosaur, landskap og forsidekartet, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        norsk talesyntese
 js/lyd.js         lydeffekter, laget av nettleseren selv

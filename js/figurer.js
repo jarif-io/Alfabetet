@@ -205,6 +205,182 @@ var Figurer = (function () {
     '</svg>';
   }
 
+
+  /* ---------- forsidens øykart ---------- */
+
+  /* Kartet på forsiden. Formspråket er flatt og enkelt, som på et tegnet
+   * skattekart: havet legger seg i lysere ringer inn mot stranda, sanden går
+   * rundt hele øya, og der landet stuper ned i sanden står en brun kant.
+   * Kystlinja tegnes derfor bare én gang og gjenbrukes skalert – da følger
+   * alle kantene hverandre slik de gjør på et ekte kart.
+   *
+   * Selve stedene – banen, vulkanen og skipet – legges oppå som knapper i
+   * HTML, ikke i tegningen, slik at de kan trykkes på og få navn. */
+
+  var KYST =
+    'M818 300' +
+    'C842 360 826 420 780 452' +
+    'C726 490 690 520 660 566' +
+    'C620 630 560 668 480 664' +
+    'C400 660 330 634 292 592' +
+    'C240 536 176 496 172 428' +
+    'C168 348 192 268 232 218' +
+    'C282 156 372 130 472 130' +
+    'C586 128 668 148 716 196' +
+    'C756 236 800 252 818 300Z';
+
+  /* Kystlinja én gang til: skalert om øyas midtpunkt og eventuelt flyttet
+   * litt ned, som når kanten skal stikke fram under landet. */
+  function kystlag(skala, dy, farge, ekstra) {
+    var t = 'translate(0,' + (dy || 0) + ') translate(505,398) scale(' +
+            skala + ') translate(-505,-398)';
+    return '<path d="' + KYST + '" transform="' + t + '" fill="' + farge + '"' +
+           (ekstra || '') + '/>';
+  }
+
+  function palme(x, y, s, speil) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' +
+           (speil ? -s : s) + ',' + s + ')">' +
+      '<ellipse cx="1" cy="3" rx="17" ry="5" fill="rgba(52,86,58,.18)"/>' +
+      '<path d="M-4 2c1-15 3-26 8-37l6 2c-6 11-8 22-8 35z" fill="#a9743c"/>' +
+      '<g fill="#3f8f5a">' +
+        '<path d="M9-35c15-7 26-3 30 6-11-5-20-4-29 1z"/>' +
+        '<path d="M9-35c13-13 26-15 34-8-12 0-20 4-28 12z"/>' +
+        '<path d="M7-37c-3-15 4-26 15-29-7 9-9 18-9 28z"/>' +
+        '<path d="M5-35c-14-7-25-3-29 6 11-5 20-4 28 1z"/>' +
+        '<path d="M5-35c-12-12-25-14-33-7 12 0 20 4 28 11z"/>' +
+      '</g>' +
+      '<circle cx="7" cy="-34" r="4" fill="#2f7a49"/>' +
+    '</g>';
+  }
+
+  function stein(x, y, s) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')">' +
+      '<path d="M-24 9c-5-11 2-21 13-23 13-3 24 4 26 15 1 6-3 8-10 8z" fill="#9aa7ad"/>' +
+      '<path d="M-3 0c4-6 11-8 17-5" fill="none" stroke="#c6d1d4" stroke-width="4" stroke-linecap="round"/>' +
+    '</g>';
+  }
+
+  /* Kryssene er kartets «her er det noe» – de peker ikke på noe spillet
+   * bruker, de er der for at det skal være noe å oppdage og peke på. */
+  function kryss(x, y, s) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')"' +
+           ' stroke="#ea7a33" stroke-width="9" stroke-linecap="round">' +
+      '<path d="M-15-15L15 15M15-15L-15 15"/></g>';
+  }
+
+  function bolge(x, y) {
+    return '<path d="M' + x + ' ' + y + 'c9-8 18-8 27 0 9 8 18 8 27 0"' +
+           ' fill="none" stroke="#e6f8f4" stroke-width="6"' +
+           ' stroke-linecap="round" opacity=".75"/>';
+  }
+
+  function kart() {
+    return '' +
+    '<svg class="kart-flate" viewBox="0 0 1000 820" role="img"' +
+        ' aria-label="Kart over øya">' +
+
+      /* Havet, og ringene inn mot land. */
+      '<rect width="1000" height="820" fill="#4fbcc0"/>' +
+      kystlag(1.34, 0, '#63c7c9') +
+      kystlag(1.21, 0, '#80d4d1') +
+      kystlag(1.10, 0, '#a4e2dc') +
+
+      /* Stranda, og den brune kanten under landet. */
+      kystlag(1.00, 0, '#f4dcaa') +
+      kystlag(0.925, 9, '#b07a44') +
+      kystlag(0.925, 0, '#6bb567') +
+
+      /* Sletta i vest, der banen ligger. */
+      '<path d="M210 470c20-92 112-122 212-100s140 98 100 178c-40 78-180 90-250 38' +
+             '-56-42-74-58-62-116z" fill="#7ec471" opacity=".75"/>' +
+
+      /* Høylandet i øst: et platå med brun kant, med vulkanen på toppen. */
+      '<path d="M486 348c0-66 62-122 154-126s138 38 138 100c2 56-52 90-130 90' +
+             '-92 0-162-10-162-64z" transform="translate(0,8)" fill="#b07a44"/>' +
+      '<path d="M486 348c0-66 62-122 154-126s138 38 138 100c2 56-52 90-130 90' +
+             '-92 0-162-10-162-64z" fill="#88c977"/>' +
+
+      /* Vulkanen. Rolig, med bare et pust av glo i toppen. */
+      '<path d="M512 270L584 138h30l76 132z" fill="#8f6b57"/>' +
+      '<path d="M599 138h15l76 132h-56z" fill="#77543f" opacity=".38"/>' +
+      '<path d="M508 270h186l-8 10H516z" fill="#7a5b45" opacity=".3"/>' +
+      '<path d="M578 142h42l11 17c-21 8-45 8-64 0z" fill="#ea7a33"/>' +
+      '<path d="M586 164l-8 30M608 164l7 25M598 168l0 34" stroke="#ea7a33"' +
+            ' stroke-width="6" stroke-linecap="round" fill="none" opacity=".75"/>' +
+
+      /* Racerbanen: asfalt, midtstripe og målstrek. */
+      '<ellipse cx="370" cy="500" rx="123" ry="71" fill="#8ecb7f" opacity=".8"/>' +
+      '<ellipse cx="370" cy="500" rx="140" ry="88" fill="none" stroke="#8d9299" stroke-width="34"/>' +
+      '<ellipse cx="370" cy="500" rx="140" ry="88" fill="none" stroke="#fdfaf2"' +
+             ' stroke-width="3" stroke-dasharray="16 20" opacity=".8"/>' +
+      '<g>' +
+        '<rect x="213" y="484" width="34" height="30" fill="#fdfaf2"/>' +
+        '<g fill="#3a3f45">' +
+          '<rect x="213" y="484" width="11" height="10"/>' +
+          '<rect x="236" y="484" width="11" height="10"/>' +
+          '<rect x="224" y="494" width="11" height="10"/>' +
+          '<rect x="213" y="504" width="11" height="10"/>' +
+          '<rect x="236" y="504" width="11" height="10"/>' +
+        '</g>' +
+      '</g>' +
+
+      /* Stier mellom stedene, prikket som på kart. */
+      '<g fill="none" stroke="#b07a44" stroke-width="8" stroke-linecap="round"' +
+        ' stroke-dasharray="1 22" opacity=".85">' +
+        '<path d="M508 452c46-30 70-74 104-118"/>' +
+        '<path d="M474 566c48 20 100 12 168-16"/>' +
+      '</g>' +
+
+      /* Hytta på sletta, og brygga som peker ut mot skipet. */
+      '<g>' +
+        '<path d="M416 302l34-28 34 28z" fill="#c0763f"/>' +
+        '<rect x="426" y="302" width="48" height="30" rx="5" fill="#f4e5c2"/>' +
+        '<rect x="442" y="313" width="16" height="19" rx="3" fill="#a9743c"/>' +
+      '</g>' +
+      '<g>' +
+        '<path d="M642 542l78 40-8 15-78-40z" fill="#c08a4f"/>' +
+        '<g stroke="#96612f" stroke-width="3.5" stroke-linecap="round">' +
+          '<path d="M652 543l-8 16M670 552l-8 16M688 561l-8 16M706 570l-8 16"/>' +
+        '</g>' +
+        '<g fill="#8d5f31">' +
+          '<rect x="662" y="566" width="6" height="16" rx="3"/>' +
+          '<rect x="700" y="586" width="6" height="16" rx="3"/>' +
+        '</g>' +
+      '</g>' +
+
+      /* Palmer, steiner og kryss – noe å peke på i mellomrommene. */
+      palme(252, 318, 1.05, false) +
+      palme(300, 236, 0.9, true) +
+      palme(432, 196, 0.95, false) +
+      palme(238, 470, 1, true) +
+      palme(322, 622, 1.05, false) +
+      palme(556, 596, 0.95, true) +
+      palme(742, 452, 1, false) +
+      palme(778, 336, 0.85, true) +
+      stein(556, 340, 1) +
+      stein(300, 552, 0.85) +
+      stein(626, 618, 0.9) +
+      kryss(276, 380, 1) +
+      kryss(568, 636, 0.9) +
+      kryss(768, 418, 0.85) +
+
+      /* Havet rundt: skvalpesteiner, bølger og et kompass i hjørnet. */
+      stein(140, 626, 1.1) +
+      stein(902, 206, 1) +
+      bolge(78, 214) +
+      bolge(880, 470) +
+      bolge(430, 736) +
+      bolge(196, 108) +
+      '<g transform="translate(122,714)">' +
+        '<circle r="46" fill="rgba(255,253,244,.88)"/>' +
+        '<circle r="46" fill="none" stroke="#b07a44" stroke-width="4"/>' +
+        '<path d="M-34 0L0-10 34 0 0 10z" fill="#7a5b45" opacity=".7"/>' +
+        '<path d="M0-34L10 0 0 34-10 0z" fill="#ea7a33"/>' +
+      '</g>' +
+    '</svg>';
+  }
+
   /* ---------- landskapet bak ---------- */
 
   /* Åser i to lag gir dybde uten å ta oppmerksomhet. */
@@ -384,6 +560,7 @@ var Figurer = (function () {
   return {
     bil: bil,
     skip: skip,
+    kart: kart,
     ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
       var f = VERDENER[verdenId].figur;
