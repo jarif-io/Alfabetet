@@ -259,7 +259,7 @@ var Spill = (function () {
     Lyd.klikk();
     visMeny();
     Tale.stopp();
-    Tale.rekke(['Hei, ' + valgt + '!']);
+    Tale.rekke([Tale.velg('Hei, ' + valgt + '!', 'Hei!')]);
   }
 
   function visMeny() {

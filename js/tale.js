@@ -212,6 +212,26 @@ var Tale = (function () {
 
     si: si,
 
+    /* Velger den første varianten vi har lydklipp for.
+     *
+     * Rosen sier navnet figuren fikk – «Bra kjørt, Turbo!». Navnene barnet
+     * kan velge fra lista ligger i språkpakken, men et navn forelderen
+     * skriver inn selv kan umulig ligge der. Da er en ros uten navn, sagt med
+     * den gode stemmen, bedre enn en ros med navn sagt av robotstemmen.
+     *
+     * Er lydbanken slått av, gjelder den rikeste varianten: talesyntesen kan
+     * si hvilket som helst navn. */
+    velg: function () {
+      var varianter = Array.prototype.slice.call(arguments);
+      if (brukBank()) {
+        for (var i = 0; i < varianter.length; i++) {
+          if (Lydbank.har(varianter[i])) return varianter[i];
+        }
+      }
+      return varianter[0];
+    },
+
+
     stopp: function () {
       generasjon += 1;
       if (stotte) {

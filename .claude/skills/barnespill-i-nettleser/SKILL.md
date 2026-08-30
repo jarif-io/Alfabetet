@@ -194,6 +194,21 @@ land. Slå av `pointer-events` på knappene et øyeblikk og bruk
 `document.elementFromPoint()` på festepunktet; da svarer nettleseren hvilken
 flate som faktisk males der, og fargen kan sammenlignes med havfargene.
 
+**Pynt arves ned i pseudoelementer.** Tallet på hver ting i tellemodusen så
+dobbelt ut på telefonen. Årsaken var `text-shadow: 0 3px 0 rgba(255,255,255,.8)`
+på oppdragsplaten – riktig som lys kant under en mørk bokstav, men arvet ned i
+`::after` ble den et hvitt ekstra siffer 3 piksler under det hvite tallet.
+`getComputedStyle(el, '::after')` svarer på slikt på ett sekund; å stirre på
+regelen som satte merket gjør det ikke, for feilen sto ikke der.
+
+**Dekning må måles med de verdiene familien faktisk har.** Språkpakken hadde
+klipp for rosen – «Bra kjørt, Turbo!» – og testen sa 99 % dekning. Den brukte
+standardnavnet. Forelderen hadde skrevet inn sitt eget navn på figuren, og da
+falt hver eneste oppmuntring tilbake til robotstemmen. Test aksene der
+familier er ulike (navn, valgte bokstaver, innstillinger), ikke bare den
+ferske installasjonen. Og der en verdi umulig kan ligge i pakken: la spillet
+velge en variant uten den, framfor å bytte stemme midt i en setning.
+
 **Skill mellom bokser og det som males.** En vid, gjennomsiktig beholder kan
 godt overlappe en knapp uten at noe ser galt ut. Sammenlign de synlige barna –
 stolpen, teksten – ikke foreldrenoden. Og sjekk med et skjermbilde før du

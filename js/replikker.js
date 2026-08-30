@@ -136,6 +136,14 @@ var Replikker = (function () {
       legg('setning', v.navnesporsmal);
       /* Rosen sier navnet figuren fikk, så den kan bare lages når navnet
        * finnes. Gjør den det, er det bare fire setninger per verden. */
+      /* Uten navn i det hele tatt. Disse er redningen når forelderen har
+       * skrevet inn et eget navn på figuren: da finnes det ikke noe klipp med
+       * navnet i, og spillet sier rosen uten navn med den gode stemmen i
+       * stedet for med navn og robotstemme. Se Tale.velg. */
+      v.ros.forEach(function (r) { legg('ros', r + '!'); });
+      legg('ros', 'Hei!');
+      legg('ros', 'Bra jobbet!');
+
       liste(navn[id]).forEach(function (n) {
         v.ros.forEach(function (r) { legg('ros', r + ', ' + n + '!'); });
         legg('ros', 'Hei, ' + n + '!');

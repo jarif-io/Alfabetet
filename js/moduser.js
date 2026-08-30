@@ -526,6 +526,7 @@ var Moduser = (function () {
        * i stedet for å telle – og da måler vi hukommelse, ikke telling. */
       okt.telleting = tilfeldig(TELLETING);
       okt.talt = 0;
+      okt.telt = [];
       tegnMengde(el('oppgave-mal'), okt.telleting.ikon, antall,
                  'oppdrag-mal oppdrag-mal--tell mengde');
 
@@ -540,14 +541,29 @@ var Moduser = (function () {
       }
     }
 
+    /* Nummererer det som er talt, i den rekkefølgen han faktisk pekte. Kalles
+     * etter at noe er tatt bort igjen, så tallene alltid går 1, 2, 3 … uten
+     * hull. Et hull i rekka er nettopp det telling ikke tåler. */
+    function nummererPaNytt() {
+      okt.telt.forEach(function (t, i) { t.dataset.talltall = String(i + 1); });
+      okt.talt = okt.telt.length;
+    }
+
     function tellTing(t) {
+      /* Trykk på noe som alt er talt: ta det bort igjen. Han skal kunne
+       * angre og telle om, uten å måtte begynne på en ny oppgave – det er
+       * halve poenget med å telle med fingeren. */
       if (t.classList.contains('talt')) {
-        /* Allerede talt: si tallet den fikk, uten å telle den om igjen. */
+        t.classList.remove('talt');
+        delete t.dataset.talltall;
+        okt.telt = okt.telt.filter(function (x) { return x !== t; });
+        nummererPaNytt();
+        Lyd.klikk();
         Tale.stopp();
-        Tale.rekke([tellenavn(t.dataset.talltall) + '.']);
         return;
       }
-      okt.talt += 1;
+      okt.telt.push(t);
+      okt.talt = okt.telt.length;
       t.classList.add('talt');
       t.dataset.talltall = String(okt.talt);
       spillOm(t, 'teller', 420);
@@ -716,8 +732,10 @@ var Moduser = (function () {
         Lagring.settAntallValg(okt.verden, okt.antallValg);
       }
 
+      var rosord = tilfeldig(v.ros);
       var ros = forsteForsok
-        ? [tilfeldig(v.ros) + ', ' + Lagring.navnFor(okt.verden) + '!']
+        ? [Tale.velg(rosord + ', ' + Lagring.navnFor(okt.verden) + '!',
+                     rosord + '!')]
         : ['Der ja! Det er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.'];
 
       Tale.stopp();
@@ -832,7 +850,8 @@ var Moduser = (function () {
         : okt.nyeMestrede.length
           ? ['Se her!', 280, navnPaTegn(okt.verden, okt.nyeMestrede[0]) + '.',
              280, 'Den kan du nå!']
-          : ['Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!'];
+          : [Tale.velg('Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!',
+                       'Bra jobbet!')];
       window.setTimeout(function () { Tale.rekke(hilsen); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
       window.setTimeout(function () { hopp(); }, 400);

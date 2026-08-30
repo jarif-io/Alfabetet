@@ -255,9 +255,12 @@ høre nettleserens egen stemme.
 ### To ting pakken ikke kan dekke
 
 - **Barnets eget navn**, som sies til slutt i «Navnet mitt». Det er ulikt hos
-  hver familie, så det sies av talesyntesen. Det samme gjelder rosen hvis dere
-  skriver inn et eget navn på figuren i stedet for å velge et av forslagene —
-  alle forslagene ligger i pakken.
+  hver familie, så akkurat det ene ordet sies av talesyntesen.
+
+  Rosen — «Bra kjørt, Turbo!» — sier navnet figuren fikk. Alle navnene i
+  forslagslista ligger i pakken. Skriver dere inn et eget navn, sier spillet
+  rosen **uten** navnet i stedet: «Bra kjørt!». Det er bedre å miste navnet
+  enn å miste den gode stemmen midt i en oppmuntring.
 - **Bokstavlydene** («fff», «sss»). En stemme som leser skrift lager ikke en
   lyd som holdes ut i tid; den leser «eff eff eff». Innstillingen er av som
   standard, og når den er på, sies lydene av talesyntesen.
