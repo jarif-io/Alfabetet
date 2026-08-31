@@ -460,7 +460,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 /* Stjernetelleren gjør framgangen synlig hele tiden. */
+/* Telleren er en knapp: den fører inn til samlingen. Den skal likevel se ut
+   som tallet hans, ikke som enda en knapp å ta stilling til. */
 .teller {
+  font: inherit;
+  border: none;
+  cursor: pointer;
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
@@ -472,6 +477,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   font-weight: 700;
   font-size: 1.05rem;
 }
+.teller:not([disabled]):hover { transform: translateY(-2px); }
+.teller:not([disabled]):active { transform: translateY(1px); }
+/* Midt i en runde er den bare tallet hans, ikke en vei ut. Den ser lik ut –
+   et tall som gråner mens han spiller ville sett ut som at noe var galt. */
+.teller[disabled] { cursor: default; }
+.teller { transition: transform var(--mykt); }
 .teller-stjerne { color: var(--gull); font-size: 1.15rem; }
 .teller-av { color: var(--blekk-svak); font-size: .82rem; font-weight: 600; }
 .teller[hidden] { display: none; }
@@ -847,8 +858,8 @@ body.pa-havet .ingress {
   margin: auto;
   width: min(1140px, 100%);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 14px;
   justify-content: center;
   /* Fliser kan komme til etter hvert som han vokser. Får de ikke plass,
      skal de kunne rulles til – ikke havne under bakken der de verken er
@@ -862,14 +873,15 @@ body.pa-havet .ingress {
   font: inherit;
   cursor: pointer;
   border: none;
-  text-align: left;
-  padding: 22px 22px 20px;
+  text-align: center;
+  padding: 14px 12px 14px;
   border-radius: var(--r-lg);
   background: rgba(255, 253, 248, .96);
   box-shadow: var(--sk-2);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   transition: transform var(--mykt), box-shadow var(--mykt);
   animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards;
   position: relative;
@@ -883,22 +895,56 @@ body.pa-havet .ingress {
 .flis:hover { transform: translateY(-7px); box-shadow: var(--sk-3); }
 .flis:active { transform: translateY(-1px); }
 
-.flis-merke {
-  width: 64px; height: 64px;
-  border-radius: 20px;
-  display: grid;
-  place-items: center;
-  background: var(--aksent-svak);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .05);
+/* Bildet er hele poenget med flisen: et lite bilde av spillet den fører
+   til. Det skal derfor være det største på kortet, ikke et merke ved siden
+   av en overskrift. */
+.flis-bilde {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+  background: var(--flate-2);
+  box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .06);
+  padding: 6px;
 }
-.flis-merke svg { width: 40px; height: 40px; display: block; }
-.flis-navn { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; }
-.flis-tekst { color: var(--blekk-svak); font-size: .93rem; font-weight: 600; line-height: 1.35; }
+.modusbilde { display: block; width: 100%; height: auto; }
 
+/* Brikkene i bildet ser ut som brikkene i spillet – samme farge, samme
+   runding, samme hvite tegn. Det er gjenkjennelsen som gjør bildet lesbart. */
+.mb-brikke rect { fill: var(--aksent); }
+.mb-brikke text, .mb-ramme text, .mb-merketall {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.mb-brikke text { fill: #fff; }
+.mb-ramme rect { fill: none; stroke: var(--aksent); stroke-width: 3; stroke-dasharray: 5 4; }
+.mb-ramme text { fill: var(--aksent); }
+.mb-pil { fill: none; stroke: var(--blekk-svak); stroke-width: 3;
+          stroke-linecap: round; stroke-linejoin: round; }
+.mb-prikk { fill: var(--blekk-svak); opacity: .35; }
+.mb-hoyttaler path { fill: var(--blekk); }
+.mb-hoyttaler .mb-bolge { fill: none; stroke: var(--blekk); stroke-width: 3; stroke-linecap: round; }
+.mb-ikon { font-size: 30px; text-anchor: middle; dominant-baseline: central; }
+.mb-ting rect { fill: var(--flate); stroke: var(--aksent); stroke-width: 3; }
+.mb-merke { fill: var(--aksent); }
+.mb-merketall { fill: #fff; font-size: 11px; }
+.mb-ting-ikon { font-size: 15px; text-anchor: middle; dominant-baseline: central; }
+
+.flis-navn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.15;
+}
+
+/* Verdenens farge som en tynn stripe langs toppen. Den satt langs venstre
+   kant da flisene var rader; på et kort er toppen der blikket lander. */
 .flis-stripe {
   position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 7px;
+  left: 0; right: 0; top: 0;
+  height: 6px;
   background: var(--aksent);
 }
 
@@ -1935,15 +1981,6 @@ body[data-verden="oy"] .skilt::after {
   box-shadow: inset 0 0 0 3px var(--aksent);
 }
 
-/* Hintet til den voksne på menyflisene */
-.flis-tekst em {
-  display: block;
-  font-style: normal;
-  opacity: .7;
-  font-size: .85rem;
-  margin-top: 4px;
-}
-
 /* Hintet som dukker opp når noen bare klikker på tannhjulet */
 /* Bekreftelsen under tannhjulet. To bevisste trykk i stedet for å holde
    inne – holding utløste tekstmarkering og hurtigmeny på telefon. */
@@ -2114,39 +2151,13 @@ body[data-verden="oy"] .skilt::after {
      skjermen på telefon, og en treåring som må rulle for å finne modusen
      sin, finner den ikke. Liggende fliser tar under halve høyden. */
   .menyrad { gap: 6px; grid-template-columns: 1fr; }
-  .flis {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "merke navn" "merke tekst";
-    align-items: center;
-    column-gap: 13px;
-    row-gap: 1px;
-    padding: 8px 12px 8px 16px;
-  }
-  .flis-merke {
-    grid-area: merke;
-    width: 42px; height: 42px;
-    border-radius: 13px;
-  }
-  .flis-merke svg { width: 26px; height: 26px; }
-  .flis-navn { grid-area: navn; align-self: end; font-size: 1.1rem; }
-  /* Forklaringen er til den voksne. To linjer er nok; resten er uansett
-     ikke det barnet navigerer etter. */
-  /* Forklaringen er til den voksne. Én linje holder flisene like høye, og
-     det er høyden som avgjør om seks moduser får plass uten rulling. */
-  .flis-tekst {
-    grid-area: tekst;
-    align-self: start;
-    font-size: .85rem;
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  /* På telefon fyller innstillingene hele skjermen. Da er det aldri tvil om
-     hva som ruller, og bunnknappene ligger alltid der de skal. */
-  .overlegg { padding: 0; }
+  /* Bildet er det han navigerer etter, så det blir med også her – bare
+     mindre. Kortene ligger i to kolonner, som er nok til at alle modusene
+     er synlige uten å rulle. */
+  .menyrad { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; }
+  .flis { padding: 9px 8px 10px; gap: 6px; border-radius: 20px; }
+  .flis-navn { font-size: .98rem; }
+  .flis-bilde { padding: 4px; border-radius: 13px; }
   .panel {
     width: 100%;
     height: 100vh;
@@ -2245,22 +2256,12 @@ body[data-verden="oy"] .skilt::after {
   /* Samme grep som på smal telefon: liggende fliser, ellers får ikke seks
      moduser plass på en skjerm som bare er 360 piksler høy. */
   .menyrad { gap: 10px; }
-  .flis {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "merke navn" "merke tekst";
-    align-items: center;
-    column-gap: 12px;
-    row-gap: 1px;
-    padding: 9px 12px 9px 16px;
-  }
-  .flis-merke { grid-area: merke; width: 42px; height: 42px; border-radius: 13px; }
-  .flis-merke svg { width: 26px; height: 26px; }
-  .flis-navn { grid-area: navn; align-self: center; font-size: 1.05rem; }
-  /* På en telefon på tvers er det ikke høyde til forklaringene. De er
-     uansett til den voksne – barnet kjenner igjen merket og navnet. */
-  .flis { grid-template-areas: "merke navn"; row-gap: 0; }
-  .flis-tekst { display: none; }
+  /* På tvers er høyden det knappe. Kortene blir smalere, så alle står på
+     én rad, og bildet krymper med dem. */
+  .menyrad { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
+  .flis { padding: 7px 6px 8px; gap: 4px; border-radius: 18px; }
+  .flis-navn { font-size: .82rem; }
+  .flis-bilde { padding: 3px; border-radius: 11px; }
 
   /* Navnet må få plass på én linje – brekker det i to, leses det ikke
      lenger som navnet hans. */
@@ -2330,10 +2331,14 @@ body[data-verden="oy"] .skilt::after {
   </div>
 
   <div class="topp-hoyre">
-    <div id="stjerneteller" class="teller" title="Bokstaver du har klart">
+    <!-- Telleren er også veien inn til samlingen. Den sto som en egen flis i
+         menyen før; der var den ett valg til å ta stilling til, og den er
+         ikke et spill. Tallet hans står jo allerede her. -->
+    <button id="stjerneteller" class="teller" type="button"
+            title="Se samlingen din">
       <span class="teller-stjerne" aria-hidden="true">★</span>
       <span id="teller-tall">0</span><span class="teller-av" id="teller-av">/29</span>
-    </div>
+    </button>
     <button id="stemmeknapp" class="ikonknapp ikonknapp--stemme" type="button"
             aria-pressed="true">
       <span class="stemmeikon" id="stemmeikon"></span>
@@ -2624,6 +2629,60 @@ body[data-verden="oy"] .skilt::after {
       </p>
     </section>
 
+    <!-- Forklaringene sto før på hver menyflis. De var til den voksne, ikke
+         til barnet, og de gjorde menyen til seks rader tekst i stedet for
+         seks bilder. Her står de samlet i stedet. -->
+    <section class="panel-del">
+      <h3>Hva er de forskjellige spillene?</h3>
+      <p class="merknad">
+        På menyen er hvert spill et lite bilde av seg selv – bokstavveggen,
+        kortet med pila, navnet hans i ruter. Han velger på formen. Her står
+        hva de er.
+      </p>
+      <details class="hjelpetekst">
+        <summary>Med bokstaver — Racerbanen og Sjørøverøya</summary>
+        <p>
+          <b>Garasjen / Skattekartet:</b> fri utforsking. Trykk på en bokstav
+          og hør den, med bilde og ord. Ingen oppgaver, ingen feil.<br><br>
+          <b>Alfabetløypa:</b> hele alfabetet fra A til Å, ett trykk om
+          gangen. Samme form som alfabetbøkene dere leser sammen.<br><br>
+          <b>Navnet mitt:</b> han bygger sitt eget navn, bokstav for bokstav.
+          Barn lærer bokstavene i navnet sitt først og best. Krever at navnet
+          hans står under «Barnets navn» lenger nede.<br><br>
+          <b>Finn bokstaven:</b> spillet sier en bokstav, han velger riktig
+          skilt. Det er her stjernene kommer fra.<br><br>
+          <b>Første lyd:</b> hvilken bokstav begynner ordet på?
+          <em>Dette er det vanskeligste, og kommer ofte først rundt fire år.</em>
+          Den dukker opp av seg selv når åtte bokstaver sitter.
+        </p>
+      </details>
+      <details class="hjelpetekst">
+        <summary>Med tall — Dinodalen</summary>
+        <p>
+          <b>Reiret:</b> fri utforsking. Trykk på et tall og se hvor mange
+          det er.<br><br>
+          <b>Tallrekka:</b> fra 1 til 10, ett trykk om gangen.<br><br>
+          <b>Tell:</b> trykk på hver ting og tell dem, og velg tallet. Det er
+          her den egentlige tellingen sitter — å peke på én ting om gangen.
+          Trykker han en gang til, tas tingen ut av tellingen igjen, så han
+          kan telle om.<br><br>
+          <b>Finn tallet:</b> spillet sier et tall, han velger riktig skilt.
+          Å kjenne igjen tallsymbolet er vanskeligere enn å telle, så den
+          kommer når han har talt seg gjennom noen runder.
+        </p>
+      </details>
+      <p class="merknad">
+        Menyen slipper til én modus om gangen, i stigende vanskegrad. En modus
+        som først har dukket opp, blir stående — at noe han fant i går er
+        borte i dag, kan han ikke lese seg til forklaringen på. Vil du se alt
+        med én gang, står bryteren under «Ro på skjermen».
+      </p>
+      <p class="merknad">
+        <b>Samlingen</b> ligger bak stjernen oppe til høyre. Trykk på tallet,
+        så ser dere hvilke bokstaver eller tall som er blitt hans.
+      </p>
+    </section>
+
     <section class="panel-del">
       <h3>Hvor mye skal han få servert</h3>
       <div class="nivavelger" id="inn-niva">
@@ -2789,7 +2848,7 @@ body[data-verden="oy"] .skilt::after {
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-28 · 11';
+var SPILLVERSJON = '2026-08-28 · 12';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -3828,6 +3887,102 @@ var Figurer = (function () {
   }
 
 
+
+  /* ---------- bilder til menyen ----------
+   *
+   * Et strekikon av en garasjeport sier ingenting til en treåring. Det han
+   * kjenner igjen, er skjermen han var på sist. Hvert bilde her er derfor et
+   * lite bilde av selve spillet: bokstavveggen, kortet med pila, navnet hans
+   * i ruter, høyttaleren over to skilt. Han velger på formen, ikke på ordet.
+   */
+
+  /* En brikke som ser ut som brikkene i spillet. */
+  function brikke(x, y, b, h, tekst, klasse) {
+    return '<g class="' + (klasse || 'mb-brikke') + '">' +
+      '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + h +
+        '" rx="' + Math.round(Math.min(b, h) * 0.26) + '"/>' +
+      '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '">' + tekst + '</text>' +
+    '</g>';
+  }
+
+  function ramme(x, y, b, h, tekst) {
+    return '<g class="mb-ramme">' +
+      '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + h +
+        '" rx="' + Math.round(Math.min(b, h) * 0.26) + '"/>' +
+      (tekst ? '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '">' + tekst + '</text>' : '') +
+    '</g>';
+  }
+
+  function pil(x, y) {
+    return '<path class="mb-pil" d="M' + x + ' ' + y + 'h13m-5-5 5 5-5 5"/>';
+  }
+
+  /* art: hvilken form spillet har. tegn: tegnene som skal stå i bildet. */
+  function modusbilde(art, tegn) {
+    var t = tegn || [];
+    function n(i, res) { return t[i] !== undefined ? t[i] : (res || ''); }
+    var inni;
+
+    if (art === 'utforsk') {
+      /* Veggen full av brikker han kan trykke på. */
+      inni = brikke(8, 8, 24, 24, n(0, 'A')) + brikke(38, 8, 24, 24, n(1, 'B')) +
+             brikke(68, 8, 24, 24, n(2, 'C')) +
+             brikke(8, 38, 24, 24, n(3, 'D')) + brikke(38, 38, 24, 24, n(4, 'E')) +
+             brikke(68, 38, 24, 24, n(5, 'F'));
+
+    } else if (art === 'loype') {
+      /* Ett tegn om gangen, framover. */
+      inni = brikke(4, 20, 30, 30, n(0, 'A')) + pil(38, 35) +
+             brikke(56, 20, 30, 30, n(1, 'B')) +
+             '<circle class="mb-prikk" cx="94" cy="35" r="3"/>';
+
+    } else if (art === 'navn') {
+      /* Navnet hans, i ruter. Ingenting er lettere å kjenne igjen. */
+      var antall = Math.min(t.length || 3, 4);
+      var bredde = 21, luft = 4;
+      var total = antall * bredde + (antall - 1) * luft;
+      var x0 = Math.round((100 - total) / 2);
+      inni = '';
+      for (var i = 0; i < antall; i++) {
+        inni += brikke(x0 + i * (bredde + luft), 21, bredde, 30, n(i, '?'));
+      }
+
+    } else if (art === 'finn') {
+      /* Hør, og velg. Høyttaleren over to skilt. */
+      inni =
+        '<g class="mb-hoyttaler">' +
+          '<path d="M30 12h8l10-8v26l-10-8h-8z"/>' +
+          '<path class="mb-bolge" d="M54 12a9 9 0 0 1 0 10M60 8a15 15 0 0 1 0 18" fill="none"/>' +
+        '</g>' +
+        brikke(20, 38, 26, 26, n(0, 'A')) + brikke(54, 38, 26, 26, n(1, 'B'));
+
+    } else if (art === 'forstelyd') {
+      /* Et bilde, og spørsmålet om hvilken bokstav det begynner på. */
+      inni =
+        '<text class="mb-ikon" x="30" y="36">' + n(0, '🍎') + '</text>' +
+        pil(50, 34) +
+        ramme(68, 20, 28, 30, '?');
+
+    } else if (art === 'tell') {
+      /* Ting på rekke med tallene de fikk – nøyaktig slik de ser ut når han
+       * har pekt på dem. Tomme ruter sa ingenting; tingen i ruta gjør det. */
+      inni = '';
+      for (var k = 0; k < 3; k++) {
+        var x = 9 + k * 31;
+        inni += '<g class="mb-ting"><rect x="' + x + '" y="24" width="25" height="25" rx="7"/></g>' +
+                '<text class="mb-ting-ikon" x="' + (x + 12.5) + '" y="37">' + n(0, '🍎') + '</text>' +
+                '<circle class="mb-merke" cx="' + (x + 23) + '" cy="24" r="7.5"/>' +
+                '<text class="mb-merketall" x="' + (x + 23) + '" y="24">' + (k + 1) + '</text>';
+      }
+
+    } else {
+      inni = brikke(35, 20, 30, 30, n(0, '?'));
+    }
+
+    return '<svg class="modusbilde" viewBox="0 0 100 72" role="img" aria-hidden="true">' +
+             inni + '</svg>';
+  }
+
   /* ---------- forsidens øykart ---------- */
 
   /* Kartet på forsiden. Formspråket er flatt og enkelt, som på et tegnet
@@ -4185,6 +4340,7 @@ var Figurer = (function () {
     bil: bil,
     skip: skip,
     kart: kart,
+    modusbilde: modusbilde,
     ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
       var f = VERDENER[verdenId].figur;
@@ -5833,6 +5989,11 @@ var Spill = (function () {
     /* Forsiden er ett bilde: havet dekker hele skjermen, og øya ligger midt
      * i det. Da slås himmel, landskap og bakke av. */
     document.body.classList.toggle('pa-havet', id === 'skjerm-start');
+    /* Stjernen fører til samlingen – men bare der en runde ikke kan gå tapt.
+     * Midt i en oppgave skal et trykk aldri koste ham det han holder på med;
+     * tallet står der fortsatt, det er bare ikke en vei ut. */
+    el('stjerneteller').disabled =
+      !(id === 'skjerm-meny' || id === 'skjerm-oppsummering');
     visStemmeknapp();
   }
 
@@ -5851,6 +6012,10 @@ var Spill = (function () {
    * øyeblikk. Fire av fire er en seier; fire av 29 ser ut som nesten ingenting. */
   function oppdaterTeller(medSmell) {
     var teller = el('stjerneteller');
+    /* På forsiden hører telleren ingen verden til, og et tall uten verden
+     * betyr ingenting. Da er den borte. */
+    teller.hidden = !naVerden;
+    if (!naVerden) return;
     /* Telleren gjelder verdenen han står i. Tall og bokstaver samles hver for
      * seg – ti tall blandet inn blant bokstavene ville gjort begge tallene
      * meningsløse. */
@@ -6037,15 +6202,17 @@ var Spill = (function () {
     var felt = el('meny-valg');
     felt.innerHTML = '';
 
-    function flis(ikon, navn, tekst, nar) {
+    /* Flisen er et lite bilde av spillet den fører til, med navnet under.
+     * Forklaringen som sto her før var til den voksne, ikke til ham – den
+     * står nå samlet i foreldremenyen. */
+    function flis(bilde, navn, nar) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'flis';
       b.innerHTML =
         '<span class="flis-stripe" aria-hidden="true"></span>' +
-        '<span class="flis-merke" aria-hidden="true">' + ikon + '</span>' +
-        '<span class="flis-navn">' + navn + '</span>' +
-        '<span class="flis-tekst">' + tekst + '</span>';
+        '<span class="flis-bilde">' + bilde + '</span>' +
+        '<span class="flis-navn">' + navn + '</span>';
       b.addEventListener('click', nar);
       felt.appendChild(b);
     }
@@ -6062,14 +6229,12 @@ var Spill = (function () {
       if (m.mulig && !m.mulig()) return;
       if (m.apen()) Lagring.laasOpp(m.id);
       if (!Lagring.erLaastOpp(m.id) && !Lagring.innstilling('visAlleModuser')) return;
-      flis(Figurer.ikon(m.ikon), m.navn, m.tekst, m.start);
+      flis(Figurer.modusbilde(m.bilde, m.tegn ? m.tegn() : null), m.navn, m.start);
     });
 
-    var antall = Lagring.mestrede(naVerden).length;
-    var ordet = domeneFor(naVerden) === 'tall' ? 'tall' : 'bokstaver';
-    flis(Figurer.ikon('stjerne'), 'Samlingen din',
-      antall + ' av ' + Lagring.aktiveTegn(naVerden).length + ' ' + ordet + ' er dine',
-      function () { Lyd.klikk(); visSamling(); });
+    /* Samlingen sto her som en sjette flis. Den er ikke et spill, og hver
+     * ekstra rute er ett valg til å ta stilling til. Nå ligger den bak
+     * stjernetelleren i toppen – der tallet hans allerede står. */
 
     /* Menyen var den eneste skjermen som ikke sa noe. For en som ikke leser,
      * er fire–seks tekstetiketter ingen hjelp; spørsmålet forteller ham i det
@@ -6091,9 +6256,9 @@ var Spill = (function () {
     return [
       {
         id: 'reiret',
-        ikon: 'reir',
+        bilde: 'utforsk',
+        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 6); },
         navn: v.utforsk,
-        tekst: 'Trykk på et tall og se hvor mange det er',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -6103,9 +6268,9 @@ var Spill = (function () {
       },
       {
         id: 'tallrekka',
-        ikon: 'loype',
+        bilde: 'loype',
+        tegn: function () { return ['1', '2']; },
         navn: 'Tallrekka',
-        tekst: 'Fra 1 til 10, ett trykk om gangen',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -6118,17 +6283,17 @@ var Spill = (function () {
       },
       {
         id: 'tell',
-        ikon: 'tell',
+        bilde: 'tell',
+        tegn: function () { return [TELLETING[0].ikon]; },
         navn: 'Tell',
-        tekst: 'Trykk på hver ting og tell dem, og velg tallet',
         apen: function () { return true; },
         start: function () { Lyd.klikk(); startOppgave('tell'); }
       },
       {
         id: 'finntall',
-        ikon: 'finn',
+        bilde: 'finn',
+        tegn: function () { return ['3', '7']; },
         navn: 'Finn tallet',
-        tekst: 'Hør tallet, og velg riktig skilt',
         /* Å kjenne igjen tallsymbolet er vanskeligere enn å telle ting, så
          * den kommer når han har talt seg gjennom noen runder. */
         apen: function () { return Lagring.mestrede('dino').length >= 3; },
@@ -6142,9 +6307,9 @@ var Spill = (function () {
     return [
       {
         id: 'utforsk',
-        ikon: naVerden === 'oy' ? 'kart' : 'garasje',
+        bilde: 'utforsk',
+        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 6); },
         navn: v.utforsk,
-        tekst: 'Trykk på en bokstav og hør den',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -6154,9 +6319,9 @@ var Spill = (function () {
       },
       {
         id: 'loype',
-        ikon: 'loype',
+        bilde: 'loype',
+        tegn: function () { return ['A', 'B']; },
         navn: 'Alfabetløypa',
-        tekst: 'Hele alfabetet, ett trykk om gangen',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -6169,9 +6334,10 @@ var Spill = (function () {
       },
       {
         id: 'navn',
-        ikon: 'navn',
+        bilde: 'navn',
+        /* Hans eget navn i rutene. Ingenting er lettere å kjenne igjen. */
+        tegn: function () { return navnBokstaver(Lagring.barnenavn()); },
         navn: 'Navnet mitt',
-        tekst: 'Bygg navnet ditt, bokstav for bokstav',
         /* Uten et navn i foreldremenyen finnes det ingenting å bygge. */
         mulig: function () { return navnBokstaver(Lagring.barnenavn()).length > 0; },
         apen: function () { return true; },
@@ -6179,17 +6345,22 @@ var Spill = (function () {
       },
       {
         id: 'finn',
-        ikon: 'finn',
+        bilde: 'finn',
+        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 2); },
         navn: 'Finn bokstaven',
-        tekst: 'Hør bokstaven, og velg riktig skilt',
         apen: function () { return true; },
         start: function () { Lyd.klikk(); startOppgave('finn'); }
       },
       {
         id: 'forstelyd',
-        ikon: 'lyd',
+        bilde: 'forstelyd',
+        /* Ikonet til den første bokstaven i utvalget – et bilde han kjenner. */
+        tegn: function () {
+          var b = Lagring.aktiveTegn(naVerden)[0];
+          var o = b && ordFor(naVerden, b);
+          return [o ? o.ikon : '🍎'];
+        },
         navn: 'Første lyd',
-        tekst: 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
         /* Lydanalyse krever at bokstavene sitter først. */
         apen: function () { return Lagring.mestrede().length >= 8; },
         start: function () { Lyd.klikk(); startOppgave('forstelyd'); }
@@ -6621,6 +6792,12 @@ var Spill = (function () {
 
     pa('foreldre-lukk', 'click', lukkForeldre);
     pa('foreldre-lukk-x', 'click', lukkForeldre);
+
+    pa('stjerneteller', 'click', function () {
+      if (!naVerden) return;
+      Lyd.klikk();
+      visSamling();
+    });
 
     pa('stemmeknapp', 'click', function () {
       Lyd.klikk();

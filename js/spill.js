@@ -38,6 +38,11 @@ var Spill = (function () {
     /* Forsiden er ett bilde: havet dekker hele skjermen, og øya ligger midt
      * i det. Da slås himmel, landskap og bakke av. */
     document.body.classList.toggle('pa-havet', id === 'skjerm-start');
+    /* Stjernen fører til samlingen – men bare der en runde ikke kan gå tapt.
+     * Midt i en oppgave skal et trykk aldri koste ham det han holder på med;
+     * tallet står der fortsatt, det er bare ikke en vei ut. */
+    el('stjerneteller').disabled =
+      !(id === 'skjerm-meny' || id === 'skjerm-oppsummering');
     visStemmeknapp();
   }
 
@@ -56,6 +61,10 @@ var Spill = (function () {
    * øyeblikk. Fire av fire er en seier; fire av 29 ser ut som nesten ingenting. */
   function oppdaterTeller(medSmell) {
     var teller = el('stjerneteller');
+    /* På forsiden hører telleren ingen verden til, og et tall uten verden
+     * betyr ingenting. Da er den borte. */
+    teller.hidden = !naVerden;
+    if (!naVerden) return;
     /* Telleren gjelder verdenen han står i. Tall og bokstaver samles hver for
      * seg – ti tall blandet inn blant bokstavene ville gjort begge tallene
      * meningsløse. */
@@ -242,15 +251,17 @@ var Spill = (function () {
     var felt = el('meny-valg');
     felt.innerHTML = '';
 
-    function flis(ikon, navn, tekst, nar) {
+    /* Flisen er et lite bilde av spillet den fører til, med navnet under.
+     * Forklaringen som sto her før var til den voksne, ikke til ham – den
+     * står nå samlet i foreldremenyen. */
+    function flis(bilde, navn, nar) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'flis';
       b.innerHTML =
         '<span class="flis-stripe" aria-hidden="true"></span>' +
-        '<span class="flis-merke" aria-hidden="true">' + ikon + '</span>' +
-        '<span class="flis-navn">' + navn + '</span>' +
-        '<span class="flis-tekst">' + tekst + '</span>';
+        '<span class="flis-bilde">' + bilde + '</span>' +
+        '<span class="flis-navn">' + navn + '</span>';
       b.addEventListener('click', nar);
       felt.appendChild(b);
     }
@@ -267,14 +278,12 @@ var Spill = (function () {
       if (m.mulig && !m.mulig()) return;
       if (m.apen()) Lagring.laasOpp(m.id);
       if (!Lagring.erLaastOpp(m.id) && !Lagring.innstilling('visAlleModuser')) return;
-      flis(Figurer.ikon(m.ikon), m.navn, m.tekst, m.start);
+      flis(Figurer.modusbilde(m.bilde, m.tegn ? m.tegn() : null), m.navn, m.start);
     });
 
-    var antall = Lagring.mestrede(naVerden).length;
-    var ordet = domeneFor(naVerden) === 'tall' ? 'tall' : 'bokstaver';
-    flis(Figurer.ikon('stjerne'), 'Samlingen din',
-      antall + ' av ' + Lagring.aktiveTegn(naVerden).length + ' ' + ordet + ' er dine',
-      function () { Lyd.klikk(); visSamling(); });
+    /* Samlingen sto her som en sjette flis. Den er ikke et spill, og hver
+     * ekstra rute er ett valg til å ta stilling til. Nå ligger den bak
+     * stjernetelleren i toppen – der tallet hans allerede står. */
 
     /* Menyen var den eneste skjermen som ikke sa noe. For en som ikke leser,
      * er fire–seks tekstetiketter ingen hjelp; spørsmålet forteller ham i det
@@ -296,9 +305,9 @@ var Spill = (function () {
     return [
       {
         id: 'reiret',
-        ikon: 'reir',
+        bilde: 'utforsk',
+        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 6); },
         navn: v.utforsk,
-        tekst: 'Trykk på et tall og se hvor mange det er',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -308,9 +317,9 @@ var Spill = (function () {
       },
       {
         id: 'tallrekka',
-        ikon: 'loype',
+        bilde: 'loype',
+        tegn: function () { return ['1', '2']; },
         navn: 'Tallrekka',
-        tekst: 'Fra 1 til 10, ett trykk om gangen',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -323,17 +332,17 @@ var Spill = (function () {
       },
       {
         id: 'tell',
-        ikon: 'tell',
+        bilde: 'tell',
+        tegn: function () { return [TELLETING[0].ikon]; },
         navn: 'Tell',
-        tekst: 'Trykk på hver ting og tell dem, og velg tallet',
         apen: function () { return true; },
         start: function () { Lyd.klikk(); startOppgave('tell'); }
       },
       {
         id: 'finntall',
-        ikon: 'finn',
+        bilde: 'finn',
+        tegn: function () { return ['3', '7']; },
         navn: 'Finn tallet',
-        tekst: 'Hør tallet, og velg riktig skilt',
         /* Å kjenne igjen tallsymbolet er vanskeligere enn å telle ting, så
          * den kommer når han har talt seg gjennom noen runder. */
         apen: function () { return Lagring.mestrede('dino').length >= 3; },
@@ -347,9 +356,9 @@ var Spill = (function () {
     return [
       {
         id: 'utforsk',
-        ikon: naVerden === 'oy' ? 'kart' : 'garasje',
+        bilde: 'utforsk',
+        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 6); },
         navn: v.utforsk,
-        tekst: 'Trykk på en bokstav og hør den',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -359,9 +368,9 @@ var Spill = (function () {
       },
       {
         id: 'loype',
-        ikon: 'loype',
+        bilde: 'loype',
+        tegn: function () { return ['A', 'B']; },
         navn: 'Alfabetløypa',
-        tekst: 'Hele alfabetet, ett trykk om gangen',
         apen: function () { return true; },
         start: function () {
           Lyd.klikk();
@@ -374,9 +383,10 @@ var Spill = (function () {
       },
       {
         id: 'navn',
-        ikon: 'navn',
+        bilde: 'navn',
+        /* Hans eget navn i rutene. Ingenting er lettere å kjenne igjen. */
+        tegn: function () { return navnBokstaver(Lagring.barnenavn()); },
         navn: 'Navnet mitt',
-        tekst: 'Bygg navnet ditt, bokstav for bokstav',
         /* Uten et navn i foreldremenyen finnes det ingenting å bygge. */
         mulig: function () { return navnBokstaver(Lagring.barnenavn()).length > 0; },
         apen: function () { return true; },
@@ -384,17 +394,22 @@ var Spill = (function () {
       },
       {
         id: 'finn',
-        ikon: 'finn',
+        bilde: 'finn',
+        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 2); },
         navn: 'Finn bokstaven',
-        tekst: 'Hør bokstaven, og velg riktig skilt',
         apen: function () { return true; },
         start: function () { Lyd.klikk(); startOppgave('finn'); }
       },
       {
         id: 'forstelyd',
-        ikon: 'lyd',
+        bilde: 'forstelyd',
+        /* Ikonet til den første bokstaven i utvalget – et bilde han kjenner. */
+        tegn: function () {
+          var b = Lagring.aktiveTegn(naVerden)[0];
+          var o = b && ordFor(naVerden, b);
+          return [o ? o.ikon : '🍎'];
+        },
         navn: 'Første lyd',
-        tekst: 'Hvilken bokstav begynner ordet på? <em>Vanskeligst — kommer ofte først rundt fire år.</em>',
         /* Lydanalyse krever at bokstavene sitter først. */
         apen: function () { return Lagring.mestrede().length >= 8; },
         start: function () { Lyd.klikk(); startOppgave('forstelyd'); }
@@ -826,6 +841,12 @@ var Spill = (function () {
 
     pa('foreldre-lukk', 'click', lukkForeldre);
     pa('foreldre-lukk-x', 'click', lukkForeldre);
+
+    pa('stjerneteller', 'click', function () {
+      if (!naVerden) return;
+      Lyd.klikk();
+      visSamling();
+    });
 
     pa('stemmeknapp', 'click', function () {
       Lyd.klikk();

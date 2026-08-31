@@ -206,6 +206,102 @@ var Figurer = (function () {
   }
 
 
+
+  /* ---------- bilder til menyen ----------
+   *
+   * Et strekikon av en garasjeport sier ingenting til en treåring. Det han
+   * kjenner igjen, er skjermen han var på sist. Hvert bilde her er derfor et
+   * lite bilde av selve spillet: bokstavveggen, kortet med pila, navnet hans
+   * i ruter, høyttaleren over to skilt. Han velger på formen, ikke på ordet.
+   */
+
+  /* En brikke som ser ut som brikkene i spillet. */
+  function brikke(x, y, b, h, tekst, klasse) {
+    return '<g class="' + (klasse || 'mb-brikke') + '">' +
+      '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + h +
+        '" rx="' + Math.round(Math.min(b, h) * 0.26) + '"/>' +
+      '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '">' + tekst + '</text>' +
+    '</g>';
+  }
+
+  function ramme(x, y, b, h, tekst) {
+    return '<g class="mb-ramme">' +
+      '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + h +
+        '" rx="' + Math.round(Math.min(b, h) * 0.26) + '"/>' +
+      (tekst ? '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '">' + tekst + '</text>' : '') +
+    '</g>';
+  }
+
+  function pil(x, y) {
+    return '<path class="mb-pil" d="M' + x + ' ' + y + 'h13m-5-5 5 5-5 5"/>';
+  }
+
+  /* art: hvilken form spillet har. tegn: tegnene som skal stå i bildet. */
+  function modusbilde(art, tegn) {
+    var t = tegn || [];
+    function n(i, res) { return t[i] !== undefined ? t[i] : (res || ''); }
+    var inni;
+
+    if (art === 'utforsk') {
+      /* Veggen full av brikker han kan trykke på. */
+      inni = brikke(8, 8, 24, 24, n(0, 'A')) + brikke(38, 8, 24, 24, n(1, 'B')) +
+             brikke(68, 8, 24, 24, n(2, 'C')) +
+             brikke(8, 38, 24, 24, n(3, 'D')) + brikke(38, 38, 24, 24, n(4, 'E')) +
+             brikke(68, 38, 24, 24, n(5, 'F'));
+
+    } else if (art === 'loype') {
+      /* Ett tegn om gangen, framover. */
+      inni = brikke(4, 20, 30, 30, n(0, 'A')) + pil(38, 35) +
+             brikke(56, 20, 30, 30, n(1, 'B')) +
+             '<circle class="mb-prikk" cx="94" cy="35" r="3"/>';
+
+    } else if (art === 'navn') {
+      /* Navnet hans, i ruter. Ingenting er lettere å kjenne igjen. */
+      var antall = Math.min(t.length || 3, 4);
+      var bredde = 21, luft = 4;
+      var total = antall * bredde + (antall - 1) * luft;
+      var x0 = Math.round((100 - total) / 2);
+      inni = '';
+      for (var i = 0; i < antall; i++) {
+        inni += brikke(x0 + i * (bredde + luft), 21, bredde, 30, n(i, '?'));
+      }
+
+    } else if (art === 'finn') {
+      /* Hør, og velg. Høyttaleren over to skilt. */
+      inni =
+        '<g class="mb-hoyttaler">' +
+          '<path d="M30 12h8l10-8v26l-10-8h-8z"/>' +
+          '<path class="mb-bolge" d="M54 12a9 9 0 0 1 0 10M60 8a15 15 0 0 1 0 18" fill="none"/>' +
+        '</g>' +
+        brikke(20, 38, 26, 26, n(0, 'A')) + brikke(54, 38, 26, 26, n(1, 'B'));
+
+    } else if (art === 'forstelyd') {
+      /* Et bilde, og spørsmålet om hvilken bokstav det begynner på. */
+      inni =
+        '<text class="mb-ikon" x="30" y="36">' + n(0, '🍎') + '</text>' +
+        pil(50, 34) +
+        ramme(68, 20, 28, 30, '?');
+
+    } else if (art === 'tell') {
+      /* Ting på rekke med tallene de fikk – nøyaktig slik de ser ut når han
+       * har pekt på dem. Tomme ruter sa ingenting; tingen i ruta gjør det. */
+      inni = '';
+      for (var k = 0; k < 3; k++) {
+        var x = 9 + k * 31;
+        inni += '<g class="mb-ting"><rect x="' + x + '" y="24" width="25" height="25" rx="7"/></g>' +
+                '<text class="mb-ting-ikon" x="' + (x + 12.5) + '" y="37">' + n(0, '🍎') + '</text>' +
+                '<circle class="mb-merke" cx="' + (x + 23) + '" cy="24" r="7.5"/>' +
+                '<text class="mb-merketall" x="' + (x + 23) + '" y="24">' + (k + 1) + '</text>';
+      }
+
+    } else {
+      inni = brikke(35, 20, 30, 30, n(0, '?'));
+    }
+
+    return '<svg class="modusbilde" viewBox="0 0 100 72" role="img" aria-hidden="true">' +
+             inni + '</svg>';
+  }
+
   /* ---------- forsidens øykart ---------- */
 
   /* Kartet på forsiden. Formspråket er flatt og enkelt, som på et tegnet
@@ -563,6 +659,7 @@ var Figurer = (function () {
     bil: bil,
     skip: skip,
     kart: kart,
+    modusbilde: modusbilde,
     ikon: function (navn) { return IKONER[navn] || ''; },
     figurFor: function (verdenId) {
       var f = VERDENER[verdenId].figur;

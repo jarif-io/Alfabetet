@@ -54,6 +54,20 @@ kan lese. Bruk pil, målflagg, øye, høyttaler – og la stemmen si det samme.
 bokstaven på skjermen; da er oppgaven trykk-på-det-som-ligner, ikke lytting.
 Skjul den, og la barnet kunne trykke på flaten for å få den fram som hjelp.
 
+**Vis skjermen, ikke et symbol for den.** Menyen hadde seks rader med et
+lite strekikon og en forklaring i tekst – en garasjeport, en bølget strek, en
+høyttaler. For en som ikke leser er det seks like rader. Byttet vi ikonet mot
+et *lite bilde av selve spillet* – bokstavveggen, kortet med pila, navnet hans
+i ruter, høyttaleren over to skilt – kunne han velge på formen. Bygg bildet av
+spillets egne deler i samme farger, så er gjenkjennelsen gratis. Og fjern
+forklaringen fra flisen: den var til den voksne uansett, og hører hjemme i
+foreldremenyen.
+
+**Færre valg slår flere.** Samlingen lå som en flis blant spillene. Den er
+ikke et spill, men den så ut som ett, og hvert ekstra kort er ett valg til å
+ta stilling til. Flyttet til stjernetelleren i toppen – der tallet hans
+allerede sto – forsvant den fra menyen uten å bli vanskeligere å finne.
+
 **Store trykkflater.** Alt barnet skal treffe må være stort – gjenta-lyden-
 knappen ble meldt som «veldig liten» og måtte doblet i størrelse.
 

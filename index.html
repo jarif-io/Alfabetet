@@ -29,10 +29,14 @@
   </div>
 
   <div class="topp-hoyre">
-    <div id="stjerneteller" class="teller" title="Bokstaver du har klart">
+    <!-- Telleren er også veien inn til samlingen. Den sto som en egen flis i
+         menyen før; der var den ett valg til å ta stilling til, og den er
+         ikke et spill. Tallet hans står jo allerede her. -->
+    <button id="stjerneteller" class="teller" type="button"
+            title="Se samlingen din">
       <span class="teller-stjerne" aria-hidden="true">★</span>
       <span id="teller-tall">0</span><span class="teller-av" id="teller-av">/29</span>
-    </div>
+    </button>
     <button id="stemmeknapp" class="ikonknapp ikonknapp--stemme" type="button"
             aria-pressed="true">
       <span class="stemmeikon" id="stemmeikon"></span>
@@ -320,6 +324,60 @@
         pakken; skriver du inn et eget navn, sier spillet rosen uten navnet
         («Bra kjørt!») i stedet for å bytte til robotstemmen midt i en
         oppmuntring.
+      </p>
+    </section>
+
+    <!-- Forklaringene sto før på hver menyflis. De var til den voksne, ikke
+         til barnet, og de gjorde menyen til seks rader tekst i stedet for
+         seks bilder. Her står de samlet i stedet. -->
+    <section class="panel-del">
+      <h3>Hva er de forskjellige spillene?</h3>
+      <p class="merknad">
+        På menyen er hvert spill et lite bilde av seg selv – bokstavveggen,
+        kortet med pila, navnet hans i ruter. Han velger på formen. Her står
+        hva de er.
+      </p>
+      <details class="hjelpetekst">
+        <summary>Med bokstaver — Racerbanen og Sjørøverøya</summary>
+        <p>
+          <b>Garasjen / Skattekartet:</b> fri utforsking. Trykk på en bokstav
+          og hør den, med bilde og ord. Ingen oppgaver, ingen feil.<br><br>
+          <b>Alfabetløypa:</b> hele alfabetet fra A til Å, ett trykk om
+          gangen. Samme form som alfabetbøkene dere leser sammen.<br><br>
+          <b>Navnet mitt:</b> han bygger sitt eget navn, bokstav for bokstav.
+          Barn lærer bokstavene i navnet sitt først og best. Krever at navnet
+          hans står under «Barnets navn» lenger nede.<br><br>
+          <b>Finn bokstaven:</b> spillet sier en bokstav, han velger riktig
+          skilt. Det er her stjernene kommer fra.<br><br>
+          <b>Første lyd:</b> hvilken bokstav begynner ordet på?
+          <em>Dette er det vanskeligste, og kommer ofte først rundt fire år.</em>
+          Den dukker opp av seg selv når åtte bokstaver sitter.
+        </p>
+      </details>
+      <details class="hjelpetekst">
+        <summary>Med tall — Dinodalen</summary>
+        <p>
+          <b>Reiret:</b> fri utforsking. Trykk på et tall og se hvor mange
+          det er.<br><br>
+          <b>Tallrekka:</b> fra 1 til 10, ett trykk om gangen.<br><br>
+          <b>Tell:</b> trykk på hver ting og tell dem, og velg tallet. Det er
+          her den egentlige tellingen sitter — å peke på én ting om gangen.
+          Trykker han en gang til, tas tingen ut av tellingen igjen, så han
+          kan telle om.<br><br>
+          <b>Finn tallet:</b> spillet sier et tall, han velger riktig skilt.
+          Å kjenne igjen tallsymbolet er vanskeligere enn å telle, så den
+          kommer når han har talt seg gjennom noen runder.
+        </p>
+      </details>
+      <p class="merknad">
+        Menyen slipper til én modus om gangen, i stigende vanskegrad. En modus
+        som først har dukket opp, blir stående — at noe han fant i går er
+        borte i dag, kan han ikke lese seg til forklaringen på. Vil du se alt
+        med én gang, står bryteren under «Ro på skjermen».
+      </p>
+      <p class="merknad">
+        <b>Samlingen</b> ligger bak stjernen oppe til høyre. Trykk på tallet,
+        så ser dere hvilke bokstaver eller tall som er blitt hans.
       </p>
     </section>
 

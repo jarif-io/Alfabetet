@@ -420,7 +420,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 
 /* Stjernetelleren gjør framgangen synlig hele tiden. */
+/* Telleren er en knapp: den fører inn til samlingen. Den skal likevel se ut
+   som tallet hans, ikke som enda en knapp å ta stilling til. */
 .teller {
+  font: inherit;
+  border: none;
+  cursor: pointer;
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
@@ -432,6 +437,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   font-weight: 700;
   font-size: 1.05rem;
 }
+.teller:not([disabled]):hover { transform: translateY(-2px); }
+.teller:not([disabled]):active { transform: translateY(1px); }
+/* Midt i en runde er den bare tallet hans, ikke en vei ut. Den ser lik ut –
+   et tall som gråner mens han spiller ville sett ut som at noe var galt. */
+.teller[disabled] { cursor: default; }
+.teller { transition: transform var(--mykt); }
 .teller-stjerne { color: var(--gull); font-size: 1.15rem; }
 .teller-av { color: var(--blekk-svak); font-size: .82rem; font-weight: 600; }
 .teller[hidden] { display: none; }
@@ -807,8 +818,8 @@ body.pa-havet .ingress {
   margin: auto;
   width: min(1140px, 100%);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 14px;
   justify-content: center;
   /* Fliser kan komme til etter hvert som han vokser. Får de ikke plass,
      skal de kunne rulles til – ikke havne under bakken der de verken er
@@ -822,14 +833,15 @@ body.pa-havet .ingress {
   font: inherit;
   cursor: pointer;
   border: none;
-  text-align: left;
-  padding: 22px 22px 20px;
+  text-align: center;
+  padding: 14px 12px 14px;
   border-radius: var(--r-lg);
   background: rgba(255, 253, 248, .96);
   box-shadow: var(--sk-2);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   transition: transform var(--mykt), box-shadow var(--mykt);
   animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards;
   position: relative;
@@ -843,22 +855,56 @@ body.pa-havet .ingress {
 .flis:hover { transform: translateY(-7px); box-shadow: var(--sk-3); }
 .flis:active { transform: translateY(-1px); }
 
-.flis-merke {
-  width: 64px; height: 64px;
-  border-radius: 20px;
-  display: grid;
-  place-items: center;
-  background: var(--aksent-svak);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .05);
+/* Bildet er hele poenget med flisen: et lite bilde av spillet den fører
+   til. Det skal derfor være det største på kortet, ikke et merke ved siden
+   av en overskrift. */
+.flis-bilde {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+  background: var(--flate-2);
+  box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .06);
+  padding: 6px;
 }
-.flis-merke svg { width: 40px; height: 40px; display: block; }
-.flis-navn { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; }
-.flis-tekst { color: var(--blekk-svak); font-size: .93rem; font-weight: 600; line-height: 1.35; }
+.modusbilde { display: block; width: 100%; height: auto; }
 
+/* Brikkene i bildet ser ut som brikkene i spillet – samme farge, samme
+   runding, samme hvite tegn. Det er gjenkjennelsen som gjør bildet lesbart. */
+.mb-brikke rect { fill: var(--aksent); }
+.mb-brikke text, .mb-ramme text, .mb-merketall {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.mb-brikke text { fill: #fff; }
+.mb-ramme rect { fill: none; stroke: var(--aksent); stroke-width: 3; stroke-dasharray: 5 4; }
+.mb-ramme text { fill: var(--aksent); }
+.mb-pil { fill: none; stroke: var(--blekk-svak); stroke-width: 3;
+          stroke-linecap: round; stroke-linejoin: round; }
+.mb-prikk { fill: var(--blekk-svak); opacity: .35; }
+.mb-hoyttaler path { fill: var(--blekk); }
+.mb-hoyttaler .mb-bolge { fill: none; stroke: var(--blekk); stroke-width: 3; stroke-linecap: round; }
+.mb-ikon { font-size: 30px; text-anchor: middle; dominant-baseline: central; }
+.mb-ting rect { fill: var(--flate); stroke: var(--aksent); stroke-width: 3; }
+.mb-merke { fill: var(--aksent); }
+.mb-merketall { fill: #fff; font-size: 11px; }
+.mb-ting-ikon { font-size: 15px; text-anchor: middle; dominant-baseline: central; }
+
+.flis-navn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.15;
+}
+
+/* Verdenens farge som en tynn stripe langs toppen. Den satt langs venstre
+   kant da flisene var rader; på et kort er toppen der blikket lander. */
 .flis-stripe {
   position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 7px;
+  left: 0; right: 0; top: 0;
+  height: 6px;
   background: var(--aksent);
 }
 
@@ -1895,15 +1941,6 @@ body[data-verden="oy"] .skilt::after {
   box-shadow: inset 0 0 0 3px var(--aksent);
 }
 
-/* Hintet til den voksne på menyflisene */
-.flis-tekst em {
-  display: block;
-  font-style: normal;
-  opacity: .7;
-  font-size: .85rem;
-  margin-top: 4px;
-}
-
 /* Hintet som dukker opp når noen bare klikker på tannhjulet */
 /* Bekreftelsen under tannhjulet. To bevisste trykk i stedet for å holde
    inne – holding utløste tekstmarkering og hurtigmeny på telefon. */
@@ -2074,39 +2111,13 @@ body[data-verden="oy"] .skilt::after {
      skjermen på telefon, og en treåring som må rulle for å finne modusen
      sin, finner den ikke. Liggende fliser tar under halve høyden. */
   .menyrad { gap: 6px; grid-template-columns: 1fr; }
-  .flis {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "merke navn" "merke tekst";
-    align-items: center;
-    column-gap: 13px;
-    row-gap: 1px;
-    padding: 8px 12px 8px 16px;
-  }
-  .flis-merke {
-    grid-area: merke;
-    width: 42px; height: 42px;
-    border-radius: 13px;
-  }
-  .flis-merke svg { width: 26px; height: 26px; }
-  .flis-navn { grid-area: navn; align-self: end; font-size: 1.1rem; }
-  /* Forklaringen er til den voksne. To linjer er nok; resten er uansett
-     ikke det barnet navigerer etter. */
-  /* Forklaringen er til den voksne. Én linje holder flisene like høye, og
-     det er høyden som avgjør om seks moduser får plass uten rulling. */
-  .flis-tekst {
-    grid-area: tekst;
-    align-self: start;
-    font-size: .85rem;
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  /* På telefon fyller innstillingene hele skjermen. Da er det aldri tvil om
-     hva som ruller, og bunnknappene ligger alltid der de skal. */
-  .overlegg { padding: 0; }
+  /* Bildet er det han navigerer etter, så det blir med også her – bare
+     mindre. Kortene ligger i to kolonner, som er nok til at alle modusene
+     er synlige uten å rulle. */
+  .menyrad { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; }
+  .flis { padding: 9px 8px 10px; gap: 6px; border-radius: 20px; }
+  .flis-navn { font-size: .98rem; }
+  .flis-bilde { padding: 4px; border-radius: 13px; }
   .panel {
     width: 100%;
     height: 100vh;
@@ -2205,22 +2216,12 @@ body[data-verden="oy"] .skilt::after {
   /* Samme grep som på smal telefon: liggende fliser, ellers får ikke seks
      moduser plass på en skjerm som bare er 360 piksler høy. */
   .menyrad { gap: 10px; }
-  .flis {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "merke navn" "merke tekst";
-    align-items: center;
-    column-gap: 12px;
-    row-gap: 1px;
-    padding: 9px 12px 9px 16px;
-  }
-  .flis-merke { grid-area: merke; width: 42px; height: 42px; border-radius: 13px; }
-  .flis-merke svg { width: 26px; height: 26px; }
-  .flis-navn { grid-area: navn; align-self: center; font-size: 1.05rem; }
-  /* På en telefon på tvers er det ikke høyde til forklaringene. De er
-     uansett til den voksne – barnet kjenner igjen merket og navnet. */
-  .flis { grid-template-areas: "merke navn"; row-gap: 0; }
-  .flis-tekst { display: none; }
+  /* På tvers er høyden det knappe. Kortene blir smalere, så alle står på
+     én rad, og bildet krymper med dem. */
+  .menyrad { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
+  .flis { padding: 7px 6px 8px; gap: 4px; border-radius: 18px; }
+  .flis-navn { font-size: .82rem; }
+  .flis-bilde { padding: 3px; border-radius: 11px; }
 
   /* Navnet må få plass på én linje – brekker det i to, leses det ikke
      lenger som navnet hans. */

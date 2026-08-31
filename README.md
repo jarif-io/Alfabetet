@@ -44,6 +44,15 @@ blant 25 bokstaver.
 
 ### I bokstavverdenene
 
+På menyen er hvert spill **et lite bilde av seg selv** — bokstavveggen,
+kortet med pila, navnet hans i ruter, høyttaleren over to skilt. Han velger på
+formen, ikke på ordet. Forklaringene til deg står i foreldremenyen under «Hva
+er de forskjellige spillene?».
+
+**Samlingen** ligger bak stjernen oppe til høyre. Trykk på tallet, så ser dere
+hvilke bokstaver eller tall som er blitt hans. Midt i en runde er stjernen bare
+tallet — den kan ikke trykkes, så en runde går aldri tapt på et bomtrykk.
+
 Fem ting å gjøre, ordnet fra lettest til vanskeligst:
 
 | | Hva det er |
