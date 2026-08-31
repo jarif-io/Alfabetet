@@ -220,7 +220,7 @@ var Figurer = (function () {
     return '<g class="' + (klasse || 'mb-brikke') + '">' +
       '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + h +
         '" rx="' + Math.round(Math.min(b, h) * 0.26) + '"/>' +
-      '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '">' + tekst + '</text>' +
+      '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '" dy=".35em">' + tekst + '</text>' +
     '</g>';
   }
 
@@ -228,7 +228,8 @@ var Figurer = (function () {
     return '<g class="mb-ramme">' +
       '<rect x="' + x + '" y="' + y + '" width="' + b + '" height="' + h +
         '" rx="' + Math.round(Math.min(b, h) * 0.26) + '"/>' +
-      (tekst ? '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '">' + tekst + '</text>' : '') +
+      (tekst ? '<text x="' + (x + b / 2) + '" y="' + (y + h / 2) + '" dy=".35em">' +
+               tekst + '</text>' : '') +
     '</g>';
   }
 
@@ -278,7 +279,7 @@ var Figurer = (function () {
     } else if (art === 'forstelyd') {
       /* Et bilde, og spørsmålet om hvilken bokstav det begynner på. */
       inni =
-        '<text class="mb-ikon" x="30" y="36">' + n(0, '🍎') + '</text>' +
+        '<text class="mb-ikon" x="30" y="36" dy=".35em">' + n(0, '🍎') + '</text>' +
         pil(50, 34) +
         ramme(68, 20, 28, 30, '?');
 
@@ -289,9 +290,11 @@ var Figurer = (function () {
       for (var k = 0; k < 3; k++) {
         var x = 9 + k * 31;
         inni += '<g class="mb-ting"><rect x="' + x + '" y="24" width="25" height="25" rx="7"/></g>' +
-                '<text class="mb-ting-ikon" x="' + (x + 12.5) + '" y="37">' + n(0, '🍎') + '</text>' +
+                '<text class="mb-ting-ikon" x="' + (x + 12.5) + '" y="37" dy=".35em">' +
+                  n(0, '🍎') + '</text>' +
                 '<circle class="mb-merke" cx="' + (x + 23) + '" cy="24" r="7.5"/>' +
-                '<text class="mb-merketall" x="' + (x + 23) + '" y="24">' + (k + 1) + '</text>';
+                '<text class="mb-merketall" x="' + (x + 23) + '" y="24" dy=".35em">' +
+                  (k + 1) + '</text>';
       }
 
     } else {

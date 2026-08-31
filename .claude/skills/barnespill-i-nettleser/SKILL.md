@@ -325,6 +325,50 @@ hvordan bokstavene faktisk *heter* på norsk (`Q` → «ku», `W` → «dobbelt-
 trykk (første viser en boble, andre åpner) i stedet for hold-inne når noe skal
 være barnesikret.
 
+**Et fullskjermspanel må ha et overlegg uten luft.** Foreldrepanelet ble
+`height: 100dvh` på telefon, men overlegget rundt hadde fremdeles `padding:
+24px`. Panelet ble dermed 48 px høyere enn skjermen, og nederste halvdel av
+«Lukk» lå utenfor – på en telefon i landskap og på pc gikk det bra, fordi
+`max-height` fortsatt gjaldt der. Setter du et barn til full skjerm, nullstill
+lufta til forelderen i samme media query, og mål `getBoundingClientRect()` mot
+`innerHeight` i stående telefon spesielt.
+
+**Et rutenett som brekker til færre kolonner trenger mer høyde, ikke mindre.**
+Bokstavrutene var 72 px på alt smalere enn 560 px, men under ~404 px bredde får
+bare fire ruter plass i bredden, og da trengs sju rader i stedet for fem. På
+360×780 rullet rutenettet med 12 px – akkurat nok til at de to nederste
+bokstavene forsvant. Regn ut hvor mange kolonner størrelsen faktisk gir
+(`n·rute + (n−1)·gap ≤ bredde`) og la breddegrensa styre, ikke bare høyden.
+Test en matrise av telefonstørrelser, ikke bare de to du husker: feilen fantes
+bare mellom 375×812 (som så vidt gikk) og 393×852 (som gikk fint).
+
+**44 px er minstemålet, også når knappen «ser stor nok ut».** Tannhjulet,
+stjernetelleren og kartstedene var under Apples minstemål for trykkflate.
+Sett `min-width`/`min-height: 44px` med `justify-content: center` framfor å
+øke padding – da vokser trykkflaten uten at ikonet flytter seg.
+
+**`Element.checkVisibility()` slår enhver håndskrevet synlighetssjekk.**
+Revisjonen som lette etter skjulte elementer meldte falske treff på
+`.skjult-visuelt` (skjermleserteksten), på tilbakeknappen som med vilje står
+med `visibility: hidden` for å holde plassen, og på SVG-tekst som «avkuttet».
+`checkVisibility({ contentVisibilityAuto: true, opacityProperty: true,
+visibilityProperty: true })` svarer på det du faktisk lurer på, og for
+«er dette mulig å rulle til» må du gå oppover forelderkjeden og se etter en
+som faktisk ruller – ikke bare sammenligne med `innerHeight`.
+
+**`dominant-baseline` er ikke til å stole på i Safari.** Bokstavene i
+menybildene sto midtstilt i Chromium og for lavt i WebKit. `dy=".35em"` på
+`<text>` gir samme resultat overalt. Samme slag: gi hver `button` eksplisitt
+`-webkit-appearance: none`, ellers får noen knapper iOS' egen form.
+
+**WebKit kan ikke lastes ned i alle miljøer – si hva testen faktisk beviser.**
+`cdn.playwright.dev` og Microsofts speil var stengt her, så iPhone-sjekken er
+Chromium med iPhone-mål, `hasTouch`, `isMobile` og `page.tap()` – fem
+skjermstørrelser, stående og liggende. Det fanger geometri, trykkflater,
+rulling og `[hidden]`, men ikke Safaris egne særheter. Da er svaret å fjerne
+det som *er* Safari-skjørt (som `dominant-baseline`) og si tydelig fra om at
+den siste milen må sjekkes på en ekte telefon.
+
 ## 6. Prosessfeller
 
 **Skriptede tekstredigeringer trenger ankere som sjekkes – og i riktig
@@ -347,6 +391,15 @@ rett ut, foreslå omveien (skru av lyden og les selv) og tilby den ekte
 løsningen (foreldrestemme spilt inn i appen) – ikke enda en runde med
 «nå prøvde jeg noe annet».
 
+**Et gammelt testskript som feiler er ikke automatisk avlegs.** Da forsiden ble
+et øykart forsvant `#knapp-start`, og et titalls skript stanset med
+`TimeoutError` før første påstand. Det er fristende å skrive dem av som
+utdaterte – men de fant to ekte feil så snart navigasjonen ble rettet
+(panelet utenfor skjermen, rutenettet som rullet). Rett navigasjonen i alle
+sammen, og velg elementene på navn slik at neste omlegging ikke gjør det
+samme. Tell påstander, ikke skript: et skript som «kjørte» med null påstander
+har ikke testet noe.
+
 **Én ting om gangen, verifisert, så commit.** Hver endring: reproduser
 symptomet, rett, kjør regresjonsskriptene, sjekk i nettleseren, commit med en
 norsk melding som beskriver hva barnet merker, push til utviklingsgrenen, og
@@ -358,6 +411,9 @@ bygg om enfil-versjonen hvis den er publisert.
 - [ ] Regresjonsskriptene kjører grønt (og et nytt dekker feilen du nettopp rettet).
 - [ ] Testet med lagret tilstand fra før, ikke bare tom `localStorage`.
 - [ ] Testet i mobilbredde, liggende og stående, på den skjermen det gjaldt.
+- [ ] Kjørt gjennom en matrise av telefonstørrelser, ikke bare én – 360×640,
+      360×780, 375×667, 375×812, 393×852, 430×932 og liggende.
+- [ ] Alt barnet skal treffe er minst 44×44 px.
 - [ ] Ingenting med `[hidden]` er synlig; ingenting overlapper eller stikker utenfor.
 - [ ] Talesyntesen sier riktig tekst med riktig stemme (verifisert via wrapper).
 - [ ] Ordlistene består sjekken: riktig førstebokstav, ingen duplikater, bildet viser ordet.
