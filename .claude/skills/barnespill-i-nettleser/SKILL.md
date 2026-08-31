@@ -168,6 +168,14 @@ den første 403-en fått stå som konklusjon, hadde hele språkpakken vært
 umulig. Test flere verter og flere protokoller, og les om avvisningen kom fra
 proxyen eller fra tjenesten selv.
 
+**En animasjon som setter `transform` slår av den du allerede hadde der.**
+Stedene på forsidekartet er sentrert på punktet sitt med
+`translate(-50%, -50%)`. Inn-animasjonen satte også `transform`, og overstyrte
+dermed sentreringen mens den gikk: i ett sekund fløy figurene inn en halv
+figurbredde ned til høyre, og skipet stakk utenfor kartet. Ta med den
+opprinnelige forskyvningen i hvert eneste keyframe. Og mål én gang *midt i*
+animasjonen, ikke bare etterpå – ellers ser du det aldri.
+
 **Mål først når animasjonene har lagt seg.** Flisene på menyen flyr inn med en
 kort animasjon. Måler man 400 ms etter at skjermen kom opp, måler man
 posisjoner som ikke finnes et halvsekund senere – i én runde ga det

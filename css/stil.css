@@ -131,7 +131,7 @@ body[data-verden="dino"] {
 
 /* Uten dette markerer iOS tekst og åpner hurtigmeny når man trykker litt
    for lenge på en knapp. */
-button, .teller, .bokstav, .skilt, .kort, .flis, .verdenkort, .navnbrikke {
+button, .teller, .bokstav, .skilt, .kort, .flis, .navnbrikke {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -684,8 +684,16 @@ body.pa-havet .ingress {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  animation: trinn-inn 520ms cubic-bezier(.2, .8, .3, 1) backwards;
+  /* Egen inn-animasjon, ikke den vanlige: stedene er sentrert på punktet
+     sitt med translate(-50%, -50%), og en animasjon som setter transform
+     ville slått den av mens den gikk. Da hoppet figurene inn fra en halv
+     figurbredde ned til høyre, og skipet stakk et øyeblikk utenfor kartet. */
+  animation: sted-inn 520ms cubic-bezier(.2, .8, .3, 1) backwards;
   transition: transform var(--mykt);
+}
+@keyframes sted-inn {
+  from { opacity: 0; transform: translate(-50%, -50%) translateY(12px) scale(.92); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
 }
 .kartsted-figur {
   display: block;
@@ -792,95 +800,7 @@ body.pa-havet .ingress {
 }
 
 /* ============================================================
-   6. Verdenskort
-   ============================================================ */
-
-.verdenrad {
-  margin: auto;
-  width: min(720px, 100%);
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.verdenkort {
-  font: inherit;
-  cursor: pointer;
-  border: none;
-  padding: 0;
-  width: 320px;
-  border-radius: var(--r-xl);
-  overflow: hidden;
-  background: var(--flate);
-  box-shadow: var(--sk-2);
-  transition: transform var(--mykt), box-shadow var(--mykt);
-  animation: trinn-inn 460ms cubic-bezier(.2, .8, .3, 1) backwards;
-  text-align: center;
-}
-.verdenkort:nth-child(2) { animation-delay: 110ms; }
-.verdenkort:nth-child(3) { animation-delay: 220ms; }
-.verdenkort:hover { transform: translateY(-8px); box-shadow: var(--sk-3); }
-.verdenkort:active { transform: translateY(-2px); }
-
-.verdenkort-bilde {
-  height: 168px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 12px;
-  position: relative;
-  overflow: hidden;
-}
-.verdenkort-bilde > svg { width: 74%; height: auto; position: relative; z-index: 2; }
-
-.verdenkort-scene { position: absolute; inset: 0; z-index: 1; }
-.verdenkort-scene .lag {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: 34px;
-  width: 100%;
-}
-.verdenkort-scene .lag--fjern { height: 92px; }
-.verdenkort-scene .lag--bak { height: 72px; opacity: .9; }
-.verdenkort-scene .lag--fram { height: 54px; }
-
-/* Kortene har hver sin verdenspalett, uavhengig av hvilken som er valgt. */
-.verdenkort--bane .verdenkort-bilde {
-  --as-fjern: #b6d3ba; --as-bak: #8fbb9c; --as-fram: #6aa47f;
-  --tre: #4c8a63; --stamme: #7a5230;
-}
-.verdenkort--dino .verdenkort-bilde {
-  --as-fjern: #a8c9b0; --as-bak: #7fae86; --as-fram: #5c9468; --bregne: #3f8f5a;
-}
-.verdenkort--oy .verdenkort-bilde {
-  --as-fjern: #a9c9cf; --as-bak: #cdb98c; --as-fram: #b9a173; --palme: #3f8f6a;
-}
-.verdenkort-bilde::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 42px;
-}
-
-.verdenkort--bane .verdenkort-bilde { background: linear-gradient(to bottom, #8fcdea, #ffdcae); }
-.verdenkort--bane .verdenkort-bilde::after { background: linear-gradient(to bottom, #4a4f5b, #33373f); }
-.verdenkort--oy .verdenkort-bilde { background: linear-gradient(to bottom, #9fd8e8, #ffe3b0); }
-.verdenkort--oy .verdenkort-bilde::after { background: linear-gradient(to bottom, #2b8fa8, #14607a); }
-.verdenkort--dino .verdenkort-bilde { background: linear-gradient(to bottom, #9ad9de, #ffd9a8); }
-.verdenkort--dino .verdenkort-bilde::after { background: linear-gradient(to bottom, #7a6a4a, #5b4e35); }
-
-.verdenkort-under { padding: 18px 22px 24px; }
-.verdenkort-navn {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.5rem;
-  display: block;
-}
-.verdenkort-tekst { color: var(--blekk-svak); font-size: .95rem; font-weight: 600; }
-
-/* ============================================================
-   7. Menyfliser
+   6. Menyfliser
    ============================================================ */
 
 .menyrad {
@@ -943,7 +863,7 @@ body.pa-havet .ingress {
 }
 
 /* ============================================================
-   8. Utforsk
+   7. Utforsk
    ============================================================ */
 
 /* Kortet har fire ting i seg: merket, bildene, ordet og lytteknappen. Før sto
@@ -1077,7 +997,7 @@ body.pa-havet .ingress {
 .bokstav.aktiv.mestret::after { color: #ffe9a0; }
 
 /* ============================================================
-   9. Oppgave
+   8. Oppgave
    ============================================================ */
 
 .prikker {
@@ -1357,7 +1277,7 @@ body[data-verden="oy"] .skilt::after {
 }
 
 /* ============================================================
-   10. Figuren på bakken
+   9. Figuren på bakken
    ============================================================ */
 
 #figurbane {
@@ -1436,7 +1356,7 @@ body[data-verden="oy"] .skilt::after {
 }
 
 /* ============================================================
-   11. Oppsummering
+   10. Oppsummering
    ============================================================ */
 
 .malflagg { font-size: 4.2rem; line-height: 1; }
@@ -1654,7 +1574,7 @@ body[data-verden="oy"] .skilt::after {
 .ordkort-bokstav.smal { font-size: 2.6rem; letter-spacing: -.02em; }
 
 /* ============================================================
-   12. Samlingen
+   11. Samlingen
    ============================================================ */
 
 .framdrift {
@@ -1728,7 +1648,7 @@ body[data-verden="oy"] .skilt::after {
 .samling-rute.tatt .stor { color: var(--god-mork); }
 
 /* ============================================================
-   13. Foreldremeny
+   12. Foreldremeny
    ============================================================ */
 
 .overlegg {
@@ -2078,7 +1998,7 @@ body[data-verden="oy"] .skilt::after {
 .hjelpetekst b { color: var(--blekk); }
 
 /* ============================================================
-   14. Mindre skjermer og mindre bevegelse
+   13. Mindre skjermer og mindre bevegelse
    ============================================================ */
 
 @media (max-width: 900px) {
@@ -2095,7 +2015,6 @@ body[data-verden="oy"] .skilt::after {
   .oppdrag-mal--tell { --ting: 72px; --ting-gap: 9px; padding: 12px 14px; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
-  .verdenkort { width: min(320px, 86vw); }
   .bokstavrutenett { gap: 8px; }
 }
 
@@ -2103,27 +2022,6 @@ body[data-verden="oy"] .skilt::after {
    skjermkanten og bare fire bokstaver fikk plass i bredden. Nå får hele
    utvalget plass uten å rulle. */
 @media (max-width: 560px) {
-  /* Tre store kort under hverandre får ikke plass på en telefon, og da måtte
-     han rulle for å oppdage at Dinodalen finnes. Liggende kort tar under
-     halve høyden, og alle tre er synlige med én gang. */
-  .verdenrad { gap: 12px; width: 100%; }
-  .verdenkort {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 128px minmax(0, 1fr);
-    align-items: center;
-    text-align: left;
-  }
-  .verdenkort-bilde { height: 100px; padding-bottom: 8px; }
-  .verdenkort-bilde > svg { width: 82%; }
-  .verdenkort-scene .lag { bottom: 20px; }
-  .verdenkort-scene .lag--fjern { height: 56px; }
-  .verdenkort-scene .lag--bak { height: 44px; }
-  .verdenkort-scene .lag--fram { height: 34px; }
-  .verdenkort-bilde::after { height: 20px; }
-  .verdenkort-under { padding: 12px 16px; }
-  .verdenkort-navn { font-size: 1.3rem; }
-  .verdenkort-tekst { font-size: .88rem; }
   :root { --grunn-h: 104px; --rute: 72px; }
   #topp { gap: 8px; padding: 8px 10px; }
   #topp-midt { display: none; }
@@ -2245,28 +2143,11 @@ body[data-verden="oy"] .skilt::after {
    Merk grensene: uten min-width slår denne inn på smale skjermer også, der
    tre kort ved siden av hverandre blir 120 piksler brede hver. */
 @media (max-height: 520px) and (min-width: 561px) {
-  .verdenrad { gap: 12px; flex-wrap: nowrap; width: 100%; }
-  .verdenkort { width: min(230px, 31vw); }
-  .verdenkort-bilde { height: 92px; padding-bottom: 6px; }
-  .verdenkort-bilde > svg { width: 78%; }
-  .verdenkort-scene .lag { bottom: 18px; }
-  .verdenkort-scene .lag--fjern { height: 52px; }
-  .verdenkort-scene .lag--bak { height: 40px; }
-  .verdenkort-scene .lag--fram { height: 32px; }
-  .verdenkort-bilde::after { height: 18px; }
-  .verdenkort-under { padding: 8px 12px 10px; }
-  .verdenkort-navn { font-size: 1.1rem; }
-  .verdenkort-tekst { font-size: .78rem; }
 }
 
 /* Smal OG lav – telefon på tvers med lite bredde. Da er liggende kort eneste
    som får plass, og de må være så lave som mulig. */
 @media (max-height: 520px) and (max-width: 560px) {
-  .verdenrad { gap: 8px; }
-  .verdenkort-bilde { height: 74px; }
-  .verdenkort-under { padding: 8px 12px; }
-  .verdenkort-navn { font-size: 1.1rem; }
-  .verdenkort-tekst { font-size: .78rem; }
 }
 
 /* Bokstavrutene er 72 px på telefon, ikke 62: en treåring treffer bredere enn

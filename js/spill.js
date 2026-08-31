@@ -158,7 +158,6 @@ var Spill = (function () {
          * iOS å spille klippene senere når de starter av seg selv. */
         Lydbank.lasOpp();
         Lyd.klikk();
-        visVerden();
         velgVerden(id);
       });
       felt.appendChild(b);
@@ -177,45 +176,14 @@ var Spill = (function () {
     });
   }
 
-  function visVerden() {
-    Tale.stopp();
-    settTastLytter(null);
-    tilbakeHandling = visStart;
-    naVerden = null;
-    settScene(null);
-    oppdaterTeller(false);
-    settTopp('Oppdagerøya', true);
-    visSkjerm('skjerm-verden');
-
-    var felt = el('verden-valg');
-    felt.innerHTML = '';
-    Object.keys(VERDENER).forEach(function (id) {
-      var v = VERDENER[id];
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'verdenkort verdenkort--' + id;
-      b.innerHTML =
-        '<span class="verdenkort-bilde">' +
-          '<span class="verdenkort-scene" aria-hidden="true">' + Figurer.landskapFor(id) + '</span>' +
-          Figurer.figurFor(id) +
-        '</span>' +
-        '<span class="verdenkort-under">' +
-          '<span class="verdenkort-navn">' + v.navn + '</span>' +
-          '<span class="verdenkort-tekst"></span>' +
-        '</span>';
-      /* Navnet forelderen har skrevet er det eneste stedet brukertekst når
-       * HTML-en. Døper man bilen «Bil <3», skal kortet vise «Bil <3» og ikke
-       * gå i stykker – derfor textContent i stedet for konkatenering. */
-      b.querySelector('.verdenkort-tekst').textContent = Lagring.harNavn(id)
-        ? 'Sammen med ' + Lagring.navnFor(id)
-        : VERDENER[id].undertekst;
-      b.addEventListener('click', function () { Lyd.klikk(); velgVerden(id); });
-      felt.appendChild(b);
-    });
-  }
-
+  /* Kartet er det eneste stedet man velger verden. Det fantes en egen
+   * «Hvor vil du leke?»-skjerm med tre kort, men den sa det samme som kartet
+   * en gang til – og et barn som nettopp har trykket på dinosauren skjønner
+   * ikke hvorfor han må velge den om igjen. Tilbakeknappen går derfor helt
+   * hjem til øya. */
   function velgVerden(id) {
     naVerden = id;
+    tilbakeHandling = visStart;
     settScene(id);
     if (Lagring.harNavn(id)) visMeny();
     else visNavn();
@@ -225,7 +193,7 @@ var Spill = (function () {
    * gjennom hele spillet, og gjør figuren til hans egen. */
   function visNavn() {
     var v = VERDENER[naVerden];
-    tilbakeHandling = visVerden;
+    tilbakeHandling = visStart;
     settTopp(v.navn, true);
     visSkjerm('skjerm-navn');
 
@@ -266,7 +234,7 @@ var Spill = (function () {
     Tale.stopp();
     settTastLytter(null);
     var v = VERDENER[naVerden];
-    tilbakeHandling = visVerden;
+    tilbakeHandling = visStart;
     settTopp(v.navn + ' · ' + Lagring.navnFor(naVerden), true);
     visSkjerm('skjerm-meny');
     oppdaterTeller(false);
@@ -750,7 +718,7 @@ var Spill = (function () {
     Lagring.settBarnenavn(el('inn-barnenavn').value);
     el('foreldre').hidden = true;
     /* Tilbake til et trygt sted – innstillingene kan ha endret bokstavutvalget. */
-    if (naVerden) visMeny(); else visVerden();
+    if (naVerden) visMeny(); else visStart();
   }
 
   /* ---------- oppstart ---------- */

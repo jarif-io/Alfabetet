@@ -31,8 +31,8 @@ som krever et trykk før den vil spille noe.
 
 Forsiden er et øykart. De tre verdenene ligger som steder på kartet —
 **Racerbanen** på sletta, **Dinodalen** ved vulkanen og **Sjørøverøya** ute på
-sjøen — og han kan trykke rett på det stedet han vil til. Vil han se dem som
-kort i stedet, går Start-knappen til den vanlige verdensvelgeren.
+sjøen — og han trykker rett på det stedet han vil til. Kartet er det eneste
+stedet verden velges, og tilbakeknappen fører alltid helt hjem dit.
 
 Så gir han figuren sin et navn. Navnet brukes gjennom hele spillet.
 
