@@ -71,10 +71,22 @@ allerede sto – forsvant den fra menyen uten å bli vanskeligere å finne.
 **Store trykkflater.** Alt barnet skal treffe må være stort – gjenta-lyden-
 knappen ble meldt som «veldig liten» og måtte doblet i størrelse.
 
-**Rolig av konstruksjon.** Ingenting starter av seg selv, ingen nedtelling,
-ingen bakgrunnsmusikk, ingen streaks eller daglige mål. Feiringen varer rundt
-ett sekund og så er det stille. Barnet styrer tempoet; runden har en tydelig
-slutt og spillet foreslår aldri «en runde til».
+**Rolig av konstruksjon.** Ingen bakgrunnsmusikk, ingen streaks eller daglige
+mål. Feiringen varer rundt ett sekund og så er det stille. Runden har en
+tydelig slutt og spillet foreslår aldri «en runde til».
+
+**Automatisk videre er et unntak, ikke en vane.** «Videre»-knappen krevde
+først et trykk for hver eneste oppgave – helt til forelderen meldte at et
+barn på tre trykker feil knapp oftere enn det finner riktig, og at *å måtte
+lete etter og treffe knappen* var friksjonen, ikke noe han trengte for å
+styre tempoet sitt. Knappen teller nå ned fra 3 til 0 (en ring som tømmes,
+tallet i midten) og går videre av seg selv, i alle moduser og i
+Alfabetløypa – men bare *etter* at noe har skjedd (et riktig svar, et steg
+lest ferdig), aldri før. Et trykk på knappen mens den teller hopper fortsatt
+rett forbi resten av den. Lærdommen: «ingen automatikk» er et virkemiddel
+for roen, ikke målet i seg selv – endrer den faktiske bruken hva som skaper
+uro, endre virkemiddelet, men behold alltid muligheten til at barnet kan gå
+fortere enn maskinen.
 
 **Mestring, ikke belønningsdryss.** Framgangen skal være synlig og ekte
 (bokstaver som samles på en vegg over uker), vanskegraden skal stige merkbart

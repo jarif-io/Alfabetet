@@ -658,12 +658,34 @@ var Figurer = (function () {
       '</svg>'
   };
 
+  /* Nedtellingen i «Videre»-knappen, i stedet for pila: en ring som tømmes
+   * etter hvert som tiden går, med tallet som står igjen midt i – samme idé
+   * som et lite stoppeklokke-ur. Bygges én gang når nedtellingen starter;
+   * js/moduser.js oppdaterer så bare ringen og tallteksten videre for hvert
+   * sekund, slik at CSS-overgangen på ringen får noe å animere fra og til. */
+  var NEDTELLING_OMKRETS = 2 * Math.PI * 15;
+  function nedtelling(n) {
+    return '<svg viewBox="0 0 38 38" aria-hidden="true">' +
+      '<circle cx="19" cy="19" r="15" fill="none" stroke="currentColor"' +
+        ' stroke-width="3" opacity=".32"/>' +
+      '<circle class="nedtelling-ring" cx="19" cy="19" r="15" fill="none"' +
+        ' stroke="currentColor" stroke-width="3" stroke-linecap="round"' +
+        ' transform="rotate(-90 19 19)" stroke-dasharray="' +
+        NEDTELLING_OMKRETS.toFixed(1) + '" stroke-dashoffset="0"/>' +
+      '<text class="nedtelling-tall" x="19" y="20" text-anchor="middle"' +
+        ' dy=".35em" font-size="16" font-weight="800" fill="currentColor">' +
+        n + '</text>' +
+    '</svg>';
+  }
+
   return {
     bil: bil,
     skip: skip,
     kart: kart,
     modusbilde: modusbilde,
     ikon: function (navn) { return IKONER[navn] || ''; },
+    nedtelling: nedtelling,
+    nedtellingOmkrets: NEDTELLING_OMKRETS,
     figurFor: function (verdenId) {
       var f = VERDENER[verdenId].figur;
       if (f === 'skip') return skip();

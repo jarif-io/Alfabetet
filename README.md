@@ -109,9 +109,10 @@ holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
 **Trykk på bilen eller skipet**, så tuter den og hopper. Det er det første han
 prøver, og da skal det skje noe.
 
-**Knappen videre** viser en pil, ikke ordet «Videre» — en treåring leser ikke, men
-en pil i samme retning som bilen kjører forstår han. På siste oppgave blir pilen et
-målflagg.
+**Knappen videre** teller ned fra 3 til 0 og går videre av seg selv — han slipper
+å lete etter og treffe en knapp for hver eneste oppgave. Vil han videre før tiden
+er ute, virker et trykk på knappen fortsatt, og hopper rett forbi resten av
+nedtellingen.
 
 **Høyttalerknappen i toppen** slår stemmen av og på med ett trykk. Vil dere lese
 bokstavene selv i stedet for å høre spillets egen stemme, er det den knappen
@@ -123,8 +124,9 @@ dere ser med én gang hvorfor det er stille.
 
 Spillet er med vilje rolig. Det er ikke en innstilling, men måten det er laget på:
 
-- **Ingenting starter av seg selv.** Neste oppgave kommer først når han trykker
-  *Videre*. Ingen timer, ingen nedtelling.
+- **Ingenting starter av seg selv mens han tenker.** Nedtellingen til neste
+  oppgave begynner først etter at svaret er gitt, aldri før — den venter aldri
+  på ham, bare på det som allerede er gjort.
 - **Ingenting beveger seg mens han tenker.** Ingen bakgrunnsmusikk, ingen
   animasjoner som løper, ingen blinking.
 - **Feiringen er kort.** Riktig svar gir ett sekund med figur, lyd og en stjerne —

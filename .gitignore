@@ -3,3 +3,7 @@ artefakt-kropp.html
 
 # Stemmemodellen lastes ned av lag-lydpakke.py – 79 MB, ikke i repoet
 stemme/
+
+# Generelle Claude Code-verktøy installert lokalt for utviklingsarbeidet her,
+# ikke en del av selve spillet – skal ikke følge med i commits.
+.claude/skills/apple-design/

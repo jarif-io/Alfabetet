@@ -58,6 +58,7 @@
   --god-mork: #1f5c3c;
   --god-svak: #e6f4ec;
   --gull: #e2a017;
+  --gull-mork: #9c6608;
 
   --sk-1: 0 1px 2px rgba(40, 30, 15, .1), 0 3px 8px rgba(40, 30, 15, .08);
   --sk-2: 0 2px 4px rgba(40, 30, 15, .1), 0 10px 24px rgba(40, 30, 15, .13);
@@ -458,7 +459,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
    et tall som gråner mens han spiller ville sett ut som at noe var galt. */
 .teller[disabled] { cursor: default; }
 .teller { transition: transform var(--mykt); }
-.teller-stjerne { color: var(--gull); font-size: 1.15rem; }
+.teller-stjerne { color: var(--gull-mork); font-size: 1.15rem; }
 .teller-av { color: var(--blekk-svak); font-size: .82rem; font-weight: 600; }
 .teller[hidden] { display: none; }
 .teller.smell { animation: smell 520ms cubic-bezier(.3, 1.5, .5, 1); }
@@ -483,7 +484,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   color: #fff;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0, 0, 0, .22), var(--sk-2);
-  transition: transform 120ms ease, box-shadow 120ms ease, filter var(--mykt);
+  transition: transform 200ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 160ms ease, filter var(--mykt);
   position: relative;
 }
 .knapp > span {
@@ -500,10 +501,11 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   background: linear-gradient(to bottom, rgba(255, 255, 255, .32), rgba(255, 255, 255, 0));
   pointer-events: none;
 }
-.knapp:hover { filter: brightness(1.06); }
+.knapp:hover { filter: brightness(1.06); transform: scale(1.03); }
 .knapp:active {
-  transform: translateY(4px);
+  transform: translateY(4px) scale(.97);
   box-shadow: 0 0 0 rgba(0, 0, 0, .22), var(--sk-1);
+  transition: transform 60ms ease, box-shadow 60ms ease;
 }
 
 .knapp--stor { font-size: 1.45rem; padding: 19px 52px 16px; }
@@ -518,6 +520,31 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .knapp--pil .knapp-ikon { display: block; }
 .knapp--pil .knapp-ikon svg { width: 38px; height: 38px; display: block; }
 .knapp--pil .knapp-tekst { display: block; line-height: 1.2; text-shadow: 0 1px 1px rgba(0, 0, 0, .22); }
+
+/* Nedtellingen som erstattet «Videre»-knappen: en ring som tømmes og et
+   tall i midten, ikke en knapp – den skal ikke se ut som noe å trykke på,
+   for det er den ikke lenger. Lys bunnfarge og verdenens aksentfarge på
+   ringen, samme uttrykk som resten av kortet den står ved siden av. */
+.nedtelling {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  background: var(--flate);
+  color: var(--aksent-mork);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--sk-2);
+}
+.nedtelling[hidden] { display: none; }
+.nedtelling svg { width: 46px; height: 46px; display: block; }
+
+/* Selve SVG-en byttes bare ut når nedtellingen starter (js/moduser.js sørger
+   for det) – hvert tikk etterpå endrer kun dashoffset og tallet på det
+   samme elementet, slik at overgangen har noe å gli mellom i stedet for å
+   hoppe. */
+.nedtelling-ring { transition: stroke-dashoffset 1s linear; }
+.nedtelling-tall { text-shadow: none; }
 
 /* Felle verdt å huske: en klasse som setter display overstyrer nettleserens
    egen regel for [hidden], og da blir knappen stående synlig selv om koden
@@ -1062,7 +1089,7 @@ body.pa-havet .ingress {
   position: absolute;
   right: 6px; top: 4px;
   font-size: .8rem;
-  color: var(--gull);
+  color: var(--gull-mork);
 }
 .bokstav.aktiv.mestret::after { color: #ffe9a0; }
 
@@ -1106,13 +1133,21 @@ body.pa-havet .ingress {
 }
 #oppgave-lytt .lytt-ikon svg,
 #utforsk-lytt .lytt-ikon svg { width: 26px; height: 26px; }
+/* Mot himmelen alene falt teksten under 4,5:1 kontrast i alle tre verdener
+   (målt 3.4–3.8:1) – en skygge løser det ikke når bunnen skifter farge
+   gjennom hele gradienten. En liten sky-aktig lapp bak ordene gir den samme
+   trygge bunnfargen overalt (5,9:1) og ser i tillegg ut som en tydelig
+   beskjed å lese, ikke tekst som flyter i løse luften. */
 .oppdrag-tekst {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.35rem;
   color: var(--blekk-svak);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .55);
+  background: rgba(255, 253, 248, .88);
+  padding: 7px 22px;
+  border-radius: 999px;
+  box-shadow: var(--sk-1);
 }
 
 .oppdrag-mal {

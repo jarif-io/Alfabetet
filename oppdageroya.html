@@ -98,6 +98,7 @@
   --god-mork: #1f5c3c;
   --god-svak: #e6f4ec;
   --gull: #e2a017;
+  --gull-mork: #9c6608;
 
   --sk-1: 0 1px 2px rgba(40, 30, 15, .1), 0 3px 8px rgba(40, 30, 15, .08);
   --sk-2: 0 2px 4px rgba(40, 30, 15, .1), 0 10px 24px rgba(40, 30, 15, .13);
@@ -498,7 +499,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
    et tall som gråner mens han spiller ville sett ut som at noe var galt. */
 .teller[disabled] { cursor: default; }
 .teller { transition: transform var(--mykt); }
-.teller-stjerne { color: var(--gull); font-size: 1.15rem; }
+.teller-stjerne { color: var(--gull-mork); font-size: 1.15rem; }
 .teller-av { color: var(--blekk-svak); font-size: .82rem; font-weight: 600; }
 .teller[hidden] { display: none; }
 .teller.smell { animation: smell 520ms cubic-bezier(.3, 1.5, .5, 1); }
@@ -523,7 +524,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   color: #fff;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0, 0, 0, .22), var(--sk-2);
-  transition: transform 120ms ease, box-shadow 120ms ease, filter var(--mykt);
+  transition: transform 200ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 160ms ease, filter var(--mykt);
   position: relative;
 }
 .knapp > span {
@@ -540,10 +541,11 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   background: linear-gradient(to bottom, rgba(255, 255, 255, .32), rgba(255, 255, 255, 0));
   pointer-events: none;
 }
-.knapp:hover { filter: brightness(1.06); }
+.knapp:hover { filter: brightness(1.06); transform: scale(1.03); }
 .knapp:active {
-  transform: translateY(4px);
+  transform: translateY(4px) scale(.97);
   box-shadow: 0 0 0 rgba(0, 0, 0, .22), var(--sk-1);
+  transition: transform 60ms ease, box-shadow 60ms ease;
 }
 
 .knapp--stor { font-size: 1.45rem; padding: 19px 52px 16px; }
@@ -558,6 +560,31 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .knapp--pil .knapp-ikon { display: block; }
 .knapp--pil .knapp-ikon svg { width: 38px; height: 38px; display: block; }
 .knapp--pil .knapp-tekst { display: block; line-height: 1.2; text-shadow: 0 1px 1px rgba(0, 0, 0, .22); }
+
+/* Nedtellingen som erstattet «Videre»-knappen: en ring som tømmes og et
+   tall i midten, ikke en knapp – den skal ikke se ut som noe å trykke på,
+   for det er den ikke lenger. Lys bunnfarge og verdenens aksentfarge på
+   ringen, samme uttrykk som resten av kortet den står ved siden av. */
+.nedtelling {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  background: var(--flate);
+  color: var(--aksent-mork);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--sk-2);
+}
+.nedtelling[hidden] { display: none; }
+.nedtelling svg { width: 46px; height: 46px; display: block; }
+
+/* Selve SVG-en byttes bare ut når nedtellingen starter (js/moduser.js sørger
+   for det) – hvert tikk etterpå endrer kun dashoffset og tallet på det
+   samme elementet, slik at overgangen har noe å gli mellom i stedet for å
+   hoppe. */
+.nedtelling-ring { transition: stroke-dashoffset 1s linear; }
+.nedtelling-tall { text-shadow: none; }
 
 /* Felle verdt å huske: en klasse som setter display overstyrer nettleserens
    egen regel for [hidden], og da blir knappen stående synlig selv om koden
@@ -1102,7 +1129,7 @@ body.pa-havet .ingress {
   position: absolute;
   right: 6px; top: 4px;
   font-size: .8rem;
-  color: var(--gull);
+  color: var(--gull-mork);
 }
 .bokstav.aktiv.mestret::after { color: #ffe9a0; }
 
@@ -1146,13 +1173,21 @@ body.pa-havet .ingress {
 }
 #oppgave-lytt .lytt-ikon svg,
 #utforsk-lytt .lytt-ikon svg { width: 26px; height: 26px; }
+/* Mot himmelen alene falt teksten under 4,5:1 kontrast i alle tre verdener
+   (målt 3.4–3.8:1) – en skygge løser det ikke når bunnen skifter farge
+   gjennom hele gradienten. En liten sky-aktig lapp bak ordene gir den samme
+   trygge bunnfargen overalt (5,9:1) og ser i tillegg ut som en tydelig
+   beskjed å lese, ikke tekst som flyter i løse luften. */
 .oppdrag-tekst {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.35rem;
   color: var(--blekk-svak);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .55);
+  background: rgba(255, 253, 248, .88);
+  padding: 7px 22px;
+  border-radius: 999px;
+  box-shadow: var(--sk-1);
 }
 
 .oppdrag-mal {
@@ -2432,9 +2467,10 @@ body[data-verden="oy"] .skilt::after {
     </div>
 
     <div class="videre-felt">
-      <button class="knapp knapp--stor knapp--pil" id="loype-videre" type="button">
+      <div class="nedtelling" id="loype-nedtelling" aria-hidden="true"></div>
+      <button class="knapp knapp--stor knapp--pil" id="loype-videre" type="button" hidden>
         <span class="knapp-ikon" id="loype-videre-ikon" aria-hidden="true"></span>
-        <span class="knapp-tekst" id="loype-videre-tekst">Neste</span>
+        <span class="knapp-tekst" id="loype-videre-tekst">Tilbake</span>
       </button>
     </div>
   </section>
@@ -2454,10 +2490,7 @@ body[data-verden="oy"] .skilt::after {
     <div class="valg" id="oppgave-valg"></div>
 
     <div class="videre-felt">
-      <button class="knapp knapp--stor knapp--pil" id="oppgave-videre" type="button" hidden>
-        <span class="knapp-ikon" id="videre-ikon" aria-hidden="true"></span>
-        <span class="knapp-tekst" id="videre-tekst">Videre</span>
-      </button>
+      <div class="nedtelling" id="oppgave-videre" hidden aria-hidden="true"></div>
     </div>
   </section>
 
@@ -2763,7 +2796,7 @@ body[data-verden="oy"] .skilt::after {
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-09-09 · 14';
+var SPILLVERSJON = '2026-09-09 · 15';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -4222,12 +4255,34 @@ var Figurer = (function () {
       '</svg>'
   };
 
+  /* Nedtellingen i «Videre»-knappen, i stedet for pila: en ring som tømmes
+   * etter hvert som tiden går, med tallet som står igjen midt i – samme idé
+   * som et lite stoppeklokke-ur. Bygges én gang når nedtellingen starter;
+   * js/moduser.js oppdaterer så bare ringen og tallteksten videre for hvert
+   * sekund, slik at CSS-overgangen på ringen får noe å animere fra og til. */
+  var NEDTELLING_OMKRETS = 2 * Math.PI * 15;
+  function nedtelling(n) {
+    return '<svg viewBox="0 0 38 38" aria-hidden="true">' +
+      '<circle cx="19" cy="19" r="15" fill="none" stroke="currentColor"' +
+        ' stroke-width="3" opacity=".32"/>' +
+      '<circle class="nedtelling-ring" cx="19" cy="19" r="15" fill="none"' +
+        ' stroke="currentColor" stroke-width="3" stroke-linecap="round"' +
+        ' transform="rotate(-90 19 19)" stroke-dasharray="' +
+        NEDTELLING_OMKRETS.toFixed(1) + '" stroke-dashoffset="0"/>' +
+      '<text class="nedtelling-tall" x="19" y="20" text-anchor="middle"' +
+        ' dy=".35em" font-size="16" font-weight="800" fill="currentColor">' +
+        n + '</text>' +
+    '</svg>';
+  }
+
   return {
     bil: bil,
     skip: skip,
     kart: kart,
     modusbilde: modusbilde,
     ikon: function (navn) { return IKONER[navn] || ''; },
+    nedtelling: nedtelling,
+    nedtellingOmkrets: NEDTELLING_OMKRETS,
     figurFor: function (verdenId) {
       var f = VERDENER[verdenId].figur;
       if (f === 'skip') return skip();
@@ -4703,6 +4758,41 @@ var Moduser = (function () {
     window.setTimeout(function () { element.classList.remove(klasse); }, ms);
   }
 
+  /* ================= nedtelling før spillet går videre av seg selv =================
+   *
+   * Pila «Videre» krevde et trykk for hver eneste oppgave. I stedet teller
+   * knappen ned fra 3 til 0 og går videre selv, i alle moduser der noe før
+   * krevde et trykk på den. Trykker han på knappen selv i mellomtiden – slik
+   * han fortsatt kan – hopper den rett til handlingen: han skal aldri måtte
+   * vente på et tall når han allerede er klar.
+   *
+   * `ikonEl` er elementet pila normalt tegnes i. `handler` er det som skjer
+   * ved null – nøyaktig det et trykk på knappen selv ville gjort. Kalles
+   * unikt for hver runde med tallet; returnerer en avbryter som MÅ kalles
+   * før noe annet skjer med den samme knappen (et trykk, en ny oppgave, eller
+   * at runden forlates) – ellers kan et gammelt tikk komme og gå videre et
+   * sted han ikke lenger er. */
+  var NEDTELLING_START = 3;
+  function nedtelling(ikonEl, handler) {
+    var n = NEDTELLING_START;
+    ikonEl.innerHTML = Figurer.nedtelling(n);
+    var ring = ikonEl.querySelector('.nedtelling-ring');
+    var tekst = ikonEl.querySelector('.nedtelling-tall');
+    var timer = window.setTimeout(function tikk() {
+      n -= 1;
+      if (n < 0) { timer = null; handler(); return; }
+      if (tekst) tekst.textContent = String(n);
+      if (ring) {
+        ring.setAttribute('stroke-dashoffset',
+          (Figurer.nedtellingOmkrets * (1 - n / NEDTELLING_START)).toFixed(1));
+      }
+      timer = window.setTimeout(tikk, 1000);
+    }, 1000);
+    return function () {
+      if (timer) { window.clearTimeout(timer); timer = null; }
+    };
+  }
+
   /* ================= figuren på bakken ================= */
 
   var kjoreTimer = null;
@@ -4970,6 +5060,10 @@ var Moduser = (function () {
 
   var Oppgave = (function () {
     var okt = null;
+    var nedtellingAv = null;
+    function stoppNedtelling() {
+      if (nedtellingAv) { nedtellingAv(); nedtellingAv = null; }
+    }
 
     /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
      * noen kjente blandes inn som hvilepunkter. */
@@ -5354,17 +5448,16 @@ var Moduser = (function () {
       Tale.stopp();
       Tale.rekke(opp ? ros.concat([350, 'Nå prøver vi en vanskeligere en.']) : ros);
 
-      var videre = el('oppgave-videre');
-      videre.hidden = false;
-      /* En treåring leser ikke «Videre». En pil i samme retning som bilen
-       * kjører forstår han med én gang. */
-      el('videre-ikon').innerHTML = Figurer.ikon(siste ? 'malflagg' : 'pil');
-      el('videre-tekst').textContent = siste ? 'Se hvordan det gikk' : 'Videre';
-      videre.setAttribute('aria-label', el('videre-tekst').textContent);
-      videre.focus();
+      /* Ingen knapp å trykke på lenger – nedtellingen viser seg selv og går
+       * videre av seg selv når den når null. */
+      var nedtellingEl = el('oppgave-videre');
+      nedtellingEl.hidden = false;
+      stoppNedtelling();
+      nedtellingAv = nedtelling(nedtellingEl, videre);
     }
 
     function videre() {
+      stoppNedtelling();
       okt.indeks += 1;
       if (okt.indeks >= okt.oppsett.antall) { avslutt(); return; }
       Spill.settTastLytter(tastesvar);
@@ -5533,7 +5626,7 @@ var Moduser = (function () {
         Tale.rekke(sporsmalstale());
       },
 
-      stopp: function () { Spill.settTastLytter(null); Tale.stopp(); }
+      stopp: function () { stoppNedtelling(); Spill.settTastLytter(null); Tale.stopp(); }
     };
   })();
 
@@ -5548,6 +5641,10 @@ var Moduser = (function () {
     var indeks = 0;
     var ferdig = false;
     var naarFerdig = null;
+    var nedtellingAv = null;
+    function stoppNedtelling() {
+      if (nedtellingAv) { nedtellingAv(); nedtellingAv = null; }
+    }
 
     /* Løypa går gjennom hele tegnsettet, også de sjeldne bokstavene: her er
      * det ingen oppgave, bare en tur fra start til slutt. */
@@ -5559,16 +5656,9 @@ var Moduser = (function () {
       Tale.rekke(tegnrekke(verdenId, b, ordFor(verdenId, b)));
     }
 
-    function settKnapp(ikon, tekst) {
-      el('loype-videre-ikon').innerHTML = Figurer.ikon(ikon);
-      el('loype-videre-tekst').textContent = tekst;
-      el('loype-videre').setAttribute('aria-label', tekst);
-    }
-
     function tegn() {
       var b = rekka()[indeks];
       var oppslag = ordFor(verdenId, b);
-      var siste = indeks + 1 >= rekka().length;
 
       el('loype-bokstav').textContent = b;
       el('loype-bokstav').classList.remove('smal');
@@ -5583,16 +5673,21 @@ var Moduser = (function () {
       el('loype-fyll').style.width =
         ((indeks + 1) / rekka().length * 100) + '%';
       spillOm(el('loype-kort'), 'bytter', 460);
-      settKnapp(siste ? 'malflagg' : 'pil', siste ? 'Se hvor langt du kom' : 'Neste');
 
       /* Figuren står der i alfabetet han er – framdriften synes i scenen. */
       kjorTil(verdenId, indeks / Math.max(1, rekka().length - 1));
       si();
-      el('loype-videre').focus();
+      /* Ingen knapp underveis – bare nedtellingen, som går videre av seg
+       * selv når den når null. Den manuelle «Tilbake»-knappen kommer først
+       * når han er ferdig, i avslutt(). */
+      stoppNedtelling();
+      nedtellingAv = nedtelling(el('loype-nedtelling'), videre);
     }
 
     function avslutt() {
       ferdig = true;
+      stoppNedtelling();
+      el('loype-nedtelling').hidden = true;
       el('loype-bokstav').textContent = domeneFor(verdenId) === 'tall' ? '1–10' : 'A–Å';
       el('loype-bokstav').classList.add('smal');
       el('loype-ikon').className = 'ordkort-ikon';
@@ -5601,7 +5696,11 @@ var Moduser = (function () {
         ? 'Alle tallene!' : 'Hele alfabetet!';
       el('loype-teller').textContent = rekka().length + ' av ' + rekka().length;
       spillOm(el('loype-kort'), 'bytter', 460);
-      settKnapp('malflagg', 'Tilbake');
+      /* Her, og bare her, er det en ekte knapp å trykke på: han skal velge
+       * selv når han vil ut, ikke bli sendt til menyen av en nedtelling. */
+      el('loype-videre-ikon').innerHTML = Figurer.ikon('malflagg');
+      el('loype-videre').hidden = false;
+      el('loype-videre').focus();
       Spill.settTastLytter(null);
       Lyd.ferdig();
       hopp();
@@ -5612,6 +5711,7 @@ var Moduser = (function () {
     }
 
     function videre() {
+      stoppNedtelling();
       if (ferdig) { if (naarFerdig) naarFerdig(); return; }
       if (indeks + 1 >= rekka().length) { avslutt(); return; }
       indeks += 1;
@@ -5637,11 +5737,22 @@ var Moduser = (function () {
         Spill.settTopp(domeneFor(id) === 'tall' ? 'Tallrekka' : 'Alfabetløypa', true);
         stillFigurTilStart();
         Spill.settTastLytter(hoppTil);
+        /* Fra forrige gang han var ferdig kan «Tilbake»-knappen stå igjen –
+         * nå starter han på nytt, og det er nedtellingen sin tur. */
+        el('loype-videre').hidden = true;
+        el('loype-nedtelling').hidden = false;
         tegn();
       },
       videre: videre,
-      gjenta: function () { if (!ferdig) si(); },
-      stopp: function () { Spill.settTastLytter(null); Tale.stopp(); }
+      /* Hører han bokstaven en gang til, skal han ikke bli dratt videre
+       * midt i det – nedtellingen starter forfra etter at den er sagt. */
+      gjenta: function () {
+        if (ferdig) return;
+        si();
+        stoppNedtelling();
+        nedtellingAv = nedtelling(el('loype-nedtelling'), videre);
+      },
+      stopp: function () { stoppNedtelling(); Spill.settTastLytter(null); Tale.stopp(); }
     };
   })();
 
@@ -6320,10 +6431,6 @@ var Spill = (function () {
       if (e.key === 'Enter') lagreNavn(el('navn-felt').value.trim());
     });
 
-    pa('oppgave-videre', 'click', function () {
-      Lyd.klikk();
-      Moduser.Oppgave.videre();
-    });
     pa('oppgave-lytt', 'click', function () {
       Moduser.Oppgave.gjentaSporsmal();
     });
@@ -6335,6 +6442,8 @@ var Spill = (function () {
       Moduser.Utforsk.gjenta();
     });
 
+    /* Denne knappen vises bare som «Tilbake» når løypa er ferdig – underveis
+     * er det nedtellingen alene som fører videre, se js/moduser.js. */
     pa('loype-videre', 'click', function () {
       Lyd.klikk();
       Moduser.Loype.videre();

@@ -661,10 +661,6 @@ var Spill = (function () {
       if (e.key === 'Enter') lagreNavn(el('navn-felt').value.trim());
     });
 
-    pa('oppgave-videre', 'click', function () {
-      Lyd.klikk();
-      Moduser.Oppgave.videre();
-    });
     pa('oppgave-lytt', 'click', function () {
       Moduser.Oppgave.gjentaSporsmal();
     });
@@ -676,6 +672,8 @@ var Spill = (function () {
       Moduser.Utforsk.gjenta();
     });
 
+    /* Denne knappen vises bare som «Tilbake» når løypa er ferdig – underveis
+     * er det nedtellingen alene som fører videre, se js/moduser.js. */
     pa('loype-videre', 'click', function () {
       Lyd.klikk();
       Moduser.Loype.videre();
