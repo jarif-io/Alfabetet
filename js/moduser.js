@@ -38,12 +38,7 @@ var Moduser = (function () {
 
   /* «ell … ell for Løve» – samme formel som alfabetbøkene bruker, og kort nok
    * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»), ellers
-   * leser talesyntesen det store tegnet som «stor L».
-   *
-   * Er bokstavlyden slått på, legges selve lyden inn mellom: «ell … lll …
-   * ell for Løve». Uten den hører han ingen sammenheng mellom navnet på
-   * konsonanten, som begynner på en vokal, og lyden den lager i ordet – og
-   * det er nettopp den sammenhengen «Første lyd» forutsetter. */
+   * leser talesyntesen det store tegnet som «stor L». */
   function tegnrekke(verdenId, tegn, oppslag) {
     var navn = navnPaTegn(verdenId, tegn);
     /* Tallene sier «fire … fire bein». «fire for bein» ville vært tull, og
@@ -51,10 +46,22 @@ var Moduser = (function () {
     if (domeneFor(verdenId) === 'tall') {
       return [navn + '.', 450, visningsordFor(verdenId, tegn) + '.'];
     }
-    var lyd = Lagring.innstilling('bokstavlyd') ? bokstavlydFor(tegn) : null;
-    var rekke = [navn + '.', 450];
-    if (lyd) rekke = rekke.concat([lyd + '.', 450]);
-    return rekke.concat([navn + ' for ' + tilTale(oppslag.ord) + '.']);
+    return [navn + '.', 450, navn + ' for ' + tilTale(oppslag.ord) + '.'];
+  }
+
+  /* Navnet sagt bokstav for bokstav – «i … de … a» – med de samme klippene
+   * som resten av runden allerede har brukt. Et vilkårlig navn en forelder
+   * skriver inn kan ingen stemme ha innspilt ferdig som ett ord, mens hver
+   * enkelt bokstav alltid finnes i språkpakken. Det er også nøyaktig det han
+   * nettopp gjorde, bokstav for bokstav – å høre det igjen samlet er selve
+   * poenget med runden. */
+  function navnetTalt(bokstaver) {
+    var rekke = [];
+    bokstaver.forEach(function (b, i) {
+      if (i) rekke.push(180);
+      rekke.push(bokstavnavnFor(b) + '.');
+    });
+    return rekke.concat([350, 'Det er navnet ditt!']);
   }
 
   /* Hva merket heter når vi omtaler det: «Bokstaven» eller «Tallet». */
@@ -776,8 +783,8 @@ var Moduser = (function () {
         Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
       }
 
-      /* Navnet skrevet som et navn: «SOFIA» sendt til talesyntesen blir
-       * stavet bokstav for bokstav, «Sofia» blir lest som navnet hans. */
+      /* Navnet vises som et navn på skjermen: «SOFIA» ville sett ut som et
+       * rop, «Sofia» leses som navnet hans. */
       var navnet = okt.type === 'navn'
         ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
         : '';
@@ -846,7 +853,7 @@ var Moduser = (function () {
 
       Lyd.ferdig();
       var hilsen = okt.type === 'navn'
-        ? [Replikker.navnTilTale(okt.ko) + '.', 300, 'Det er navnet ditt!']
+        ? navnetTalt(okt.ko)
         : okt.nyeMestrede.length
           ? ['Se her!', 280, navnPaTegn(okt.verden, okt.nyeMestrede[0]) + '.',
              280, 'Den kan du nå!']
@@ -901,7 +908,10 @@ var Moduser = (function () {
         /* «Finn bokstaven» heter «Finn tallet» i Dinodalen. */
         var tittel = MODUSTITTEL[type] || 'Finn bokstaven';
         if (type === 'finn' && domeneFor(verdenId) === 'tall') tittel = 'Finn tallet';
-        Spill.settTopp(tittel, true);
+        /* Er runden låst, er pila tilbake borte helt til «Se hvordan det
+         * gikk» – se innstillingen «Fullfør runden» og startOppgave() i
+         * spill.js, som også lar tilbakeHandling stå tom mens den er der. */
+        Spill.settTopp(tittel, !Lagring.innstilling('laasUnderveis'));
         stillFigurTilStart();
         Spill.settTastLytter(tastesvar);
         visOppgave();

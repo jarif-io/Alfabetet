@@ -34,7 +34,7 @@
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-31 · 13';
+var SPILLVERSJON = '2026-09-09 · 14';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -63,28 +63,6 @@ function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
  * norsk bokstav han møter overalt, og å utelate den er noe helt annet enn å
  * utelate Q. Y står heller ikke her – «yoghurt» er et ord han faktisk sier. */
 var SJELDNE_BOKSTAVER = ['Q', 'W', 'X', 'Z'];
-
-/* Selve bokstavlyden, til bruk mellom bokstavnavnet og ordet:
- * «ell … lll … ell for Løve».
- *
- * Poenget er at bokstavnavnet til en konsonant begynner på en vokal («ell»,
- * «emm», «eff»), så et barn hører ingen kobling mellom «ell» og /l/-lyden i
- * «Løve». Vokalene trenger ingen oppføring – der er navn og lyd det samme.
- *
- * Bare lyder som kan holdes ut i tid står her. Plosivene (B, D, G, K, P, T)
- * er utelatt med vilje: de kan ikke uttales uten en vokal etterpå, og da er
- * man tilbake til bokstavnavnet.
- *
- * VIKTIG: dette er forslag som må høres på. Hvordan en stemme leser «sss»
- * varierer fra stemme til stemme, og en lyd som blir rot er verre enn ingen
- * lyd. Slå på «si bokstavlyden» i foreldremenyen, hør gjennom, og stryk
- * linjene som ikke funker. Det er derfor bryteren er av fra start. */
-var BOKSTAVLYD = {
-  'F': 'fff', 'J': 'jjj', 'L': 'lll', 'M': 'mmm',
-  'N': 'nnn', 'R': 'rrr', 'S': 'sss', 'V': 'vvv'
-};
-
-function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
 
 /* ================= uttale ================= */
 

@@ -70,11 +70,7 @@ def replikker():
     Object.keys(ctx.VERDENER).forEach(function (id) {
       navn[id] = ctx.VERDENER[id].navneforslag;
     });
-    /* Grupper stemmen ikke klarer holdes utenfor – de sies av nettleserens
-       egen stemme i stedet. Se kommentaren ved GRUPPER i js/replikker.js. */
-    var med = {};
-    ctx.Replikker.grupper.forEach(function (g) { if (g.iPakken) med[g.id] = true; });
-    var liste = ctx.Replikker.alle(navn).filter(function (r) { return med[r.gruppe]; });
+    var liste = ctx.Replikker.alle(navn);
     liste.forEach(function (r) { r.nokkel = ctx.Replikker.nokkel(r.tekst); });
     process.stdout.write(JSON.stringify(liste));
     """

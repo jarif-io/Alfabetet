@@ -14,8 +14,11 @@
  * byttet. En test i nettleseren høster det spillet faktisk sier og krever at
  * alt finnes her.
  *
- * Navnene på figurene og barnets eget navn kommer utenfra, siden de er ulike
- * hos hver familie. Uten dem hopper vi over de replikkene.
+ * Navnene på figurene kommer utenfra, siden de er ulike hos hver familie.
+ * Uten dem hopper vi over de replikkene – rosen sies da uten navn i stedet,
+ * se Tale.velg(). Barnets eget navn i «Navnet mitt» er ikke med her: det
+ * staves bokstav for bokstav med bokstavnavn-klippene i stedet for å sies
+ * som ett ord, så det trenger ingen egen oppføring.
  */
 
 var Replikker = (function () {
@@ -42,25 +45,19 @@ var Replikker = (function () {
    * «kjerne» er det han hører hele tiden – bokstavnavnene, ordene og de faste
    * setningene. Det er rundt hundre korte klipp, og de alene løfter hele
    * spillet. Resten er fint å ha, men ikke verdt en kveld med opptak. */
-  /* «iPakken: false» betyr at gruppen ikke kan lages av stemmen i lydpakken,
-   * og at spillet må la talesyntesen ta den. Det gjelder bokstavlydene: en
-   * lyd som skal holdes ut i tid – «fffff» – leser stemmen som «eff eff eff»,
-   * fordi den leser skrift og ikke lyd. Bedre å la den ene, avslåtte
-   * innstillingen bruke nettleserens stemme enn å lage klipp som sier feil. */
   var GRUPPER = [
-    { id: 'bokstavnavn', navn: 'Bokstavnavn',     iPakken: true },
-    { id: 'tallnavn',    navn: 'Tallnavn',        iPakken: true },
-    { id: 'ord',         navn: 'Bokstav og ord',  iPakken: true },
-    { id: 'ordet',       navn: 'Ordene alene',    iPakken: true },
-    { id: 'forstelyd',   navn: 'Første lyd',      iPakken: true },
-    { id: 'telling',     navn: 'Telling',         iPakken: true },
-    { id: 'setning',     navn: 'Faste setninger', iPakken: true },
-    { id: 'ros',         navn: 'Ros og hilsener', iPakken: true },
-    { id: 'bokstavlyd',  navn: 'Bokstavlyder',    iPakken: false }
+    { id: 'bokstavnavn', navn: 'Bokstavnavn' },
+    { id: 'tallnavn',    navn: 'Tallnavn' },
+    { id: 'ord',         navn: 'Bokstav og ord' },
+    { id: 'ordet',       navn: 'Ordene alene' },
+    { id: 'forstelyd',   navn: 'Første lyd' },
+    { id: 'telling',     navn: 'Telling' },
+    { id: 'setning',     navn: 'Faste setninger' },
+    { id: 'ros',         navn: 'Ros og hilsener' }
   ];
 
-  /* navn: { bane: 'Turbo', oy: '…', dino: '…', barn: 'Ida' } – tomme felt
-   * hopper over replikkene som trenger dem.
+  /* navn: { bane: 'Turbo', oy: '…', dino: '…' } – tomme felt hopper over
+   * replikkene som trenger dem.
    *
    * Hvert felt kan også være en liste. Det bruker skriptet som lager
    * språkpakken: der lages rosen for alle navnene figuren kan få, slik at
@@ -69,12 +66,6 @@ var Replikker = (function () {
   function liste(v) {
     if (!v) return [];
     return (typeof v === 'string' ? [v] : v).filter(Boolean);
-  }
-
-  /* «IDA» sagt høyt blir «i de a» hos noen stemmer. «Ida» blir navnet. */
-  function navnTilTale(bokstaver) {
-    var s = bokstaver.join('');
-    return s.charAt(0) + s.slice(1).toLowerCase();
   }
 
   function alle(navn) {
@@ -105,10 +96,6 @@ var Replikker = (function () {
     ALFABET.forEach(function (b) {
       legg('bokstavnavn', bokstavnavnFor(b) + '.',
            uttaleFor(bokstavnavnFor(b)) + '.');
-    });
-    ALFABET.forEach(function (b) {
-      var lyd = bokstavlydFor(b);
-      if (lyd) legg('bokstavlyd', lyd + '.');
     });
 
     /* --- tallene --- */
@@ -177,11 +164,6 @@ var Replikker = (function () {
       'Der var alle tallene! Fra én til ti.'
     ].forEach(function (t) { legg('setning', t); });
 
-    liste(navn.barn).forEach(function (n) {
-      var b = navnBokstaver(n);
-      if (b.length) legg('ros', navnTilTale(b) + '.');
-    });
-
     return ut;
   }
 
@@ -193,7 +175,6 @@ var Replikker = (function () {
 
   return {
     alle: alle,
-    navnTilTale: navnTilTale,
     grupper: GRUPPER,
     nokkel: nokkel,
     slugg: slugg

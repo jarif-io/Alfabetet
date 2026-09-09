@@ -29,18 +29,18 @@ var Lagring = (function () {
       stemme: true,
       lyd: true,
       /* Standard er innstilt på de aller minste: kort runde, få valg,
-       * hjelp med én gang, og en stemme som snakker rolig. */
+       * hjelp med én gang. */
       niva: 'liten',
-      talefart: 0.9,
-      stemmenavn: null,   /* null = spillet velger den beste norske selv */
       visMal: false,    /* bokstaven er skjult til barnet trykker på merket */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null,  /* null = alle utenom de sjeldne (Q, W, X, Z) */
       visAlleModuser: false, /* av = menyen slipper til én modus om gangen */
-      bokstavlyd: false, /* av = si bare bokstavnavnet, ikke selve lyden */
-      /* På = spill ferdige lydklipp når vi har dem, i stedet for å be
-       * nettleseren snakke. Det er dette som gir god norsk på iPhone. */
-      lydbank: true
+      /* På = pila tilbake er borte mens en oppgaverunde pågår, så den ikke
+       * kan forlates halvveis. Av som standard – det er et virkemiddel for
+       * familier som trenger det, ikke en atferd alle skal få uten å be om
+       * den. Fri utforsking og Alfabetløypa er ikke berørt, se startOppgave()
+       * i js/spill.js. */
+      laasUnderveis: false
     }
   };
 
@@ -65,6 +65,15 @@ var Lagring = (function () {
     /* 6: lydbanken kom til. Den som allerede har spilt skal ha den på, ellers
      *    ville en gammel og en ny installasjon hørt ulike ut. */
     6: function (d) { d.innstillinger.lydbank = standard.innstillinger.lydbank; }
+
+    /* Ingen migrering 7 med vilje. Nettleserens egen talesyntese (og med den
+     * stemmenavn, talefart, lydbank og bokstavlyd) ble fjernet: spillet
+     * snakker nå bare med den innspilte språkpakken. Feltene finnes ikke
+     * lenger i `standard.innstillinger`, og les() kopierer bare felter som
+     * står der – gammel lagring med disse nøklene mister dem stille og
+     * skader ingenting. `laasUnderveis` kom til samtidig med standardverdien
+     * `false`, som er nøyaktig dagens oppførsel, og trenger derfor heller
+     * ingen migrering. */
   };
 
   var maaSkrives = false;

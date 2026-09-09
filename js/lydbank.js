@@ -8,11 +8,13 @@
  *
  * Så vi går utenom: alt spillet sier er lest inn på forhånd med en norsk
  * nevral stemme og ligger som lydfiler i lyd/. Har vi et klipp for setningen,
- * spiller vi klippet i stedet for å be nettleseren snakke. Da høres spillet
- * likt ut overalt – iPhone, iPad, Mac, Windows, Android – uten at noen
- * trenger å gjøre noe.
+ * spiller vi klippet – det er den eneste stemmen spillet har. Da høres
+ * spillet likt ut overalt – iPhone, iPad, Mac, Windows, Android – uten at
+ * noen trenger å gjøre noe.
  *
- * For de få replikkene pakken ikke dekker, snakker talesyntesen som før.
+ * Har vi ikke et klipp for noe, sier spillet ingenting for akkurat den
+ * setningen. Se js/tale.js for hvorfor det ikke finnes noen nettleserstemme
+ * å falle tilbake på.
  */
 
 var Lydbank = (function () {
@@ -24,8 +26,9 @@ var Lydbank = (function () {
     return String(tekst).replace(/\s+/g, ' ').trim().toLowerCase();
   }
 
-  /* lyd/manifest.js definerer LYDFILER. Mangler filen, eller er den tom, står
-   * vi igjen med talesyntesen – og alt annet skal virke som før. */
+  /* lyd/manifest.js definerer LYDFILER. Mangler filen, eller er den tom, blir
+   * spillet stille – det finnes ingen annen stemme å falle tilbake på, se
+   * js/tale.js – men alt annet virker som før. */
   function filer() {
     return (typeof LYDFILER !== 'undefined' && LYDFILER) || {};
   }
@@ -58,8 +61,8 @@ var Lydbank = (function () {
   }
 
   /* Spiller klippet for teksten. Løftet innfris når klippet er ferdig, og
-   * avvises hvis noe gikk galt – da tar talesyntesen over, slik at én
-   * ødelagt fil aldri gjør spillet stumt. */
+   * avvises hvis noe gikk galt – Tale.si() lar da resten av rekka fortsette
+   * i stillhet i stedet for å stoppe helt på grunn av én ødelagt fil. */
   function spill(tekst) {
     var fil = filer()[nokkel(tekst)];
     if (!fil) return Promise.reject();

@@ -114,10 +114,10 @@ en pil i samme retning som bilen kjører forstår han. På siste oppgave blir pi
 målflagg.
 
 **Høyttalerknappen i toppen** slår stemmen av og på med ett trykk. Vil dere lese
-bokstavene selv i stedet for å høre på talesyntesen, er det den knappen dere
-bruker. Lydeffektene — motoren, stjernen, tutingen — fortsetter som før; de sier
-ingenting og er halve moroa. Når stemmen er av, blir knappen oransje, så dere ser
-med én gang hvorfor det er stille.
+bokstavene selv i stedet for å høre spillets egen stemme, er det den knappen
+dere bruker. Lydeffektene — motoren, stjernen, tutingen — fortsetter som før; de
+sier ingenting og er halve moroa. Når stemmen er av, blir knappen oransje, så
+dere ser med én gang hvorfor det er stille.
 
 ## Slik er det bygget
 
@@ -168,17 +168,18 @@ telefon. Bekreftelsen forsvinner av seg selv etter noen sekunder.
 På telefon fyller innstillingene hele skjermen, med tittelen øverst og **Lukk**
 nederst hele tiden, så du aldri mister veien ut. Der kan du:
 
-- Skru stemme og lydeffekter av og på, og **velge hvilken stemme** som leser, med
-  en prøveknapp. Farten kan justeres, men ikke sett den for lavt — se «Om stemmen».
+- Skru stemme og lydeffekter av og på. Stemmen er den samme overalt — se
+  «Språkpakken» nedenfor for hvorfor det ikke finnes noe stemmevalg her.
 - **Velge nivå.** «Helt liten» (standard, fra ca. 3 år) eller «litt større».
 - **Velge hvilke bokstaver som er med** — for eksempel bare bokstavene i navnet hans,
   eller de dere leser om denne uka. Dette er funksjonen som knytter spillet til
   lesestundene, og for en treåring er det trolig den nyttigste: begynn med tre–fire
   bokstaver i stedet for hele alfabetet. Uten et eget valg er alle med unntatt
   **Q, W, X og Z** — se «Ordene» nedenfor.
-- Slå på **«si bokstavlyden også»**. Da sier spillet «ell … lll … ell for Løve» i
-  stedet for bare navn og ord. Hør gjennom før du lar den stå på: hvordan en stemme
-  leser «sss» varierer, og en lyd som blir rot er verre enn ingen lyd.
+- Slå på **«fullfør runden før man kan gå ut»**. Skjuler pila tilbake mens en
+  runde med fem oppgaver pågår, så barnet ikke hopper mellom moduser midt i en
+  runde. Fri utforsking og Alfabetløypa er ikke berørt — der er det ingenting å
+  fullføre. Dere kommer alltid ut selv via tannhjulet.
 - Slå på **«vis bokstaven med én gang»**. Normalt er bokstaven skjult bak et
   spørsmålstegn han kan trykke på, så oppgaven blir å kjenne den igjen på lyden.
   Slår du denne på, står den framme fra start — da blir oppgaven å finne to like.
@@ -240,39 +241,42 @@ at `H` skal være «Hest» i stedet for «Hus», så endrer dere den ene linja:
 Bytt gjerne til ordene fra alfabetboka dere leser — da kjenner han dem igjen
 begge veier. Husk bare de to reglene over når dere velger bilde.
 
-## Språkpakken — god norsk overalt, også på iPhone
+## Språkpakken — spillets eneste stemme
 
-Spillet bruker **ikke** nettleserens talesyntese når det kan unngås. Alt det
-sier er lest inn på forhånd med en norsk nevral stemme og ligger som lydfiler
-i `lyd/`. Da høres spillet likt ut på iPhone, iPad, Mac, Windows og Android —
-uten at noen trenger å gjøre noe.
+Spillet bruker **ikke** nettleserens eller operativsystemets egen talesyntese
+i det hele tatt. Alt det sier er lest inn på forhånd med en norsk nevral
+stemme og ligger som lydfiler i `lyd/`. Da høres spillet likt ut på iPhone,
+iPad, Mac, Windows og Android — uten at noen trenger å gjøre noe, og uten at
+noen kan skru det tilbake til en annen stemme.
 
 Grunnen er iPhone. Safari gir nettsider bare de enkle systemstemmene. De
 forbedrede norske stemmene man laster ned under Innstillinger →
 Tilgjengelighet → Talt innhold kan ikke velges av en nettside i det hele tatt,
 og en Apple-ingeniør har svart at det er slik det skal være. Ingen innstilling
-i spillet kan hente dem fram. Ferdige lydklipp går utenom hele problemet.
+i spillet kan hente dem fram. Ferdige lydklipp går utenom hele problemet — og
+siden det uansett bare finnes den ene veien, er det heller ingen liste over
+maskinens egne stemmer å velge feil i.
 
 **Stemmen** er Piper-modellen `no_NO-talesyntese-medium`, trent på
 [Språkbankens talesyntesekorpus](https://www.nb.no/sprakbanken/en/resource-catalogue/oai-nb-no-sbr-15/)
 fra Nasjonalbiblioteket. Datasettet er CC0.
 
-I foreldremenyen, under **Norsk språkpakke**, står det hvor mange av
-replikkene som har klipp, og en bryter som slår pakken av hvis dere heller vil
-høre nettleserens egen stemme.
+I foreldremenyen, under **Lyd**, står det hvor mange av replikkene som har
+klipp for akkurat denne familiens navn. Finnes det ikke et klipp for noe,
+sier spillet rett og slett ingenting for den ene setningen — aldri en annen
+stemme.
 
-### To ting pakken ikke kan dekke
+### To ting som ikke trenger egne klipp
 
-- **Barnets eget navn**, som sies til slutt i «Navnet mitt». Det er ulikt hos
-  hver familie, så akkurat det ene ordet sies av talesyntesen.
-
-  Rosen — «Bra kjørt, Turbo!» — sier navnet figuren fikk. Alle navnene i
+- **Rosen** sier navnet figuren fikk — «Bra kjørt, Turbo!». Alle navnene i
   forslagslista ligger i pakken. Skriver dere inn et eget navn, sier spillet
   rosen **uten** navnet i stedet: «Bra kjørt!». Det er bedre å miste navnet
-  enn å miste den gode stemmen midt i en oppmuntring.
-- **Bokstavlydene** («fff», «sss»). En stemme som leser skrift lager ikke en
-  lyd som holdes ut i tid; den leser «eff eff eff». Innstillingen er av som
-  standard, og når den er på, sies lydene av talesyntesen.
+  enn å bytte stemme midt i en oppmuntring.
+- **Barnets eget navn**, som bygges bokstav for bokstav i «Navnet mitt», sies
+  til slutt bokstav for bokstav igjen — «i … de … a» — med akkurat de samme
+  klippene som resten av runden allerede har brukt. Et vilkårlig navn kan
+  ingen stemme ha ferdig innspilt som ett ord, men hver bokstav i alfabetet
+  finnes alltid i pakken, uansett hvilket navn dere skriver inn.
 
 ### Lage pakken på nytt
 
@@ -305,53 +309,11 @@ python3 lag-lydpakke.py --uttale juice jus
 #   jus    → jˈʉːs       ← riktig
 ```
 
-## Om talesyntesen
-
-Der språkpakken ikke rekker – barnets eget navn, bokstavlydene, eller hvis
-dere slår pakken av – bruker spillet nettleserens egen talesyntese. **Kvaliteten kommer fra stemmen
-operativsystemet har installert, ikke fra spillet.** De gamle innebygde norske
-stemmene er metalliske; de nyere nevrale stemmene er langt bedre, og gratis:
-
-- **Mac:** Systeminnstillinger → Tilgjengelighet → Talt innhold → Systemstemme →
-  Tilpass. Last ned **Nora (Premium)**.
-- **iPhone og iPad:** her går det ikke via talesyntesen. Safari gir nettsider
-  bare de enkle systemstemmene. Du kan laste ned Nora og Henrik i «forbedret»
-  eller «premium» til telefonen, men Apple lar dem ikke brukes av nettsider —
-  bare av iOS selv, og en Apple-ingeniør har svart at det er slik det skal
-  være. Derfor dukker de ikke opp i lista, uansett hva spillet gjør.
-  **Derfor har spillet sin egen språkpakke – se over.**
-- **Windows:** Innstillinger → Tid og språk → Tale → Legg til stemmer → Norsk bokmål.
-  Stemmer som heter **Natural** eller **Online** er de nye. Microsoft Edge viser som
-  regel flere av dem enn Chrome gjør.
-
-Spillet plukker den beste norske stemmen det finner av seg selv, men i foreldremenyen
-ligger det en liste over alle stemmene maskinen har, med en **Hør stemmen**-knapp så
-du kan sammenligne og velge selv. Under lista står det hvor mange stemmer nettleseren
-faktisk tilbyr, så du kan se forskjell på «stemmene har ikke kommet ennå» og
-«nettleseren gir oss dem ikke». Kommer de sent, oppdaterer lista seg av seg selv —
-og **Søk etter stemmer på nytt** tvinger fram et nytt forsøk. Ved siden av knappen står det hvilken stemme som
-**faktisk er i bruk akkurat nå** — sjekk den hvis du er i tvil om et valg slo inn.
-
-Et par ting som er greie å vite på Mac:
-
-- Etter at du har lastet ned en ny stemme, må nettleseren startes på nytt før den
-  dukker opp i lista. Chrome er tregest til å oppdage nye stemmer; **Safari viser som
-  regel premiumstemmene først**.
-- Mac har ofte flere stemmer som alle heter «Nora». Lista merker dem som *enkel*,
-  *forbedret* og *premium* så du ser hvilken du velger, og valget lagres på stemmens
-  egen id — ikke på navnet.
-
-To ting til om lyden:
-
-- Bokstavnavnene er skrevet ut i koden («ku» for Q, «dobbelt-ve» for W). Får
-  talesyntesen bare tegnet, leser flere stemmer det som «stor L» eller staver det på
-  engelsk.
-- **Ikke skru talefarten for langt ned.** Under «rolig» begynner de fleste stemmer å
-  slure og høres *mer* robotaktige ut. Roen i spillet kommer fra pausene mellom
-  setningene i stedet.
-
-Finnes ingen norsk stemme i det hele tatt, sier foreldremenyen fra, og spillet
-fungerer fortsatt — da må en voksen si bokstaven ved siden av.
+Sier spillet aldri noe, uansett skjerm? Da mangler `lyd/manifest.js`, eller
+filen kan ikke leses derfra spillet åpnes. Tallet under **Lyd** i
+foreldremenyen («X av Y replikker har lydklipp») viser om pakken faktisk er
+der. Spillet har ingen annen stemme å falle tilbake på — se
+[Språkpakken](#språkpakken--spillets-eneste-stemme) over for hvorfor.
 
 ## Få det opp i nettleseren
 
@@ -421,11 +383,11 @@ css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
 js/data.js        bokstavene, tallene, ordene og de tre verdenene  ← denne kan dere endre
 js/figurer.js     bil, skip, dinosaur, landskap og forsidekartet, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage), med migreringer
-js/tale.js        norsk talesyntese
+js/tale.js        spiller spillets egen stemme via Lydbank
 js/lyd.js         lydeffekter, laget av nettleseren selv
 js/moduser.js     modusene, felles for bokstaver og tall
 js/replikker.js   alt spillet sier, samlet på ett sted (grunnlaget for lydbanken)
-js/lydbank.js     spiller klipp fra språkpakken i stedet for talesyntese
+js/lydbank.js     spiller lydklippene fra språkpakken — spillets eneste stemme
 js/spill.js       navigasjon, scene, tastatur og foreldremeny
 lag-lydpakke.py   leser inn alle replikkene med en norsk nevral stemme
 lyd/              språkpakken: ett lydklipp per replikk, og manifest.js

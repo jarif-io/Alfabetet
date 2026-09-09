@@ -215,115 +215,21 @@
         <span class="bryter-spor"></span>
         <span>Lydeffekter</span>
       </label>
-      <label class="velgerrad">
-        <span>Hvilken stemme</span>
-        <select id="inn-stemmevalg"></select>
-      </label>
-      <div class="provrad">
-        <button class="lyttknapp" id="inn-prov" type="button">
-          <span class="lytt-ikon" aria-hidden="true"></span><span>Hør stemmen</span>
-        </button>
-        <span class="ibruk" id="stemme-ibruk"></span>
-      </div>
-      <div class="provrad">
-        <button class="knapp knapp--flat knapp--liten" id="inn-let" type="button">
-          Søk etter stemmer på nytt
-        </button>
-        <span class="stemmetall" id="stemme-tall"></span>
-      </div>
-      <p class="merknad advarsel" id="ios-merknad" hidden>
-        <b>På iPhone og iPad:</b> Safari gir nettsider bare de enkle
-        systemstemmene. Nora og Henrik i «forbedret» eller «premium» kan lastes
-        ned til iPhonen, men Apple lar dem ikke brukes av nettsider — bare av
-        iOS selv, og Apple sier at det er slik det skal være. Det er derfor de
-        ikke dukker opp i lista over, og ingen innstilling her kan hente dem
-        fram. På Mac og Windows virker de nedlastede stemmene som de skal.
-        <b>Veien utenom står under «Lydklipp».</b>
-      </p>
-      <label class="bryter">
-        <input type="checkbox" id="inn-bokstavlyd">
-        <span class="bryter-spor"></span>
-        <span>Si bokstavlyden også</span>
-      </label>
-      <p class="merknad">
-        Normalt sier spillet «ell … ell for Løve». Med denne på legges selve
-        lyden inn imellom: «ell … lll … ell for Løve». Navnet på en konsonant
-        begynner på en vokal, så uten lyden hører han ingen sammenheng mellom
-        «ell» og lyden L lager i «Løve» — og det er nettopp den sammenhengen
-        «Første lyd» bygger på.
-        <br><br>
-        <b>Hør gjennom før du lar den stå på.</b> Hvordan en stemme leser
-        «sss» eller «rrr» varierer, og en lyd som blir rot er verre enn ingen
-        lyd. Bare bokstaver som kan holdes ut i tid er med (F, J, L, M, N, R,
-        S, V); B, D, G, K, P og T kan ikke sies uten en vokal etterpå. Tabellen
-        står øverst i <code>js/data.js</code> og er lett å rette i.
-      </p>
-      <label class="skyver">
-        <span>Hvor fort stemmen snakker</span>
-        <input type="range" id="inn-fart" min="0.75" max="1.1" step="0.05">
-        <output id="ut-fart"></output>
-      </label>
-      <p class="merknad">
-        Går farten under «rolig», begynner de fleste stemmer å slure og høres
-        mer robotaktige ut. Roen i spillet kommer fra pausene mellom setningene,
-        ikke fra å bremse stemmen.
-      </p>
-      <p class="merknad" id="stemme-merknad" hidden></p>
-      <details class="hjelpetekst">
-        <summary>Stemmen høres robotaktig ut — hva kan jeg gjøre?</summary>
-        <p>
-          Kvaliteten kommer fra stemmen operativsystemet har installert, ikke fra
-          spillet. De gamle innebygde stemmene er metalliske; de nyere er langt
-          bedre og gratis å laste ned:
-        </p>
-        <p>
-          <b>Mac:</b> Systeminnstillinger → Tilgjengelighet → Talt innhold →
-          Systemstemme → Tilpass. Last ned <b>Nora (Premium)</b>. Velg den i lista over.
-        </p>
-        <p>
-          <b>Windows:</b> Innstillinger → Tid og språk → Tale → Legg til stemmer →
-          Norsk bokmål. Stemmer som heter <b>Natural</b> eller <b>Online</b> er de nye.
-          Microsoft Edge har som regel flere av dem enn Chrome.
-        </p>
-        <p>
-          Spillet velger den beste norske stemmen det finner av seg selv, men du
-          kan overstyre valget i lista over.
-        </p>
-      </details>
-    </section>
-
-    <!-- Språkpakken. Dette er svaret på iPhone-problemet over: alt spillet
-         sier ligger som ferdige lydklipp i lyd/, så vi slipper å be
-         nettleseren snakke. -->
-    <section class="panel-del">
-      <h3>Norsk språkpakke</h3>
       <p class="merknad">
         Alt spillet sier er lest inn på forhånd med en norsk nevral stemme og
-        ligger som lydfiler i spillet. Derfor høres det likt ut på iPhone,
-        iPad, Mac, Windows og Android — uten at noen trenger å gjøre noe.
-        Stemmen er trent på Nasjonalbibliotekets talesyntesekorpus.
+        ligger som lydfiler i spillet selv — det er den eneste stemmen
+        spillet har, og den samme overalt: iPhone, iPad, Mac, Windows og
+        Android, uten at noen trenger å gjøre noe. Stemmen er trent på
+        Nasjonalbibliotekets talesyntesekorpus.
       </p>
-      <label class="bryter">
-        <input type="checkbox" id="inn-lydbank">
-        <span class="bryter-spor"></span>
-        <span>Bruk språkpakken</span>
-      </label>
       <p class="ibruk" id="lydbank-status"></p>
       <p class="merknad">
-        Slår du den av, snakker nettleserens egen talesyntese i stedet — den
-        du velger over.
-      </p>
-      <p class="merknad">
-        To ting kan ikke ligge i en ferdig pakke, og sies derfor av
-        talesyntesen: <b>barnets eget navn</b> til slutt i «Navnet mitt», og
-        <b>bokstavlydene</b> («fff», «sss») — en lyd som skal holdes ut i tid
-        får ikke en lesende stemme til.
-      </p>
-      <p class="merknad">
         Rosen sier navnet figuren fikk. Alle navnene i forslagslista ligger i
-        pakken; skriver du inn et eget navn, sier spillet rosen uten navnet
-        («Bra kjørt!») i stedet for å bytte til robotstemmen midt i en
-        oppmuntring.
+        pakken; skriver du inn et eget navn selv, sier spillet rosen uten
+        navnet i stedet («Bra kjørt!») — det er bedre å miste navnet enn å
+        plutselig høres helt annerledes ut. Barnets eget navn i «Navnet
+        mitt» sies bokstav for bokstav med de samme klippene som resten av
+        runden, av samme grunn.
       </p>
     </section>
 
@@ -432,6 +338,18 @@
         og «Første lyd» når åtte bokstaver sitter. En modus som først har
         dukket opp, blir stående – noe som forsvinner igjen er uforståelig for
         en som ikke kan lese seg til hvorfor.
+      </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-las-underveis">
+        <span class="bryter-spor"></span>
+        <span>Fullfør runden før man kan gå ut</span>
+      </label>
+      <p class="merknad">
+        Gjemmer pila tilbake mens en runde med fem oppgaver pågår, så den
+        alltid får en slutt i stedet for å bli avbrutt underveis. Fri
+        utforsking i Garasjen og Alfabetløypa er ikke berørt av dette — der
+        er det ingenting å fullføre, bare et sted å se seg om. Du kommer
+        alltid ut selv, via tannhjulet øverst.
       </p>
     </section>
 

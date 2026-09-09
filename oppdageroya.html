@@ -1881,9 +1881,6 @@ body[data-verden="oy"] .skilt::after {
 .bryter input:checked + .bryter-spor::after { transform: translateX(21px); }
 .bryter input:focus-visible + .bryter-spor { outline: 3px solid var(--blekk); outline-offset: 2px; }
 
-.skyver { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-weight: 600; }
-.skyver input { flex: 1; accent-color: var(--aksent); }
-.skyver output { font-weight: 700; color: var(--blekk-svak); min-width: 92px; }
 
 .merknad { margin: 4px 0 0; font-size: .87rem; color: var(--blekk-svak); font-weight: 500; }
 .merknad.advarsel { color: #9a5116; }
@@ -2038,33 +2035,6 @@ body[data-verden="oy"] .skilt::after {
 }
 .voksenboble .knapp { box-shadow: 0 3px 0 rgba(0, 0, 0, .3); }
 
-/* Stemmevelger og prøveknapp i foreldremenyen */
-.velgerrad {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  font-weight: 600;
-}
-.velgerrad select {
-  flex: 1;
-  min-width: 0;
-  font: inherit;
-  font-size: .95rem;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 12px;
-  background: var(--flate-2);
-  color: var(--blekk);
-  cursor: pointer;
-}
-.provrad {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-bottom: 4px;
-}
 .ibruk {
   font-size: .85rem;
   font-weight: 700;
@@ -2074,7 +2044,6 @@ body[data-verden="oy"] .skilt::after {
   border-radius: 999px;
 }
 .ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
-.stemmetall { font-size: .82rem; font-weight: 600; color: var(--blekk-svak); }
 
 }
 
@@ -2204,15 +2173,6 @@ body[data-verden="oy"] .skilt::after {
   .panel-innhold { font-size: .95rem; }
   .bokstavvelger { grid-template-columns: repeat(auto-fit, minmax(38px, 1fr)); }
 
-  /* Rader med etikett + kontroll får ikke plass side om side på en telefon.
-     Etiketten legger seg over kontrollen i stedet for å brekke i tre. */
-  .skyver, .velgerrad { flex-wrap: wrap; gap: 8px; }
-  .skyver > span:first-child,
-  .velgerrad > span:first-child { width: 100%; }
-  .skyver input[type="range"] { flex: 1 1 60%; }
-  .skyver output { min-width: 0; }
-  .velgerrad select { width: 100%; }
-  .provrad { flex-direction: column; align-items: flex-start; gap: 8px; }
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
@@ -2554,115 +2514,21 @@ body[data-verden="oy"] .skilt::after {
         <span class="bryter-spor"></span>
         <span>Lydeffekter</span>
       </label>
-      <label class="velgerrad">
-        <span>Hvilken stemme</span>
-        <select id="inn-stemmevalg"></select>
-      </label>
-      <div class="provrad">
-        <button class="lyttknapp" id="inn-prov" type="button">
-          <span class="lytt-ikon" aria-hidden="true"></span><span>Hør stemmen</span>
-        </button>
-        <span class="ibruk" id="stemme-ibruk"></span>
-      </div>
-      <div class="provrad">
-        <button class="knapp knapp--flat knapp--liten" id="inn-let" type="button">
-          Søk etter stemmer på nytt
-        </button>
-        <span class="stemmetall" id="stemme-tall"></span>
-      </div>
-      <p class="merknad advarsel" id="ios-merknad" hidden>
-        <b>På iPhone og iPad:</b> Safari gir nettsider bare de enkle
-        systemstemmene. Nora og Henrik i «forbedret» eller «premium» kan lastes
-        ned til iPhonen, men Apple lar dem ikke brukes av nettsider — bare av
-        iOS selv, og Apple sier at det er slik det skal være. Det er derfor de
-        ikke dukker opp i lista over, og ingen innstilling her kan hente dem
-        fram. På Mac og Windows virker de nedlastede stemmene som de skal.
-        <b>Veien utenom står under «Lydklipp».</b>
-      </p>
-      <label class="bryter">
-        <input type="checkbox" id="inn-bokstavlyd">
-        <span class="bryter-spor"></span>
-        <span>Si bokstavlyden også</span>
-      </label>
-      <p class="merknad">
-        Normalt sier spillet «ell … ell for Løve». Med denne på legges selve
-        lyden inn imellom: «ell … lll … ell for Løve». Navnet på en konsonant
-        begynner på en vokal, så uten lyden hører han ingen sammenheng mellom
-        «ell» og lyden L lager i «Løve» — og det er nettopp den sammenhengen
-        «Første lyd» bygger på.
-        <br><br>
-        <b>Hør gjennom før du lar den stå på.</b> Hvordan en stemme leser
-        «sss» eller «rrr» varierer, og en lyd som blir rot er verre enn ingen
-        lyd. Bare bokstaver som kan holdes ut i tid er med (F, J, L, M, N, R,
-        S, V); B, D, G, K, P og T kan ikke sies uten en vokal etterpå. Tabellen
-        står øverst i <code>js/data.js</code> og er lett å rette i.
-      </p>
-      <label class="skyver">
-        <span>Hvor fort stemmen snakker</span>
-        <input type="range" id="inn-fart" min="0.75" max="1.1" step="0.05">
-        <output id="ut-fart"></output>
-      </label>
-      <p class="merknad">
-        Går farten under «rolig», begynner de fleste stemmer å slure og høres
-        mer robotaktige ut. Roen i spillet kommer fra pausene mellom setningene,
-        ikke fra å bremse stemmen.
-      </p>
-      <p class="merknad" id="stemme-merknad" hidden></p>
-      <details class="hjelpetekst">
-        <summary>Stemmen høres robotaktig ut — hva kan jeg gjøre?</summary>
-        <p>
-          Kvaliteten kommer fra stemmen operativsystemet har installert, ikke fra
-          spillet. De gamle innebygde stemmene er metalliske; de nyere er langt
-          bedre og gratis å laste ned:
-        </p>
-        <p>
-          <b>Mac:</b> Systeminnstillinger → Tilgjengelighet → Talt innhold →
-          Systemstemme → Tilpass. Last ned <b>Nora (Premium)</b>. Velg den i lista over.
-        </p>
-        <p>
-          <b>Windows:</b> Innstillinger → Tid og språk → Tale → Legg til stemmer →
-          Norsk bokmål. Stemmer som heter <b>Natural</b> eller <b>Online</b> er de nye.
-          Microsoft Edge har som regel flere av dem enn Chrome.
-        </p>
-        <p>
-          Spillet velger den beste norske stemmen det finner av seg selv, men du
-          kan overstyre valget i lista over.
-        </p>
-      </details>
-    </section>
-
-    <!-- Språkpakken. Dette er svaret på iPhone-problemet over: alt spillet
-         sier ligger som ferdige lydklipp i lyd/, så vi slipper å be
-         nettleseren snakke. -->
-    <section class="panel-del">
-      <h3>Norsk språkpakke</h3>
       <p class="merknad">
         Alt spillet sier er lest inn på forhånd med en norsk nevral stemme og
-        ligger som lydfiler i spillet. Derfor høres det likt ut på iPhone,
-        iPad, Mac, Windows og Android — uten at noen trenger å gjøre noe.
-        Stemmen er trent på Nasjonalbibliotekets talesyntesekorpus.
+        ligger som lydfiler i spillet selv — det er den eneste stemmen
+        spillet har, og den samme overalt: iPhone, iPad, Mac, Windows og
+        Android, uten at noen trenger å gjøre noe. Stemmen er trent på
+        Nasjonalbibliotekets talesyntesekorpus.
       </p>
-      <label class="bryter">
-        <input type="checkbox" id="inn-lydbank">
-        <span class="bryter-spor"></span>
-        <span>Bruk språkpakken</span>
-      </label>
       <p class="ibruk" id="lydbank-status"></p>
       <p class="merknad">
-        Slår du den av, snakker nettleserens egen talesyntese i stedet — den
-        du velger over.
-      </p>
-      <p class="merknad">
-        To ting kan ikke ligge i en ferdig pakke, og sies derfor av
-        talesyntesen: <b>barnets eget navn</b> til slutt i «Navnet mitt», og
-        <b>bokstavlydene</b> («fff», «sss») — en lyd som skal holdes ut i tid
-        får ikke en lesende stemme til.
-      </p>
-      <p class="merknad">
         Rosen sier navnet figuren fikk. Alle navnene i forslagslista ligger i
-        pakken; skriver du inn et eget navn, sier spillet rosen uten navnet
-        («Bra kjørt!») i stedet for å bytte til robotstemmen midt i en
-        oppmuntring.
+        pakken; skriver du inn et eget navn selv, sier spillet rosen uten
+        navnet i stedet («Bra kjørt!») — det er bedre å miste navnet enn å
+        plutselig høres helt annerledes ut. Barnets eget navn i «Navnet
+        mitt» sies bokstav for bokstav med de samme klippene som resten av
+        runden, av samme grunn.
       </p>
     </section>
 
@@ -2771,6 +2637,18 @@ body[data-verden="oy"] .skilt::after {
         og «Første lyd» når åtte bokstaver sitter. En modus som først har
         dukket opp, blir stående – noe som forsvinner igjen er uforståelig for
         en som ikke kan lese seg til hvorfor.
+      </p>
+      <label class="bryter">
+        <input type="checkbox" id="inn-las-underveis">
+        <span class="bryter-spor"></span>
+        <span>Fullfør runden før man kan gå ut</span>
+      </label>
+      <p class="merknad">
+        Gjemmer pila tilbake mens en runde med fem oppgaver pågår, så den
+        alltid får en slutt i stedet for å bli avbrutt underveis. Fri
+        utforsking i Garasjen og Alfabetløypa er ikke berørt av dette — der
+        er det ingenting å fullføre, bare et sted å se seg om. Du kommer
+        alltid ut selv, via tannhjulet øverst.
       </p>
     </section>
 
@@ -2885,7 +2763,7 @@ body[data-verden="oy"] .skilt::after {
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-08-31 · 13';
+var SPILLVERSJON = '2026-09-09 · 14';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -2914,28 +2792,6 @@ function bokstavnavnFor(bokstav) { return BOKSTAVNAVN[bokstav] || bokstav; }
  * norsk bokstav han møter overalt, og å utelate den er noe helt annet enn å
  * utelate Q. Y står heller ikke her – «yoghurt» er et ord han faktisk sier. */
 var SJELDNE_BOKSTAVER = ['Q', 'W', 'X', 'Z'];
-
-/* Selve bokstavlyden, til bruk mellom bokstavnavnet og ordet:
- * «ell … lll … ell for Løve».
- *
- * Poenget er at bokstavnavnet til en konsonant begynner på en vokal («ell»,
- * «emm», «eff»), så et barn hører ingen kobling mellom «ell» og /l/-lyden i
- * «Løve». Vokalene trenger ingen oppføring – der er navn og lyd det samme.
- *
- * Bare lyder som kan holdes ut i tid står her. Plosivene (B, D, G, K, P, T)
- * er utelatt med vilje: de kan ikke uttales uten en vokal etterpå, og da er
- * man tilbake til bokstavnavnet.
- *
- * VIKTIG: dette er forslag som må høres på. Hvordan en stemme leser «sss»
- * varierer fra stemme til stemme, og en lyd som blir rot er verre enn ingen
- * lyd. Slå på «si bokstavlyden» i foreldremenyen, hør gjennom, og stryk
- * linjene som ikke funker. Det er derfor bryteren er av fra start. */
-var BOKSTAVLYD = {
-  'F': 'fff', 'J': 'jjj', 'L': 'lll', 'M': 'mmm',
-  'N': 'nnn', 'R': 'rrr', 'S': 'sss', 'V': 'vvv'
-};
-
-function bokstavlydFor(bokstav) { return BOKSTAVLYD[bokstav] || null; }
 
 /* ================= uttale ================= */
 
@@ -3218,8 +3074,11 @@ function visningsordFor(verdenId, tegn) {
  * byttet. En test i nettleseren høster det spillet faktisk sier og krever at
  * alt finnes her.
  *
- * Navnene på figurene og barnets eget navn kommer utenfra, siden de er ulike
- * hos hver familie. Uten dem hopper vi over de replikkene.
+ * Navnene på figurene kommer utenfra, siden de er ulike hos hver familie.
+ * Uten dem hopper vi over de replikkene – rosen sies da uten navn i stedet,
+ * se Tale.velg(). Barnets eget navn i «Navnet mitt» er ikke med her: det
+ * staves bokstav for bokstav med bokstavnavn-klippene i stedet for å sies
+ * som ett ord, så det trenger ingen egen oppføring.
  */
 
 var Replikker = (function () {
@@ -3246,25 +3105,19 @@ var Replikker = (function () {
    * «kjerne» er det han hører hele tiden – bokstavnavnene, ordene og de faste
    * setningene. Det er rundt hundre korte klipp, og de alene løfter hele
    * spillet. Resten er fint å ha, men ikke verdt en kveld med opptak. */
-  /* «iPakken: false» betyr at gruppen ikke kan lages av stemmen i lydpakken,
-   * og at spillet må la talesyntesen ta den. Det gjelder bokstavlydene: en
-   * lyd som skal holdes ut i tid – «fffff» – leser stemmen som «eff eff eff»,
-   * fordi den leser skrift og ikke lyd. Bedre å la den ene, avslåtte
-   * innstillingen bruke nettleserens stemme enn å lage klipp som sier feil. */
   var GRUPPER = [
-    { id: 'bokstavnavn', navn: 'Bokstavnavn',     iPakken: true },
-    { id: 'tallnavn',    navn: 'Tallnavn',        iPakken: true },
-    { id: 'ord',         navn: 'Bokstav og ord',  iPakken: true },
-    { id: 'ordet',       navn: 'Ordene alene',    iPakken: true },
-    { id: 'forstelyd',   navn: 'Første lyd',      iPakken: true },
-    { id: 'telling',     navn: 'Telling',         iPakken: true },
-    { id: 'setning',     navn: 'Faste setninger', iPakken: true },
-    { id: 'ros',         navn: 'Ros og hilsener', iPakken: true },
-    { id: 'bokstavlyd',  navn: 'Bokstavlyder',    iPakken: false }
+    { id: 'bokstavnavn', navn: 'Bokstavnavn' },
+    { id: 'tallnavn',    navn: 'Tallnavn' },
+    { id: 'ord',         navn: 'Bokstav og ord' },
+    { id: 'ordet',       navn: 'Ordene alene' },
+    { id: 'forstelyd',   navn: 'Første lyd' },
+    { id: 'telling',     navn: 'Telling' },
+    { id: 'setning',     navn: 'Faste setninger' },
+    { id: 'ros',         navn: 'Ros og hilsener' }
   ];
 
-  /* navn: { bane: 'Turbo', oy: '…', dino: '…', barn: 'Ida' } – tomme felt
-   * hopper over replikkene som trenger dem.
+  /* navn: { bane: 'Turbo', oy: '…', dino: '…' } – tomme felt hopper over
+   * replikkene som trenger dem.
    *
    * Hvert felt kan også være en liste. Det bruker skriptet som lager
    * språkpakken: der lages rosen for alle navnene figuren kan få, slik at
@@ -3273,12 +3126,6 @@ var Replikker = (function () {
   function liste(v) {
     if (!v) return [];
     return (typeof v === 'string' ? [v] : v).filter(Boolean);
-  }
-
-  /* «IDA» sagt høyt blir «i de a» hos noen stemmer. «Ida» blir navnet. */
-  function navnTilTale(bokstaver) {
-    var s = bokstaver.join('');
-    return s.charAt(0) + s.slice(1).toLowerCase();
   }
 
   function alle(navn) {
@@ -3309,10 +3156,6 @@ var Replikker = (function () {
     ALFABET.forEach(function (b) {
       legg('bokstavnavn', bokstavnavnFor(b) + '.',
            uttaleFor(bokstavnavnFor(b)) + '.');
-    });
-    ALFABET.forEach(function (b) {
-      var lyd = bokstavlydFor(b);
-      if (lyd) legg('bokstavlyd', lyd + '.');
     });
 
     /* --- tallene --- */
@@ -3381,11 +3224,6 @@ var Replikker = (function () {
       'Der var alle tallene! Fra én til ti.'
     ].forEach(function (t) { legg('setning', t); });
 
-    liste(navn.barn).forEach(function (n) {
-      var b = navnBokstaver(n);
-      if (b.length) legg('ros', navnTilTale(b) + '.');
-    });
-
     return ut;
   }
 
@@ -3397,7 +3235,6 @@ var Replikker = (function () {
 
   return {
     alle: alle,
-    navnTilTale: navnTilTale,
     grupper: GRUPPER,
     nokkel: nokkel,
     slugg: slugg
@@ -3441,18 +3278,18 @@ var Lagring = (function () {
       stemme: true,
       lyd: true,
       /* Standard er innstilt på de aller minste: kort runde, få valg,
-       * hjelp med én gang, og en stemme som snakker rolig. */
+       * hjelp med én gang. */
       niva: 'liten',
-      talefart: 0.9,
-      stemmenavn: null,   /* null = spillet velger den beste norske selv */
       visMal: false,    /* bokstaven er skjult til barnet trykker på merket */
       bevegelse: true,  /* la skyer og bølger drive sakte */
       bokstaver: null,  /* null = alle utenom de sjeldne (Q, W, X, Z) */
       visAlleModuser: false, /* av = menyen slipper til én modus om gangen */
-      bokstavlyd: false, /* av = si bare bokstavnavnet, ikke selve lyden */
-      /* På = spill ferdige lydklipp når vi har dem, i stedet for å be
-       * nettleseren snakke. Det er dette som gir god norsk på iPhone. */
-      lydbank: true
+      /* På = pila tilbake er borte mens en oppgaverunde pågår, så den ikke
+       * kan forlates halvveis. Av som standard – det er et virkemiddel for
+       * familier som trenger det, ikke en atferd alle skal få uten å be om
+       * den. Fri utforsking og Alfabetløypa er ikke berørt, se startOppgave()
+       * i js/spill.js. */
+      laasUnderveis: false
     }
   };
 
@@ -3477,6 +3314,15 @@ var Lagring = (function () {
     /* 6: lydbanken kom til. Den som allerede har spilt skal ha den på, ellers
      *    ville en gammel og en ny installasjon hørt ulike ut. */
     6: function (d) { d.innstillinger.lydbank = standard.innstillinger.lydbank; }
+
+    /* Ingen migrering 7 med vilje. Nettleserens egen talesyntese (og med den
+     * stemmenavn, talefart, lydbank og bokstavlyd) ble fjernet: spillet
+     * snakker nå bare med den innspilte språkpakken. Feltene finnes ikke
+     * lenger i `standard.innstillinger`, og les() kopierer bare felter som
+     * står der – gammel lagring med disse nøklene mister dem stille og
+     * skader ingenting. `laasUnderveis` kom til samtidig med standardverdien
+     * `false`, som er nøyaktig dagens oppførsel, og trenger derfor heller
+     * ingen migrering. */
   };
 
   var maaSkrives = false;
@@ -4425,11 +4271,13 @@ var LYDFILER = {"a for ambulanse.":"data:audio/mpeg;base64,//NgxAAT6yIsV0MQAAiw5
  *
  * Så vi går utenom: alt spillet sier er lest inn på forhånd med en norsk
  * nevral stemme og ligger som lydfiler i lyd/. Har vi et klipp for setningen,
- * spiller vi klippet i stedet for å be nettleseren snakke. Da høres spillet
- * likt ut overalt – iPhone, iPad, Mac, Windows, Android – uten at noen
- * trenger å gjøre noe.
+ * spiller vi klippet – det er den eneste stemmen spillet har. Da høres
+ * spillet likt ut overalt – iPhone, iPad, Mac, Windows, Android – uten at
+ * noen trenger å gjøre noe.
  *
- * For de få replikkene pakken ikke dekker, snakker talesyntesen som før.
+ * Har vi ikke et klipp for noe, sier spillet ingenting for akkurat den
+ * setningen. Se js/tale.js for hvorfor det ikke finnes noen nettleserstemme
+ * å falle tilbake på.
  */
 
 var Lydbank = (function () {
@@ -4441,8 +4289,9 @@ var Lydbank = (function () {
     return String(tekst).replace(/\s+/g, ' ').trim().toLowerCase();
   }
 
-  /* lyd/manifest.js definerer LYDFILER. Mangler filen, eller er den tom, står
-   * vi igjen med talesyntesen – og alt annet skal virke som før. */
+  /* lyd/manifest.js definerer LYDFILER. Mangler filen, eller er den tom, blir
+   * spillet stille – det finnes ingen annen stemme å falle tilbake på, se
+   * js/tale.js – men alt annet virker som før. */
   function filer() {
     return (typeof LYDFILER !== 'undefined' && LYDFILER) || {};
   }
@@ -4475,8 +4324,8 @@ var Lydbank = (function () {
   }
 
   /* Spiller klippet for teksten. Løftet innfris når klippet er ferdig, og
-   * avvises hvis noe gikk galt – da tar talesyntesen over, slik at én
-   * ødelagt fil aldri gjør spillet stumt. */
+   * avvises hvis noe gikk galt – Tale.si() lar da resten av rekka fortsette
+   * i stillhet i stedet for å stoppe helt på grunn av én ødelagt fil. */
   function spill(tekst) {
     var fil = filer()[nokkel(tekst)];
     if (!fil) return Promise.reject();
@@ -4524,195 +4373,36 @@ var Lydbank = (function () {
 /* js/tale.js */
 /* Oppdagerøya – tale
  *
- * Bruker nettleserens egen talesyntese (speechSynthesis). Ingen lydfiler,
- * ingen nedlasting, ingen nettforbindelse. Vi leter etter en norsk stemme;
- * finnes ingen, går spillet videre uten tale og sier fra i foreldremenyen.
+ * Spillet snakker utelukkende med sin egen norske språkpakke – ferdig
+ * innleste lydklipp i lyd/. Det finnes bevisst ingen vei tilbake til
+ * nettleserens eller operativsystemets egen talesyntese: iOS Safari gir
+ * nettsider bare de enkle systemstemmene uansett hva som er lastet ned i
+ * Innstillinger, og «den beste stemmen den aktuelle maskinen tilfeldigvis
+ * har» skal ikke avgjøre hvordan spillet høres ut. Finnes det ikke et klipp
+ * for noe, er svaret stillhet for akkurat den setningen – ikke en stemme som
+ * plutselig høres helt annerledes ut.
  */
 
 var Tale = (function () {
-  var stotte = typeof window.speechSynthesis !== 'undefined';
-  var stemme = null;
-  var lette = false;
 
   /* Hver gang noe avbrytes teller vi opp. En rekke som ble påbegynt før
    * avbruddet stopper da av seg selv i stedet for å snakke oppå den nye.
    * Uten dette snakker spillet i munnen på seg selv når barnet trykker fort. */
   var generasjon = 0;
 
-  /* Stemmer med disse ordene i navnet er nyere, nevrale stemmer og høres
-   * langt mindre robotaktige ut enn de gamle innebygde. På Windows heter de
-   * gjerne «Microsoft Iselin Online (Natural)», på Mac «Nora (Premium)». */
-  var KVALITETSORD = ['premium', 'enhanced', 'neural', 'natural', 'online', 'siri'];
-
-  function erNorsk(v) {
-    var kode = (v.lang || '').replace('_', '-').toLowerCase();
-    return kode.indexOf('nb') === 0 || kode.indexOf('no') === 0 || kode.indexOf('nn') === 0;
-  }
-
-  function poeng(v) {
-    var p = 0;
-    var kode = (v.lang || '').replace('_', '-').toLowerCase();
-    if (kode.indexOf('nb') === 0) p += 40;        /* bokmål først */
-    else if (kode.indexOf('no') === 0) p += 30;
-    else if (kode.indexOf('nn') === 0) p += 20;
-
-    var navn = (v.name || '').toLowerCase();
-    for (var i = 0; i < KVALITETSORD.length; i++) {
-      if (navn.indexOf(KVALITETSORD[i]) !== -1) { p += 25; break; }
-    }
-    /* En stemme som hentes over nett er som regel den nyere, nevrale. */
-    if (v.localService === false) p += 8;
-    if (v.default) p += 2;
-    return p;
-  }
-
-  /* Alle norske stemmer maskinen har, best først. Brukes av foreldremenyen. */
-  function norskeStemmer() {
-    if (!stotte) return [];
-    var alle = window.speechSynthesis.getVoices() || [];
-    return alle.filter(erNorsk).sort(function (a, b) { return poeng(b) - poeng(a); });
-  }
-
-  /* Nøkkelen vi lagrer på. Flere stemmer kan hete det samme – en Mac har
-   * gjerne både «Nora», «Nora (Enhanced)» og «Nora (Premium)», og to av dem
-   * kan rapportere nøyaktig samme navn. voiceURI skiller dem. */
-  function nokkel(v) { return v.voiceURI || v.name; }
-
-  function finnStemme() {
-    if (!stotte) return null;
-    var alle = window.speechSynthesis.getVoices();
-    if (!alle || !alle.length) return null;
-    lette = true;
-
-    /* Har den voksne valgt en stemme selv, gjelder den. */
-    var valgt = Lagring.innstilling('stemmenavn');
-    if (valgt) {
-      for (var i = 0; i < alle.length; i++) {
-        if (nokkel(alle[i]) === valgt) return alle[i];
-      }
-      /* Navn som nøkkel var det vi lagret i en tidligere utgave. */
-      for (var j = 0; j < alle.length; j++) {
-        if (alle[j].name === valgt) return alle[j];
-      }
-    }
-
-    var norske = norskeStemmer();
-    return norske.length ? norske[0] : null;
-  }
-
-  /* Andre deler av spillet vil vite når stemmelista endrer seg. På iOS kommer
-   * den ofte flere sekunder etter at siden er lastet, og noen ganger først
-   * etter at noe er sagt høyt. */
-  var lyttere = [];
-  var forrigeAntall = -1;
-
-  function oppdater() {
-    stemme = finnStemme();
-    var antall = stotte ? (window.speechSynthesis.getVoices() || []).length : 0;
-    if (antall !== forrigeAntall) {
-      forrigeAntall = antall;
-      for (var i = 0; i < lyttere.length; i++) lyttere[i]();
-    }
-  }
-
-  if (stotte) {
-    oppdater();
-    /* Stemmelista lastes asynkront, og på Mac kommer de nedlastede
-     * premiumstemmene ofte et lite øyeblikk etter de innebygde. */
-    window.speechSynthesis.onvoiceschanged = oppdater;
-    window.setTimeout(oppdater, 300);
-    window.setTimeout(oppdater, 1200);
-    window.setTimeout(oppdater, 3000);
-  }
-
-  /* Spillet kan si noe hvis det finnes en talesyntese – eller hvis vi har
-   * lydklipp. En iPad uten talesyntese er fortsatt stum i dag; med en
-   * lydbank snakker den. */
+  /* Spillet kan si noe hvis stemmen er slått på og pakken faktisk er lastet. */
   function pa() {
-    if (!Lagring.innstilling('stemme')) return false;
-    if (stotte) return true;
-    return typeof Lydbank !== 'undefined' && Lydbank.antallKlipp() > 0;
+    return !!Lagring.innstilling('stemme') &&
+           typeof Lydbank !== 'undefined' && Lydbank.antallKlipp() > 0;
   }
 
-  /* Har vi et ferdig klipp for setningen, spiller vi det i stedet for å be
-   * nettleseren snakke. Det er hele poenget med lydbanken: på iPhone gir
-   * Safari bare de enkle systemstemmene, og de forbedrede stemmene man
-   * laster ned kan ikke velges av en nettside. Et klipp går utenom hele
-   * problemet, og spillet høres likt ut på alle maskiner. */
-  function brukBank() {
-    return typeof Lydbank !== 'undefined' &&
-           Lagring.innstilling('lydbank') !== false;
-  }
-
-  /* Sier én tekst: klipp om vi har det, ellers talesyntesen. */
+  /* Sier én tekst. Har vi ikke et klipp for den, sier vi rett og slett
+   * ingenting for akkurat den setningen og fortsetter til neste – se
+   * toppkommentaren for hvorfor det ikke finnes noen stemme å falle
+   * tilbake på. */
   function si(tekst) {
-    if (!pa() || !tekst) return Promise.resolve();
-    if (brukBank() && Lydbank.har(tekst)) {
-      return Lydbank.spill(tekst).then(null, function () {
-        /* Klippet lot seg ikke spille – da er en robotstemme bedre enn
-         * stillhet, og barnet merker ingenting annet enn at den ene
-         * setningen hørtes annerledes ut. */
-        return snakk(tekst);
-      });
-    }
-    return snakk(tekst);
-  }
-
-  /* Sier én tekst med nettleserens talesyntese. Løftet innfris når stemmen er
-   * ferdig – eller etter en beregnet maksimaltid, siden enkelte nettlesere
-   * glemmer å melde fra. */
-  function snakk(tekst) {
-    return new Promise(function (ferdig) {
-      if (!pa() || !tekst) { ferdig(); return; }
-
-      var ytring = new window.SpeechSynthesisUtterance(tekst);
-      /* Rekkefølgen er ikke likegyldig: setter man lang etterpå, eller til
-       * noe annet enn stemmens eget språk, ignorerer Safari på Mac stemmen
-       * og bruker systemets standard i stedet. */
-      if (stemme) {
-        try {
-          ytring.voice = stemme;
-          ytring.lang = stemme.lang || 'nb-NO';
-        } catch (e) {
-          /* Stemmelista kan ha blitt byttet ut under føttene på oss. Da er
-           * det bedre å snakke med standardstemmen enn å tie helt. */
-          stemme = null;
-          ytring.lang = 'nb-NO';
-          oppdater();
-        }
-      } else {
-        ytring.lang = 'nb-NO';
-      }
-      /* Under ca. 0,8 begynner de fleste talesynteser å slure og høres mer
-       * robotaktige ut, ikke roligere. Roen kommer fra pausene mellom
-       * setningene i stedet – se Tale.rekke. */
-      ytring.rate = Math.max(0.75, Lagring.innstilling('talefart') || 0.9);
-      ytring.pitch = 1;
-      ytring.volume = 1;
-
-      var lost = false;
-      function los() {
-        if (lost) return;
-        lost = true;
-        window.clearTimeout(vakt);
-        ferdig();
-      }
-
-      ytring.onend = los;
-      ytring.onerror = los;
-
-      /* Grovt anslag: ca. 12 tegn i sekundet ved normal fart, pluss slingring. */
-      var anslag = 1200 + (tekst.length / 12) * 1000 / (ytring.rate || 1);
-      var vakt = window.setTimeout(los, anslag);
-
-      try {
-        window.speechSynthesis.speak(ytring);
-        /* iOS fyller av og til stemmelista først etter at noe er sagt. */
-        window.setTimeout(oppdater, 400);
-      } catch (e) {
-        los();
-      }
-    });
+    if (!pa() || !tekst || !Lydbank.har(tekst)) return Promise.resolve();
+    return Lydbank.spill(tekst).then(null, function () { return null; });
   }
 
   function vent(ms) {
@@ -4736,60 +4426,28 @@ var Tale = (function () {
 
     si: si,
 
-    /* Velger den første varianten vi har lydklipp for.
+    /* Velger den første varianten vi har lydklipp for. Finnes ingen av dem,
+     * velges den siste – som regel den enkleste, navneløse varianten – i
+     * stedet for den rikeste: bedre stille enn å risikere en hel setning
+     * uten klipp midt i en rekke.
      *
      * Rosen sier navnet figuren fikk – «Bra kjørt, Turbo!». Navnene barnet
      * kan velge fra lista ligger i språkpakken, men et navn forelderen
-     * skriver inn selv kan umulig ligge der. Da er en ros uten navn, sagt med
-     * den gode stemmen, bedre enn en ros med navn sagt av robotstemmen.
-     *
-     * Er lydbanken slått av, gjelder den rikeste varianten: talesyntesen kan
-     * si hvilket som helst navn. */
+     * skriver inn selv kan umulig ligge der – da sier vi rosen uten navn. */
     velg: function () {
       var varianter = Array.prototype.slice.call(arguments);
-      if (brukBank()) {
-        for (var i = 0; i < varianter.length; i++) {
-          if (Lydbank.har(varianter[i])) return varianter[i];
+      for (var i = 0; i < varianter.length; i++) {
+        if (typeof Lydbank !== 'undefined' && Lydbank.har(varianter[i])) {
+          return varianter[i];
         }
       }
-      return varianter[0];
+      return varianter[varianter.length - 1];
     },
-
 
     stopp: function () {
       generasjon += 1;
-      if (stotte) {
-        try { window.speechSynthesis.cancel(); } catch (e) {}
-      }
       if (typeof Lydbank !== 'undefined') Lydbank.stopp();
-    },
-
-    /* Brukes av foreldremenyen. */
-    norskeStemmer: norskeStemmer,
-    /* Kalles hver gang nettleseren melder om en ny stemmeliste. */
-    naarStemmerEndres: function (fn) { lyttere.push(fn); },
-    letEtterStemmer: function () {
-      forrigeAntall = -1;
-      oppdater();
-    },
-    alleStemmer: function () {
-      return stotte ? (window.speechSynthesis.getVoices() || []) : [];
-    },
-    naStemme: function () { return stemme; },
-    velgStemme: function (nokkelverdi) {
-      Lagring.settInnstilling('stemmenavn', nokkelverdi || null);
-      oppdater();
-      return stemme;
-    },
-    nokkelFor: nokkel,
-    /* Prøvesetning, så den voksne kan høre forskjell mellom stemmene. */
-    prov: function () {
-      this.stopp();
-      return this.rekke(['Hei! Skal vi finne bokstaven be?']);
-    },
-    harNorskStemme: function () { return !!stemme && erNorsk(stemme); },
-    stottes: function () { return stotte; },
-    harLett: function () { return lette; }
+    }
   };
 })();
 
@@ -4986,12 +4644,7 @@ var Moduser = (function () {
 
   /* «ell … ell for Løve» – samme formel som alfabetbøkene bruker, og kort nok
    * til at en treåring holder følge. Bokstavnavnet skrives ut («ell»), ellers
-   * leser talesyntesen det store tegnet som «stor L».
-   *
-   * Er bokstavlyden slått på, legges selve lyden inn mellom: «ell … lll …
-   * ell for Løve». Uten den hører han ingen sammenheng mellom navnet på
-   * konsonanten, som begynner på en vokal, og lyden den lager i ordet – og
-   * det er nettopp den sammenhengen «Første lyd» forutsetter. */
+   * leser talesyntesen det store tegnet som «stor L». */
   function tegnrekke(verdenId, tegn, oppslag) {
     var navn = navnPaTegn(verdenId, tegn);
     /* Tallene sier «fire … fire bein». «fire for bein» ville vært tull, og
@@ -4999,10 +4652,22 @@ var Moduser = (function () {
     if (domeneFor(verdenId) === 'tall') {
       return [navn + '.', 450, visningsordFor(verdenId, tegn) + '.'];
     }
-    var lyd = Lagring.innstilling('bokstavlyd') ? bokstavlydFor(tegn) : null;
-    var rekke = [navn + '.', 450];
-    if (lyd) rekke = rekke.concat([lyd + '.', 450]);
-    return rekke.concat([navn + ' for ' + tilTale(oppslag.ord) + '.']);
+    return [navn + '.', 450, navn + ' for ' + tilTale(oppslag.ord) + '.'];
+  }
+
+  /* Navnet sagt bokstav for bokstav – «i … de … a» – med de samme klippene
+   * som resten av runden allerede har brukt. Et vilkårlig navn en forelder
+   * skriver inn kan ingen stemme ha innspilt ferdig som ett ord, mens hver
+   * enkelt bokstav alltid finnes i språkpakken. Det er også nøyaktig det han
+   * nettopp gjorde, bokstav for bokstav – å høre det igjen samlet er selve
+   * poenget med runden. */
+  function navnetTalt(bokstaver) {
+    var rekke = [];
+    bokstaver.forEach(function (b, i) {
+      if (i) rekke.push(180);
+      rekke.push(bokstavnavnFor(b) + '.');
+    });
+    return rekke.concat([350, 'Det er navnet ditt!']);
   }
 
   /* Hva merket heter når vi omtaler det: «Bokstaven» eller «Tallet». */
@@ -5724,8 +5389,8 @@ var Moduser = (function () {
         Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
       }
 
-      /* Navnet skrevet som et navn: «SOFIA» sendt til talesyntesen blir
-       * stavet bokstav for bokstav, «Sofia» blir lest som navnet hans. */
+      /* Navnet vises som et navn på skjermen: «SOFIA» ville sett ut som et
+       * rop, «Sofia» leses som navnet hans. */
       var navnet = okt.type === 'navn'
         ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
         : '';
@@ -5794,7 +5459,7 @@ var Moduser = (function () {
 
       Lyd.ferdig();
       var hilsen = okt.type === 'navn'
-        ? [Replikker.navnTilTale(okt.ko) + '.', 300, 'Det er navnet ditt!']
+        ? navnetTalt(okt.ko)
         : okt.nyeMestrede.length
           ? ['Se her!', 280, navnPaTegn(okt.verden, okt.nyeMestrede[0]) + '.',
              280, 'Den kan du nå!']
@@ -5849,7 +5514,10 @@ var Moduser = (function () {
         /* «Finn bokstaven» heter «Finn tallet» i Dinodalen. */
         var tittel = MODUSTITTEL[type] || 'Finn bokstaven';
         if (type === 'finn' && domeneFor(verdenId) === 'tall') tittel = 'Finn tallet';
-        Spill.settTopp(tittel, true);
+        /* Er runden låst, er pila tilbake borte helt til «Se hvordan det
+         * gikk» – se innstillingen «Fullfør runden» og startOppgave() i
+         * spill.js, som også lar tilbakeHandling stå tom mens den er der. */
+        Spill.settTopp(tittel, !Lagring.innstilling('laasUnderveis'));
         stillFigurTilStart();
         Spill.settTastLytter(tastesvar);
         visOppgave();
@@ -6082,9 +5750,7 @@ var Spill = (function () {
     el('stemmetekst').textContent = knapp.title;
     /* «Hør igjen» har ingen jobb når stemmen er av. */
     var lytt = document.querySelectorAll('.lyttknapp');
-    for (var i = 0; i < lytt.length; i++) {
-      if (lytt[i].id !== 'inn-prov') lytt[i].classList.toggle('borte', !pa);
-    }
+    for (var i = 0; i < lytt.length; i++) lytt[i].classList.toggle('borte', !pa);
   }
 
   function settStemme(pa) {
@@ -6414,7 +6080,13 @@ var Spill = (function () {
      * starte. Da blir vi stående i menyen framfor å vise en tom skjerm. */
     if (type === 'navn' && !navnkoe.length) { visMeny(); return; }
     sisteModus = type;
-    tilbakeHandling = function () { Moduser.Oppgave.stopp(); visMeny(); };
+    /* «Fullfør runden»: da finnes det ingen vei ut før «Se hvordan det gikk»
+     * – verken via pila (Moduser.start skjuler den, se moduser.js) eller
+     * Escape, som ellers ville kalt akkurat denne funksjonen. Fri utforsking
+     * og Alfabetløypa har ingen runde å fullføre og er ikke berørt. */
+    tilbakeHandling = Lagring.innstilling('laasUnderveis')
+      ? null
+      : function () { Moduser.Oppgave.stopp(); visMeny(); };
     Moduser.Oppgave.start(type, naVerden, navnkoe);
   }
 
@@ -6478,25 +6150,7 @@ var Spill = (function () {
     el('inn-vis-mal').checked = Lagring.innstilling('visMal');
     el('inn-bevegelse').checked = Lagring.innstilling('bevegelse');
     el('inn-alle-moduser').checked = Lagring.innstilling('visAlleModuser');
-    el('inn-bokstavlyd').checked = Lagring.innstilling('bokstavlyd');
-    el('inn-fart').value = Lagring.innstilling('talefart');
-    visFart();
-
-    var merknad = el('stemme-merknad');
-    if (!Tale.stottes()) {
-      merknad.hidden = false;
-      merknad.className = 'merknad advarsel';
-      merknad.textContent = 'Denne nettleseren har ikke talesyntese. Spillet fungerer, ' +
-        'men uten stemme – da må en voksen si bokstavlyden ved siden av.';
-    } else if (!Tale.harNorskStemme()) {
-      merknad.hidden = false;
-      merknad.className = 'merknad advarsel';
-      merknad.textContent = 'Fant ingen norsk stemme på denne maskinen. Spillet leser ' +
-        'med den stemmen som finnes, noe som kan høres rart ut. En norsk stemme kan ' +
-        'legges til i innstillingene til operativsystemet (språk og tale).';
-    } else {
-      merknad.hidden = true;
-    }
+    el('inn-las-underveis').checked = Lagring.innstilling('laasUnderveis');
 
     el('inn-barnenavn').value = Lagring.barnenavn();
     visBarnenavn();
@@ -6511,10 +6165,7 @@ var Spill = (function () {
     el('inn-navn-oy').value = Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '';
     el('inn-navn-oy').placeholder = VERDENER.oy.standardnavn;
 
-    el('inn-lydbank').checked = Lagring.innstilling('lydbank') !== false;
-
     tegnNiva();
-    tegnStemmevalg();
     tegnLydbank();
     tegnBokstavvelger();
     tegnStatus();
@@ -6528,135 +6179,33 @@ var Spill = (function () {
     }
   }
 
-  /* Lister stemmene maskinen faktisk har. Norske først, resten under, slik at
-   * den voksne kan høre seg fram til den minst robotaktige.
-   *
-   * Valget lagres på voiceURI, ikke på navn: en Mac har gjerne flere stemmer
-   * som alle heter «Nora», og bare URI-en skiller dem fra hverandre. */
-  function stemmeEtikett(v, erDuplikat) {
-    var tekst = v.name;
-    if (erDuplikat) {
-      var uri = (v.voiceURI || '').toLowerCase();
-      var art = uri.indexOf('premium') !== -1 ? 'premium'
-              : uri.indexOf('enhanced') !== -1 ? 'forbedret'
-              : uri.indexOf('compact') !== -1 ? 'enkel'
-              : null;
-      if (art) tekst += ' – ' + art;
-    }
-    return tekst + '  (' + v.lang + ')';
-  }
-
-  /* iPad melder seg som Mac i nyere iOS, så berøringspunkter må med. */
-  function erIOS() {
-    var ua = navigator.userAgent || '';
-    if (/iPad|iPhone|iPod/.test(ua)) return true;
-    return /Mac/.test(navigator.platform || '') && navigator.maxTouchPoints > 1;
-  }
-
-  function tegnStemmevalg() {
-    var velger = el('inn-stemmevalg');
-    var norske = Tale.norskeStemmer();
-    var alle = Tale.alleStemmer();
-    var valgt = Lagring.innstilling('stemmenavn');
-
-    /* Navn som går igjen må merkes, ellers ser lista ut som en feil. */
-    var antallPerNavn = {};
-    alle.forEach(function (v) {
-      antallPerNavn[v.name] = (antallPerNavn[v.name] || 0) + 1;
-    });
-
-    velger.innerHTML = '';
-    var auto = document.createElement('option');
-    auto.value = '';
-    auto.textContent = norske.length
-      ? 'Velg beste norske automatisk (' + norske[0].name + ')'
-      : 'Velg automatisk';
-    velger.appendChild(auto);
-
-    var norskeNokler = norske.map(Tale.nokkelFor);
-
-    function gruppe(tittel, stemmer) {
-      if (!stemmer.length) return;
-      var g = document.createElement('optgroup');
-      g.label = tittel;
-      stemmer.forEach(function (v) {
-        var o = document.createElement('option');
-        o.value = Tale.nokkelFor(v);
-        o.textContent = stemmeEtikett(v, antallPerNavn[v.name] > 1);
-        g.appendChild(o);
-      });
-      velger.appendChild(g);
-    }
-
-    gruppe('Norske stemmer', norske);
-    gruppe('Andre stemmer', alle.filter(function (v) {
-      return norskeNokler.indexOf(Tale.nokkelFor(v)) === -1;
-    }));
-
-    velger.value = valgt || '';
-    /* Den lagrede stemmen finnes ikke lenger – da skal det ikke se ut som
-     * om den er i bruk. */
-    if (velger.value !== (valgt || '')) velger.value = '';
-
-    /* Å vise hva nettleseren faktisk tilbyr gjør det mulig å se forskjell på
-     * «stemmene har ikke kommet ennå» og «nettleseren gir oss dem ikke». */
-    el('stemme-tall').textContent = alle.length
-      ? 'Nettleseren tilbyr ' + alle.length + (alle.length === 1 ? ' stemme, ' : ' stemmer, ') +
-        (norske.length === 0 ? 'ingen norske'
-          : norske.length === 1 ? 'én norsk' : norske.length + ' norske')
-      : 'Nettleseren har ikke meldt om noen stemmer ennå';
-    el('ios-merknad').hidden = !erIOS();
-
-    visIBruk();
-  }
-
   /* ---------- språkpakken ----------
    *
-   * Her ligger svaret på iPhone-problemet: Apple slipper ikke de nedlastede
-   * stemmene til på nettsider, så i stedet for å be nettleseren snakke
-   * spiller spillet ferdige klipp som følger med. */
+   * Spillet har ingen annen stemme enn denne: ferdig innleste lydklipp, se
+   * js/tale.js for hvorfor. Tallet her er til orientering for den voksne –
+   * det sier hvor godt akkurat denne familiens ord og navn er dekket, ikke
+   * en bryter å skru på eller av. */
 
   function tegnLydbank() {
     /* Nevneren er replikkene *denne* familien kan møte, med navnene de har
      * valgt. Har de skrevet inn et eget navn på figuren, finnes det ikke
-     * klipp for rosen – og da skal ikke tallet late som om alt er dekket. */
+     * klipp for rosen med akkurat det navnet – og da skal ikke tallet late
+     * som om alt er dekket. Spillet sier likevel rosen, bare uten navnet. */
     var liste = Replikker.alle({
       bane: Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '',
       oy: Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '',
-      dino: Lagring.harNavn('dino') ? Lagring.navnFor('dino') : '',
-      barn: Lagring.barnenavn()
+      dino: Lagring.harNavn('dino') ? Lagring.navnFor('dino') : ''
     });
     var har = liste.filter(function (r) { return Lydbank.har(r.tekst); }).length;
 
     var felt = el('lydbank-status');
     if (!har) {
       felt.className = 'ibruk ibruk--advarsel';
-      felt.textContent = 'Språkpakken mangler — spillet bruker talesyntesen.';
+      felt.textContent = 'Språkpakken mangler — spillet vil være stille.';
       return;
     }
     felt.className = 'ibruk';
     felt.textContent = har + ' av ' + liste.length + ' replikker har lydklipp.';
-  }
-
-  /* Viser hvilken stemme som faktisk brukes akkurat nå. Uten dette er det
-   * umulig å se om et valg har slått inn. */
-  function visIBruk() {
-    var felt = el('stemme-ibruk');
-    var na = Tale.naStemme();
-    if (!na) {
-      felt.className = 'ibruk ibruk--advarsel';
-      felt.textContent = Tale.stottes()
-        ? 'Ingen stemme valgt — nettleseren bruker sin egen standard'
-        : 'Nettleseren har ikke talesyntese';
-      return;
-    }
-    felt.className = 'ibruk';
-    felt.textContent = 'I bruk nå: ' + na.name + ' (' + na.lang + ')';
-  }
-
-  function visFart() {
-    var v = parseFloat(el('inn-fart').value);
-    el('ut-fart').textContent = v <= 0.8 ? 'rolig' : (v <= 0.95 ? 'vanlig' : 'rask');
   }
 
   function tegnBokstavvelger() {
@@ -6858,37 +6407,11 @@ var Spill = (function () {
     pa('inn-alle-moduser', 'change', function () {
       Lagring.settInnstilling('visAlleModuser', this.checked);
     });
-    pa('inn-bokstavlyd', 'change', function () {
-      Lagring.settInnstilling('bokstavlyd', this.checked);
+    pa('inn-las-underveis', 'change', function () {
+      Lagring.settInnstilling('laasUnderveis', this.checked);
     });
     pa('inn-barnenavn', 'input', visBarnenavn);
-    pa('inn-stemmevalg', 'change', function () {
-      Tale.velgStemme(this.value || null);
-      visIBruk();
-      Tale.prov();
-    });
-    pa('inn-prov', 'click', function () { visIBruk(); Tale.prov(); });
 
-    pa('inn-lydbank', 'change', function () {
-      Lagring.settInnstilling('lydbank', this.checked);
-      tegnLydbank();
-    });
-
-    pa('inn-let', 'click', function () {
-      Tale.letEtterStemmer();
-      tegnStemmevalg();
-    });
-
-    /* Stemmelista kommer ofte etter at panelet er åpnet – særlig på iOS.
-     * Uten dette ble lista stående som den var da panelet ble tegnet. */
-    Tale.naarStemmerEndres(function () {
-      if (!el('foreldre').hidden) tegnStemmevalg();
-    });
-
-    pa('inn-fart', 'input', function () {
-      Lagring.settInnstilling('talefart', parseFloat(this.value));
-      visFart();
-    });
     var nivaKnapper = alle('inn-niva', 'button');
     for (var n = 0; n < nivaKnapper.length; n++) {
       nivaKnapper[n].addEventListener('click', function () {

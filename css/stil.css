@@ -1841,9 +1841,6 @@ body[data-verden="oy"] .skilt::after {
 .bryter input:checked + .bryter-spor::after { transform: translateX(21px); }
 .bryter input:focus-visible + .bryter-spor { outline: 3px solid var(--blekk); outline-offset: 2px; }
 
-.skyver { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-weight: 600; }
-.skyver input { flex: 1; accent-color: var(--aksent); }
-.skyver output { font-weight: 700; color: var(--blekk-svak); min-width: 92px; }
 
 .merknad { margin: 4px 0 0; font-size: .87rem; color: var(--blekk-svak); font-weight: 500; }
 .merknad.advarsel { color: #9a5116; }
@@ -1998,33 +1995,6 @@ body[data-verden="oy"] .skilt::after {
 }
 .voksenboble .knapp { box-shadow: 0 3px 0 rgba(0, 0, 0, .3); }
 
-/* Stemmevelger og prøveknapp i foreldremenyen */
-.velgerrad {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  font-weight: 600;
-}
-.velgerrad select {
-  flex: 1;
-  min-width: 0;
-  font: inherit;
-  font-size: .95rem;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 12px;
-  background: var(--flate-2);
-  color: var(--blekk);
-  cursor: pointer;
-}
-.provrad {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-bottom: 4px;
-}
 .ibruk {
   font-size: .85rem;
   font-weight: 700;
@@ -2034,7 +2004,6 @@ body[data-verden="oy"] .skilt::after {
   border-radius: 999px;
 }
 .ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
-.stemmetall { font-size: .82rem; font-weight: 600; color: var(--blekk-svak); }
 
 }
 
@@ -2164,15 +2133,6 @@ body[data-verden="oy"] .skilt::after {
   .panel-innhold { font-size: .95rem; }
   .bokstavvelger { grid-template-columns: repeat(auto-fit, minmax(38px, 1fr)); }
 
-  /* Rader med etikett + kontroll får ikke plass side om side på en telefon.
-     Etiketten legger seg over kontrollen i stedet for å brekke i tre. */
-  .skyver, .velgerrad { flex-wrap: wrap; gap: 8px; }
-  .skyver > span:first-child,
-  .velgerrad > span:first-child { width: 100%; }
-  .skyver input[type="range"] { flex: 1 1 60%; }
-  .skyver output { min-width: 0; }
-  .velgerrad select { width: 100%; }
-  .provrad { flex-direction: column; align-items: flex-start; gap: 8px; }
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
