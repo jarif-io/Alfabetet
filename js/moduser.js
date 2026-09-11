@@ -100,17 +100,18 @@ var Moduser = (function () {
   /* ================= nedtelling før spillet går videre av seg selv =================
    *
    * Pila «Videre» krevde et trykk for hver eneste oppgave. I stedet teller
-   * knappen ned fra 3 til 0 og går videre selv, i alle moduser der noe før
-   * krevde et trykk på den. Trykker han på knappen selv i mellomtiden – slik
-   * han fortsatt kan – hopper den rett til handlingen: han skal aldri måtte
-   * vente på et tall når han allerede er klar.
+   * badgen ned fra 3 til 0 og går videre av seg selv, i alle moduser der noe
+   * før krevde et trykk. Den er ikke lenger en knapp og har ingen klikk-
+   * håndtering – et trykk på den gjør ingenting, og de tre sekundene kan
+   * ikke hoppes over. Det er bevisst: et barn som ikke leser skal aldri
+   * kunne trykke seg forbi en oppgave ved et uhell.
    *
-   * `ikonEl` er elementet pila normalt tegnes i. `handler` er det som skjer
-   * ved null – nøyaktig det et trykk på knappen selv ville gjort. Kalles
+   * `ikonEl` er elementet badgen tegnes i. `handler` er det som skjer ved
+   * null – nøyaktig det et trykk på den gamle knappen ville gjort. Kalles
    * unikt for hver runde med tallet; returnerer en avbryter som MÅ kalles
-   * før noe annet skjer med den samme knappen (et trykk, en ny oppgave, eller
-   * at runden forlates) – ellers kan et gammelt tikk komme og gå videre et
-   * sted han ikke lenger er. */
+   * før noe annet skjer med den samme badgen (en ny oppgave, eller at runden
+   * forlates) – ellers kan et gammelt tikk komme og gå videre et sted han
+   * ikke lenger er. */
   var NEDTELLING_START = 3;
   function nedtelling(ikonEl, handler) {
     var n = NEDTELLING_START;

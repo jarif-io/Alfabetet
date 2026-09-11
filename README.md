@@ -109,10 +109,10 @@ holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
 **Trykk på bilen eller skipet**, så tuter den og hopper. Det er det første han
 prøver, og da skal det skje noe.
 
-**Knappen videre** teller ned fra 3 til 0 og går videre av seg selv — han slipper
-å lete etter og treffe en knapp for hver eneste oppgave. Vil han videre før tiden
-er ute, virker et trykk på knappen fortsatt, og hopper rett forbi resten av
-nedtellingen.
+**Nedtellingen etter hvert svar** teller ned fra 3 til 0 og går videre av seg
+selv — det finnes ingen knapp å lete etter og treffe for hver eneste oppgave.
+Badgen er ikke trykkbar; de tre sekundene kan ikke hoppes over, med vilje —
+han skal aldri kunne trykke seg forbi en oppgave ved et uhell.
 
 **Høyttalerknappen i toppen** slår stemmen av og på med ett trykk. Vil dere lese
 bokstavene selv i stedet for å høre spillets egen stemme, er det den knappen

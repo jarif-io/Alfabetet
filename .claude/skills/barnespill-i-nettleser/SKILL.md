@@ -79,14 +79,19 @@ tydelig slutt og spillet foreslår aldri «en runde til».
 først et trykk for hver eneste oppgave – helt til forelderen meldte at et
 barn på tre trykker feil knapp oftere enn det finner riktig, og at *å måtte
 lete etter og treffe knappen* var friksjonen, ikke noe han trengte for å
-styre tempoet sitt. Knappen teller nå ned fra 3 til 0 (en ring som tømmes,
-tallet i midten) og går videre av seg selv, i alle moduser og i
-Alfabetløypa – men bare *etter* at noe har skjedd (et riktig svar, et steg
-lest ferdig), aldri før. Et trykk på knappen mens den teller hopper fortsatt
-rett forbi resten av den. Lærdommen: «ingen automatikk» er et virkemiddel
-for roen, ikke målet i seg selv – endrer den faktiske bruken hva som skaper
-uro, endre virkemiddelet, men behold alltid muligheten til at barnet kan gå
-fortere enn maskinen.
+styre tempoet sitt. Knappen ble først erstattet av en nedtelling som fortsatt
+kunne trykkes for å hoppe forbi resten av den – men det viste seg å være
+samme problem i ny drakt: et barn som ikke leser trykker på alt som ser ut
+som noe å trykke på, og da forsvinner oppgaven under fingeren hans akkurat
+som knappen gjorde. Løsningen ble å fjerne trykkbarheten helt: en ring som
+tømmes og et tall i midten (ikke en knapp, `aria-hidden`, ingen klikk-
+håndtering), som teller ned fra 3 til 0 og går videre av seg selv, i alle
+moduser og i Alfabetløypa – men bare *etter* at noe har skjedd (et riktig
+svar, et steg lest ferdig), aldri før, og uten at noe trykk kan korte den
+ned. Lærdommen: «ingen automatikk» er et virkemiddel for roen, ikke målet i
+seg selv – men det samme gjelder «barnet kan alltid gå fortere» når selve
+det å kunne trykke er kilden til uroen. Da er riktig svar å ta bort
+trykkflaten, ikke å beholde en snarvei ingen treåring bruker riktig.
 
 **Mestring, ikke belønningsdryss.** Framgangen skal være synlig og ekte
 (bokstaver som samles på en vegg over uker), vanskegraden skal stige merkbart

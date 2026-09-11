@@ -658,11 +658,12 @@ var Figurer = (function () {
       '</svg>'
   };
 
-  /* Nedtellingen i «Videre»-knappen, i stedet for pila: en ring som tømmes
+  /* Badgen som erstattet «Videre»-knappen og pila i den: en ring som tømmes
    * etter hvert som tiden går, med tallet som står igjen midt i – samme idé
-   * som et lite stoppeklokke-ur. Bygges én gang når nedtellingen starter;
-   * js/moduser.js oppdaterer så bare ringen og tallteksten videre for hvert
-   * sekund, slik at CSS-overgangen på ringen får noe å animere fra og til. */
+   * som et lite stoppeklokke-ur. Ikke en knapp, ikke trykkbar. Bygges én
+   * gang når nedtellingen starter; js/moduser.js oppdaterer så bare ringen
+   * og tallteksten videre for hvert sekund, slik at CSS-overgangen på ringen
+   * får noe å animere fra og til. */
   var NEDTELLING_OMKRETS = 2 * Math.PI * 15;
   function nedtelling(n) {
     return '<svg viewBox="0 0 38 38" aria-hidden="true">' +
