@@ -9,6 +9,12 @@
 </head>
 <body>
 
+<!-- For skjermlesere: nedtellingen selv er aria-hidden (den skal ikke lese
+     opp «3, 2, 1» hvert sekund), men et enkelt varsel når den starter er
+     bedre enn at skjermen bare bytter innhold uten forvarsel. Se
+     js/moduser.js sin nedtelling(). -->
+<div class="skjult-visuelt" id="nedtelling-kunngjoring" aria-live="polite"></div>
+
 <!-- Scenen ligger bakerst og bytter når man bytter verden.
      Den er stille: skyene driver så sakte at det knapt merkes. -->
 <div id="scene" aria-hidden="true">

@@ -111,11 +111,19 @@ var Moduser = (function () {
    * unikt for hver runde med tallet; returnerer en avbryter som MÅ kalles
    * før noe annet skjer med den samme badgen (en ny oppgave, eller at runden
    * forlates) – ellers kan et gammelt tikk komme og gå videre et sted han
-   * ikke lenger er. */
+   * ikke lenger er.
+   *
+   * Badgen er selv aria-hidden – den skal ikke lese opp «3, 2, 1» hvert
+   * sekund. En som bruker skjermleser skal likevel ikke oppleve at skjermen
+   * bare bytter innhold uten forvarsel (slik den gamle, fokuserbare
+   * «Videre»-knappen ga et varsel gjennom fokus), så ett varsel går ut idet
+   * nedtellingen starter – ikke ett per tikk. */
   var NEDTELLING_START = 3;
   function nedtelling(ikonEl, handler) {
     var n = NEDTELLING_START;
     ikonEl.innerHTML = Figurer.nedtelling(n);
+    var kunngjoring = el('nedtelling-kunngjoring');
+    if (kunngjoring) kunngjoring.textContent = 'Går videre om ' + n + ' sekunder.';
     var ring = ikonEl.querySelector('.nedtelling-ring');
     var tekst = ikonEl.querySelector('.nedtelling-tall');
     var timer = window.setTimeout(function tikk() {
