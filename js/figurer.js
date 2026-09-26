@@ -548,12 +548,15 @@ var Figurer = (function () {
   var IKONER = {
     /* Et hus: veien hjem til menyen i verdenen. */
     hjem:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<path d="M6 22L24 8l18 14v16a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="var(--aksent)"/>' +
-        '<rect x="13" y="24" width="22" height="17" rx="2" fill="#fffdf8"/>' +
-        '<g stroke="var(--aksent-mork)" stroke-width="2.6" stroke-linecap="round">' +
-          '<path d="M16 29h16M16 34h16"/>' +
-        '</g>' +
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M4 15L16 5l12 10v11a2 2 0 0 1-2 2h-6v-8h-8v8H6a2 2 0 0 1-2-2z" fill="currentColor"/>' +
+      '</svg>',
+    /* En pil rundt: én gang til. */
+    igjen:
+      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M26 16a10 10 0 1 1-2.9-7.1" fill="none" stroke="currentColor"' +
+          ' stroke-width="3.6" stroke-linecap="round"/>' +
+        '<path d="M27.5 3.5v9h-9z" fill="currentColor"/>' +
       '</svg>',
     malflagg:
       '<svg viewBox="0 0 32 32" aria-hidden="true">' +

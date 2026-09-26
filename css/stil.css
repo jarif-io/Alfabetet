@@ -26,7 +26,7 @@
   --rute: 96px;      /* bokstavrutene i Garasjen/Skattekartet */
 
   /* Nøytral scene – brukes på start- og verdensskjermen */
-  --himmel-topp: #b7e0f2;
+  --himmel-topp: #9bd6f0;
   --himmel-bunn: #ffe7c9;
   --sol: rgba(255, 236, 190, .85);
   --as-fjern: #c2dcc6;
@@ -64,7 +64,7 @@
 
 /* Racerbanen: ettermiddagshimmel over asfalt. */
 body[data-verden="bane"] {
-  --himmel-topp: #8fcdea;
+  --himmel-topp: #6cc0ec;
   --himmel-bunn: #ffdcae;
   --sol: rgba(255, 226, 168, .9);
   --as-fjern: #b6d3ba;
@@ -81,7 +81,7 @@ body[data-verden="bane"] {
 
 /* Sjørøverøya: gullhimmel over dypt vann. */
 body[data-verden="oy"] {
-  --himmel-topp: #9fd8e8;
+  --himmel-topp: #74cde6;
   --himmel-bunn: #ffe3b0;
   --sol: rgba(255, 233, 178, .95);
   --as-fjern: #a9c9cf;
@@ -99,7 +99,7 @@ body[data-verden="oy"] {
 /* Dinodalen: frodig grønt under en varm urtidshimmel. Aksenten er grønn, så
    barnet ser med én gang at han er et annet sted enn på racerbanen. */
 body[data-verden="dino"] {
-  --himmel-topp: #9ad9de;
+  --himmel-topp: #78d0d4;
   --himmel-bunn: #ffd9a8;
   --sol: rgba(255, 226, 168, .9);
   --as-fjern: #a8c9b0;
@@ -371,7 +371,9 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   white-space: nowrap;
 }
 
-.topp-hoyre { display: flex; align-items: center; gap: 10px; position: relative; }
+/* margin-left: auto holder gruppa i høyre hjørne også på telefon, der
+   midtfeltet er borte – uten den havnet lyd og tannhjul midt på. */
+.topp-hoyre { display: flex; align-items: center; gap: 10px; position: relative; margin-left: auto; }
 
 /* Minst 44×44 – Apples egen grense for hva en finger treffer, og en treårs
    finger sikter dårligere enn en voksen. Knappene i toppen lå på 36–42 og
@@ -478,15 +480,6 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   line-height: 1.2;
   text-shadow: 0 1px 1px rgba(0, 0, 0, .22);
 }
-.knapp::before {
-  content: "";
-  position: absolute;
-  inset: 3px 12px auto;
-  height: 38%;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, .32), rgba(255, 255, 255, 0));
-  pointer-events: none;
-}
 .knapp:hover { filter: brightness(1.06); transform: scale(1.03); }
 .knapp:active {
   transform: translateY(4px) scale(.97);
@@ -536,7 +529,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
    egen regel for [hidden], og da blir knappen stående synlig selv om koden
    tror den er skjult. Disse to må derfor sies eksplisitt. */
 .knapp[hidden], .lyttknapp[hidden] { display: none; }
-.knapp--liten { font-size: .95rem; padding: 11px 20px 9px; }
+.knapp--liten { font-size: .95rem; padding: 11px 20px 9px; min-height: 44px; }
 
 .knapp--flat {
   background: rgba(255, 253, 248, .9);
@@ -544,14 +537,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   box-shadow: 0 3px 0 var(--kant), var(--sk-1);
 }
 .knapp--flat:hover { color: var(--blekk); }
-.knapp--flat::before { display: none; }
 
 .knapp--fare {
   background: rgba(255, 253, 248, .9);
   color: #b03a2b;
   box-shadow: inset 0 0 0 2px rgba(176, 58, 43, .35);
 }
-.knapp--fare::before { display: none; }
 
 /* Knapp som må holdes inne. Fyllingen viser den voksne at noe skjer, og at
    det tar tid – en dialogboks er bare ett trykk til for et barn som uansett
@@ -574,6 +565,12 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .knapp--hold.holder .hold-fyll { width: 100%; transition: width 2s linear; }
 
 .knapperad { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+/* Knapp med et symbol i stedet for et ord. */
+.knapp--ikon { display: inline-flex; align-items: center; justify-content: center; padding: 14px 40px 12px; }
+.knapp--ikon .knapp-ikon svg { width: 42px; height: 42px; display: block; }
+.knapp--ikon.knapp--flat { padding: 12px 20px 10px; }
+.knapp--ikon.knapp--flat .knapp-ikon svg { width: 30px; height: 30px; }
 
 .lyttknapp {
   font-family: var(--font-ui);
@@ -862,6 +859,9 @@ body.bevegelse .kartsted--oy .kartsted-figur {
      trengs; derfor krymper flisene på små skjermer lenger nede. */
   min-height: 0;
   overflow-y: auto;
+  /* Luft til skyggene: et rullefelt klipper det som stikker ut, og da sto
+     det et blekt rektangel bak flisene. */
+  padding: 18px 30px 36px;
 }
 
 .flis {
@@ -1177,7 +1177,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   color: var(--aksent);
   background: rgba(255, 253, 248, .96);
   text-shadow: none;
-  box-shadow: inset 0 0 0 5px var(--aksent), var(--sk-2);
+  box-shadow: inset 0 0 0 4px var(--aksent), var(--sk-2);
 }
 .oppdrag-mal--bokstav.skjult:hover { transform: translateY(-3px); }
 .oppdrag-mal--bokstav.skjult:active { transform: translateY(1px) scale(.98); }
@@ -1228,7 +1228,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
 }
 .navnrute.na {
   background: rgba(255, 253, 248, .96);
-  box-shadow: inset 0 0 0 5px var(--aksent), var(--sk-2);
+  box-shadow: inset 0 0 0 4px var(--aksent), var(--sk-2);
 }
 .oppdrag-mal--navn:hover .navnrute.na { transform: translateY(-3px); }
 .oppdrag-mal--navn:active .navnrute.na { transform: translateY(1px) scale(.98); }
@@ -1258,7 +1258,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   border-radius: 24px;
   color: var(--blekk);
   background: var(--flate);
-  box-shadow: inset 0 0 0 6px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2);
+  box-shadow: inset 0 0 0 4px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2);
   position: relative;
   transition: transform 140ms ease, box-shadow 140ms ease, background var(--mykt), color var(--mykt);
   animation: skilt-opp 380ms cubic-bezier(.2, .9, .3, 1) backwards;
@@ -1289,7 +1289,7 @@ body[data-verden="oy"] .skilt::after {
 .skilt.riktig {
   background: var(--god-svak);
   color: var(--god-mork);
-  box-shadow: inset 0 0 0 6px var(--god), 0 5px 0 var(--god-mork), var(--sk-3);
+  box-shadow: inset 0 0 0 4px var(--god), 0 5px 0 var(--god-mork), var(--sk-3);
   animation: sprett 560ms cubic-bezier(.3, 1.5, .45, 1) forwards;
 }
 @keyframes sprett {
@@ -1302,7 +1302,7 @@ body[data-verden="oy"] .skilt::after {
 .skilt.feil {
   background: var(--flate-2);
   color: rgba(35, 38, 45, .32);
-  box-shadow: inset 0 0 0 6px rgba(35, 38, 45, .13), 0 3px 0 rgba(40, 30, 15, .1);
+  box-shadow: inset 0 0 0 4px rgba(35, 38, 45, .13), 0 3px 0 rgba(40, 30, 15, .1);
   opacity: .62;
 }
 /* Skiltene han aldri rørte, når spillet peker på svaret. De skal tre i
@@ -1329,7 +1329,7 @@ body[data-verden="oy"] .skilt::after {
   z-index: 2;
 }
 @keyframes pek {
-  0%, 100% { box-shadow: inset 0 0 0 6px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2); }
+  0%, 100% { box-shadow: inset 0 0 0 4px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2); }
   50% { box-shadow: inset 0 0 0 8px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), 0 0 0 12px var(--aksent-svak), var(--sk-2); }
 }
 
@@ -1806,7 +1806,7 @@ body[data-verden="oy"] .skilt::after {
   border: none;
   background: var(--flate-2);
   color: var(--blekk-svak);
-  width: 38px; height: 38px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   font-size: 1.5rem;
   line-height: 1;
@@ -2083,6 +2083,15 @@ body[data-verden="oy"] .skilt::after {
   .ordkort-ikon { font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; }
   .ordkort-innhold { gap: 10px; }
   .ordkort-ord { font-size: 1.15rem; }
+  /* I løypa er kortet alene på skjermen. Der skal bokstaven og bildet være
+     store, som i en alfabetbok – ikke krympet som over rutenettet i
+     Garasjen, der 29 ruter trenger plassen. */
+  .loype-kort { flex-direction: column; padding: 18px 14px 14px; gap: 12px; }
+  .loype-kort .ordkort-innhold { flex-direction: column; gap: 10px; }
+  .loype-kort .ordkort-bokstav { font-size: 4.4rem; width: 108px; height: 108px; border-radius: 26px; }
+  .loype-kort .ordkort-ikon:not(.mengde) { font-size: 3.6rem; width: 104px; height: 104px; border-radius: 24px; }
+  .loype-kort .ordkort-ikon.mengde { --ting: 34px; }
+  .loype-kort .ordkort-ord { font-size: 1.8rem; }
   .lytt-tekst { display: none; }
   .lyttknapp { padding: 9px 11px; }
 
@@ -2125,7 +2134,7 @@ body[data-verden="oy"] .skilt::after {
      sin, finner den ikke. Bildet er det han navigerer etter, så det blir med
      også her – bare mindre. Kortene ligger i to kolonner, som er nok til at
      alle modusene er synlige uten å rulle. */
-  .menyrad { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; }
+  .menyrad { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; padding: 10px 12px 24px; }
   .flis { padding: 9px 8px 10px; gap: 6px; border-radius: 20px; }
   .flis-navn { font-size: .98rem; }
   .flis-bilde { padding: 4px; border-radius: 13px; }
@@ -2206,7 +2215,7 @@ body[data-verden="oy"] .skilt::after {
      stort merke og en rad skilt. Merket er fortsatt større enn skiltene –
      hierarkiet står – men begge krymper så de ikke møtes. */
   .oppdrag-mal--bokstav { width: 70px; height: 70px; font-size: 2.7rem; border-radius: 17px; }
-  .oppdrag-mal--tell { --ting: 42px; --ting-gap: 5px; padding: 6px 9px; }
+  .oppdrag-mal--tell { --ting: 44px; --ting-gap: 5px; padding: 6px 9px; }
   .oppdrag-mal--tell .ting.talt::after { width: 18px; height: 18px; font-size: .72rem; right: -3px; top: -3px; }
   .ordkort-ikon.mengde { --ting: 20px; min-width: 46px; min-height: 46px; padding: 4px; }
   .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }

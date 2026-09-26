@@ -174,11 +174,17 @@
       <div class="oppsum-stjerner" id="oppsum-stjerner" aria-hidden="true"></div>
       <div class="oppsum-brikker" id="oppsum-brikker"></div>
       <div class="oppsum-ny" id="oppsum-ny" hidden></div>
-      <p class="oppsum-tekst" id="oppsum-tekst"></p>
+      <!-- Symboler, ikke ord – han kan ikke lese «Tilbake». Huset fører hjem
+           til menyen og er hovedvalget; pila rundt er en runde til, noe han
+           kan velge selv, men som spillet aldri foreslår. -->
       <div class="knapperad">
-        <button class="knapp" id="oppsum-igjen" type="button"><span>En runde til</span></button>
-        <button class="knapp knapp--flat" id="oppsum-tilbake" type="button">Tilbake</button>
+        <button class="knapp knapp--ikon" id="oppsum-tilbake" type="button"
+                aria-label="Tilbake til menyen"><span class="knapp-ikon" aria-hidden="true"></span></button>
+        <button class="knapp knapp--flat knapp--ikon" id="oppsum-igjen" type="button"
+                aria-label="En runde til"><span class="knapp-ikon" aria-hidden="true"></span></button>
       </div>
+      <!-- Til den voksne som sitter ved siden av. -->
+      <p class="oppsum-tekst" id="oppsum-tekst"></p>
     </div>
   </section>
 

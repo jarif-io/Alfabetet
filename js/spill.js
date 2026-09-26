@@ -649,6 +649,8 @@ var Spill = (function () {
     for (var i = 0; i < lyttIkoner.length; i++) {
       lyttIkoner[i].innerHTML = Figurer.ikon('stemmePa');
     }
+    el('oppsum-tilbake').querySelector('.knapp-ikon').innerHTML = Figurer.ikon('hjem');
+    el('oppsum-igjen').querySelector('.knapp-ikon').innerHTML = Figurer.ikon('igjen');
 
     pa('tilbake', 'click', function () {
       Lyd.klikk();
