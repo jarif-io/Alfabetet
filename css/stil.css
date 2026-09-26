@@ -1570,8 +1570,9 @@ body[data-verden="oy"] .skilt::after {
 
 /* Bilene krenger bakover når de setter fart, og nikker når de bremser. */
 .figur.kjorer .fig--bil, .figur.kjorer .fig--taue { animation: krenge 1000ms ease-out; }
-/* Kroken på tauebilen henger i wiren og svinger når den kjører. */
-.krok { transform-box: view-box; transform-origin: 20px 22px; }
+/* Kroken på tauebilen henger i wiren og svinger når den kjører – rundt
+   trinsa, som er origo i planet kroken er tegnet i (se tauebil). */
+.krok { transform-box: view-box; transform-origin: 0 0; }
 .figur.kjorer .krok { animation: sving 1000ms ease-in-out; }
 @keyframes sving {
   0%, 100% { transform: none; }

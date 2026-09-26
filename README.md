@@ -416,6 +416,11 @@ tegnet for dette spillet, i samme ånd, og barnet gir dem navn selv. Vil han at
 tauebilen skal hete Taue-Bill, kan dere skrive det inn under **For voksne** –
 rosen sies da uten navnet, siden det ikke ligger i språkpakken.
 
+Bilene er bygget som enkle 3D-former – en sideprofil trukket ut i bredden – og
+tegnet fra ett og samme kamera, litt forfra og ovenfra. Da stemmer vinklene på
+siden, panseret, ruta, lyktene og hjulene med hverandre, og hjulene ruller i sitt
+eget plan. Skipet og dinosauren er tegnet rett fra siden.
+
 ## Filene
 
 ```
@@ -423,7 +428,7 @@ index.html        hele skjermen: scenen, de ni skjermbildene og foreldremenyen
 css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
 js/data.js        bokstavene, tallene, ordene og de tre verdenene  ← denne kan dere endre
-js/figurer.js     bil, skip, dinosaur, landskap og forsidekartet, tegnet som SVG
+js/figurer.js     bilene, skipet, dinosauren, landskap og forsidekartet, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        spiller spillets egen stemme via Lydbank
 js/lyd.js         lydeffekter, laget av nettleseren selv

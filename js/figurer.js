@@ -24,7 +24,7 @@ var Figurer = (function () {
    * stil 'prikk': mørke prikkøyne med et lysglimt, for dyr og folk.
    * oyne: [[x, y, r], …]. munn: path-data for hvert uttrykk; den glade er
    * lukket (z) og fylles, som en åpen munn. */
-  function ansikt(stil, oyne, munn) {
+  function ansikt(stil, oyne, munn, oyePlan, munnPlan) {
     var stor = stil === 'stor';
     var sw = stor ? 2.2 : 1.7;
     function n(v) { return +v.toFixed(1); }
@@ -65,13 +65,19 @@ var Figurer = (function () {
         '" stroke-linecap="round" stroke-linejoin="round"/>';
     }
 
+    /* Øynene og munnen kan ligge i hvert sitt plan (frontruta og
+     * støtfangeren på bilene) – da får de hver sin matrise, se lag3d. */
+    function i(plan, innhold) {
+      return plan ? '<g transform="' + plan + '">' + innhold + '</g>' : innhold;
+    }
+    var glad = '<path d="' + munn.glad + '" fill="#7a2a22" stroke="#23262d" stroke-width="' + sw +
+      '" stroke-linejoin="round"/>';
+
     return '<g class="ansikt">' +
-      '<g class="u-vanlig">' + apne(0.25, 0.1) + strek(munn.vanlig) + '</g>' +
-      '<g class="u-glad">' + buer(true) +
-        '<path d="' + munn.glad + '" fill="#7a2a22" stroke="#23262d" stroke-width="' + sw +
-        '" stroke-linejoin="round"/></g>' +
-      '<g class="u-hmm">' + apne(-0.15, 0.35) + bryn() + strek(munn.hmm) + '</g>' +
-      '<g class="u-trott">' + buer(false) + strek(munn.trott) + '</g>' +
+      '<g class="u-vanlig">' + i(oyePlan, apne(0.25, 0.1)) + i(munnPlan, strek(munn.vanlig)) + '</g>' +
+      '<g class="u-glad">' + i(oyePlan, buer(true)) + i(munnPlan, glad) + '</g>' +
+      '<g class="u-hmm">' + i(oyePlan, apne(-0.15, 0.35) + bryn()) + i(munnPlan, strek(munn.hmm)) + '</g>' +
+      '<g class="u-trott">' + i(oyePlan, buer(false)) + i(munnPlan, strek(munn.trott)) + '</g>' +
     '</g>';
   }
 
@@ -88,114 +94,230 @@ var Figurer = (function () {
       }).join('');
   }
 
-  /* Et hjul sett litt på skrå. Eikene og dekkmønsteret roterer i den indre
-   * gruppa (.hjul, se «rull» i stil.css), og den ytre gruppa klemmer det hele
-   * sammen sidelengs – da ser det ut som et hjul som ruller mot oss, ikke en
-   * flat skive. Den mørke kanten bak er dekkets tykkelse. */
-  function hjul(cx, cy, r, klasse, sx) {
-    sx = sx || 1;
-    function n(v) { return +v.toFixed(1); }
-    return '<g transform="translate(' + cx + ' ' + cy + ') scale(' + sx + ' 1)">' +
-      '<circle cx="' + n(-r * 0.3) + '" r="' + r + '" fill="#111317"/>' +
-      '<g class="hjul ' + klasse + '">' +
+  /* ---------- en liten 3D-tegner for bilene ----------
+   *
+   * Bilene er bygget som enkle 3D-former – en sideprofil trukket ut i
+   * bredden, som en kakeform – og tegnet fra ett og samme kamera. Da stemmer
+   * vinklene på alle delene med hverandre av seg selv: siden, panseret,
+   * ruta, lyktene, hjulene og skyggen ses fra nøyaktig samme sted. Tegnet for
+   * hånd fikk hver del sin egen vinkel.
+   *
+   * Kameraet står litt foran til høyre og litt over. Det er ortografisk (uten
+   * forsvinningspunkt), så et plan i 3D blir en ren SVG-matrise – derfor kan
+   * øyne, munn og hjul tegnes flatt i sitt eget plan og legges på plass, og
+   * hjulene ruller i sitt eget plan, ikke i skjermens.
+   *
+   * Koordinater: x langs bilen (fram er +x), y opp, z ut mot oss (nærsiden). */
+  var KAMERA = (function () {
+    var yaw = 32 * Math.PI / 180, pitch = 13 * Math.PI / 180;
+    var st = Math.sin(yaw), ct = Math.cos(yaw), sp = Math.sin(pitch), cp = Math.cos(pitch);
+    return {
+      h: [ct, 0, -st],              /* skjermens høyre */
+      o: [-st * sp, cp, -ct * sp],  /* skjermens opp */
+      mot: [st * cp, sp, ct * cp]   /* mot kameraet */
+    };
+  })();
+  /* Lyset kommer ovenfra, litt fra venstre og forfra. */
+  var LYS = [-0.33, 0.83, 0.45];
+  function prikk(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function r1(v) { return +v.toFixed(1); }
+
+  /* En tegner for én figur. boks = [[x0,y0,z0],[x1,y1,z1]] rundt figuren;
+   * den plasseres midt i bredden, med det laveste punktet på bunn. */
+  function lag3d(boks, bredde, bunn) {
+    var hjorner = [];
+    [0, 1].forEach(function (a) { [0, 1].forEach(function (b) { [0, 1].forEach(function (c) {
+      hjorner.push([boks[a][0], boks[b][1], boks[c][2]]);
+    }); }); });
+    var xs = hjorner.map(function (p) { return prikk(p, KAMERA.h); });
+    var ys = hjorner.map(function (p) { return -prikk(p, KAMERA.o); });
+    var ox = (bredde - (Math.max.apply(null, xs) - Math.min.apply(null, xs))) / 2 - Math.min.apply(null, xs);
+    var oy = bunn - Math.max.apply(null, ys);
+
+    function p2(p) { return [ox + prikk(p, KAMERA.h), oy - prikk(p, KAMERA.o)]; }
+    function sti(punkter) {
+      return 'M' + punkter.map(function (p) { var q = p2(p); return r1(q[0]) + ' ' + r1(q[1]); })
+        .join('L') + 'Z';
+    }
+    /* En flate får farge etter hvor mye den vender mot lyset. */
+    function skygge(hex, normal) {
+      var k = 0.6 + 0.45 * Math.max(0, prikk(normal, LYS));
+      var v = parseInt(hex.slice(1), 16);
+      return 'rgb(' + [v >> 16, (v >> 8) & 255, v & 255].map(function (c) {
+        return Math.min(255, Math.round(c * k));
+      }).join(',') + ')';
+    }
+    /* En profil (mot klokka, y opp) trukket ut fra z0 til z1. Kantflatene
+     * som vender mot kameraet tegnes bakerst først, så nærsiden over. */
+    function uttrukket(profil, z0, z1, farge, nerFyll) {
+      var flater = [];
+      profil.forEach(function (a, i) {
+        var b = profil[(i + 1) % profil.length];
+        var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.sqrt(dx * dx + dy * dy);
+        var nrm = [dy / l, -dx / l, 0];
+        if (prikk(nrm, KAMERA.mot) <= 0.01) return;
+        var q = [[a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], z1], [a[0], a[1], z1]];
+        flater.push({ d: sti(q), dybde: prikk(q[0], KAMERA.mot) + prikk(q[2], KAMERA.mot),
+                      fyll: skygge(farge, nrm) });
+      });
+      flater.sort(function (x, y) { return x.dybde - y.dybde; });
+      return flater.map(function (f) {
+        /* streken i samme farge tetter hårfine sprekker mellom flatene */
+        return '<path d="' + f.d + '" fill="' + f.fyll + '" stroke="' + f.fyll + '" stroke-width=".6" stroke-linejoin="round"/>';
+      }).join('') +
+        '<path d="' + sti(profil.map(function (p) { return [p[0], p[1], z1]; })) +
+        '" fill="' + (nerFyll || skygge(farge, [0, 0, 1])) + '"/>';
+    }
+    /* Et plan som SVG-matrise: origo O, lokal x langs A, lokal y langs B. */
+    function plan(O, A, B) {
+      var o = p2(O);
+      return 'matrix(' + [prikk(A, KAMERA.h), -prikk(A, KAMERA.o),
+                          prikk(B, KAMERA.h), -prikk(B, KAMERA.o), o[0], o[1]]
+        .map(function (v) { return +v.toFixed(3); }).join(' ') + ')';
+    }
+    /* Et punkt på en kant, t fra 0 (a) til 1 (b). */
+    function langs(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
+    /* Planet til en kant i profilen, med lokal x på tvers av bilen (mot
+     * høyre på skjermen) og lokal y nedover kanten fra b mot a. */
+    function kantplan(a, b, t, z) {
+      var p = langs(a, b, t), dx = a[0] - b[0], dy = a[1] - b[1], l = Math.sqrt(dx * dx + dy * dy);
+      return plan([p[0], p[1], z || 0], [0, 0, -1], [dx / l, dy / l, 0]);
+    }
+    /* Sidens plan i dybden z, med origo i (x, y) og lokal y nedover. */
+    function side(x, y, z) { return plan([x, y, z], [1, 0, 0], [0, -1, 0]); }
+    /* Et hjul i sidens plan (z), med dekkets tykkelse innover. */
+    function hjul(x, y, z, r, klasse, tykk) {
+      return '<g transform="' + side(x, y, z - (tykk || 6)) + '"><circle r="' + r + '" fill="#111317"/></g>' +
+        '<g transform="' + side(x, y, z) + '">' + hjulInnmat(r, klasse) + '</g>';
+    }
+    /* Hjulbuen: en halvsirkel over hjulet, ned til underkanten (ned under
+     * navet) av karosseriet. */
+    function hjulbue(x, y, z, r, ned) {
+      return '<path transform="' + side(x, y, z) + '" d="M' + -r + ' ' + ned + 'V0A' + r + ' ' + r +
+        ' 0 0 1 ' + r + ' 0V' + ned + 'Z" fill="#3b0b05" fill-opacity=".85"/>';
+    }
+    /* Runder av hjørnene i en profil (Chaikin): hver kant beholder midten
+     * sin, så planene til lykter og ruter ligger der de lå. */
+    function rund(profil) {
+      return [].concat.apply([], profil.map(function (a, i) {
+        var b = profil[(i + 1) % profil.length];
+        return [[a[0] * .75 + b[0] * .25, a[1] * .75 + b[1] * .25],
+                [a[0] * .25 + b[0] * .75, a[1] * .25 + b[1] * .75]];
+      }));
+    }
+    return { sti: sti, uttrukket: uttrukket, plan: plan, langs: langs, side: side, rund: rund,
+             kantplan: kantplan, hjul: hjul, hjulbue: hjulbue };
+  }
+
+  /* Hjulet flatt, med sentrum i origo: eikene og dekkmønsteret roterer i den
+   * indre gruppa (.hjul, se «rull» i stil.css). Glimtet i dekket roterer ikke. */
+  function hjulInnmat(r, klasse) {
+    return '<g class="hjul ' + klasse + '">' +
         '<circle r="' + r + '" fill="#262a31"/>' +
-        '<circle r="' + n(r - 2.4) + '" fill="none" stroke="#3b4048" stroke-width="3.2" stroke-dasharray="3.2 2.6"/>' +
-        '<circle r="' + n(r * 0.6) + '" fill="#eef0f3"/>' +
-        '<circle r="' + n(r * 0.48) + '" fill="#b9bfc7"/>' +
+        '<circle r="' + r1(r - 2.4) + '" fill="none" stroke="#3b4048" stroke-width="3.2" stroke-dasharray="3.2 2.6"/>' +
+        '<circle r="' + r1(r * 0.6) + '" fill="#eef0f3"/>' +
+        '<circle r="' + r1(r * 0.48) + '" fill="#b9bfc7"/>' +
         '<g stroke="#eef0f3" stroke-width="3" stroke-linecap="round">' +
-          '<path d="M0 ' + n(-r * 0.46) + 'V' + n(r * 0.46) + '"/>' +
-          '<path d="M' + n(-r * 0.4) + ' ' + n(-r * 0.23) + 'L' + n(r * 0.4) + ' ' + n(r * 0.23) + '"/>' +
-          '<path d="M' + n(-r * 0.4) + ' ' + n(r * 0.23) + 'L' + n(r * 0.4) + ' ' + n(-r * 0.23) + '"/>' +
+          '<path d="M0 ' + r1(-r * 0.46) + 'V' + r1(r * 0.46) + '"/>' +
+          '<path d="M' + r1(-r * 0.4) + ' ' + r1(-r * 0.23) + 'L' + r1(r * 0.4) + ' ' + r1(r * 0.23) + '"/>' +
+          '<path d="M' + r1(-r * 0.4) + ' ' + r1(r * 0.23) + 'L' + r1(r * 0.4) + ' ' + r1(-r * 0.23) + '"/>' +
         '</g>' +
-        '<circle r="' + n(r * 0.16) + '" fill="#6d747e"/>' +
+        '<circle r="' + r1(r * 0.16) + '" fill="#6d747e"/>' +
       '</g>' +
-      /* lyset glimter i dekket oppe til venstre – det roterer ikke */
-      '<path d="M' + n(-r * 0.72) + ' ' + n(-r * 0.4) + 'A' + r + ' ' + r + ' 0 0 1 ' + n(-r * 0.2) + ' ' + n(-r * 0.86) +
-        '" stroke="rgba(255,255,255,.22)" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
-    '</g>';
+      '<path d="M' + r1(-r * 0.72) + ' ' + r1(-r * 0.4) + 'A' + r + ' ' + r + ' 0 0 1 ' +
+        r1(-r * 0.2) + ' ' + r1(-r * 0.86) +
+        '" stroke="rgba(255,255,255,.22)" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+  }
+
+  /* Myk skygge på bakken (y = 0), i samme perspektiv som resten. */
+  function bakkeskygge3d(t, lengde, bredde) {
+    var g = unik('skygge');
+    return '<defs><radialGradient id="' + g + '" cx=".5" cy=".5" r=".5">' +
+        '<stop offset="0" stop-color="#000" stop-opacity=".38"/>' +
+        '<stop offset=".7" stop-color="#000" stop-opacity=".16"/>' +
+        '<stop offset="1" stop-color="#000" stop-opacity="0"/>' +
+      '</radialGradient></defs>' +
+      '<g transform="' + t.plan([0, 0, 0], [1, 0, 0], [0, 0, 1]) + '">' +
+        '<ellipse class="fig-skygge" rx="' + lengde + '" ry="' + bredde + '" fill="url(#' + g + ')"/></g>';
   }
 
   /* ---------- racerbilen ---------- */
 
-  /* Vår egen racerbil: rød, med lynmerke og øyne i frontruta, sett litt på
-   * skrå forfra – siden, panseret og fronten med lykter og munn. I samme ånd
-   * som bilfilmene, men ingen andres figur – barnet gir den navn selv.
-   * Lyset kommer ovenfra og litt fra venstre: toppflatene er lysest, siden
-   * er mellomtone og fronten litt mørkere, og nederst ligger en skygge. */
+  /* Vår egen racerbil: rød, med lynmerke og øyne i frontruta. I samme ånd
+   * som bilfilmene, men ingen andres figur – barnet gir den navn selv. */
   function bil() {
-    var gSide = unik('side'), gFront = unik('front'), gTopp = unik('topp'),
-        gGlass = unik('glass'), gGlans = unik('glans');
+    var gSide = unik('side'), gGlass = unik('glass');
+    var t = lag3d([[-97, 0, -34], [99, 62, 34]], 200, 100);
+    /* Sideprofilene, mot klokka med y opp: underdelen og kupeen. */
+    var kropp = [[-90, 8], [84, 8], [93, 14], [96, 24], [92, 32], [64, 36], [38, 38],
+                 [-60, 40], [-86, 38], [-94, 28], [-95, 16]];
+    var kupe = [[-58, 38], [38, 37], [14, 58], [-28, 60], [-48, 52]];
+    var W = 31, K = 24;
+    /* frontruta: kanten fra panseret opp til taket */
+    var ruteA = [38, 37], ruteB = [14, 58];
+    function rute(a, b, t0, t1, z) {
+      var p = t.langs(a, b, t0), q = t.langs(a, b, t1);
+      return t.sti([[p[0], p[1], -z], [q[0], q[1], -z], [q[0], q[1], z], [p[0], p[1], z]]);
+    }
     return '' +
     '<svg class="fig fig--bil" viewBox="0 0 200 104" role="img" aria-label="Racerbil">' +
       '<defs>' +
         '<linearGradient id="' + gSide + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#ff6b5b"/><stop offset=".45" stop-color="#e2382b"/>' +
-          '<stop offset=".85" stop-color="#a51f10"/><stop offset="1" stop-color="#7d170b"/>' +
+          '<stop offset="0" stop-color="#ff6a5a"/><stop offset=".5" stop-color="#df3528"/>' +
+          '<stop offset="1" stop-color="#8f1a0d"/>' +
         '</linearGradient>' +
-        '<linearGradient id="' + gFront + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#e5392c"/><stop offset="1" stop-color="#8e1a0d"/>' +
-        '</linearGradient>' +
-        '<linearGradient id="' + gTopp + '" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0" stop-color="#ff8a7c"/><stop offset="1" stop-color="#e8412f"/>' +
-        '</linearGradient>' +
-        /* Himmelen speiler seg i rutene: lys øverst, et mørkere horisontbånd. */
         '<linearGradient id="' + gGlass + '" x1="0" y1="0" x2="0" y2="1">' +
           '<stop offset="0" stop-color="#f2fbff"/><stop offset=".5" stop-color="#aad6ee"/>' +
           '<stop offset=".58" stop-color="#6f9fbf"/><stop offset="1" stop-color="#a9d2ea"/>' +
         '</linearGradient>' +
-        '<radialGradient id="' + gGlans + '" cx=".5" cy=".5" r=".5">' +
-          '<stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>' +
-        '</radialGradient>' +
       '</defs>' +
 
-      bakkeskygge(104, 95, 94, [52, 132]) +
+      bakkeskygge3d(t, 104, 40) +
+      /* hjulene på andre siden */
+      t.hjul(-56, 15, -W - 1, 15.5, 'hjul--bak', -6) +
+      t.hjul(56, 15, -W - 1, 15.5, 'hjul--front', -6) +
+      /* spoilerstagene, bak kroppen */
+      t.uttrukket([[-91, 38], [-87, 38], [-87, 46], [-91, 46]], 14, 19, '#8d1a0c') +
+      t.uttrukket([[-91, 38], [-87, 38], [-87, 46], [-91, 46]], -19, -14, '#8d1a0c') +
 
-      /* hjulet på andre siden, foran – så vidt synlig under fronten */
-      '<ellipse cx="182" cy="86" rx="9" ry="14" fill="#111317"/>' +
+      t.uttrukket(t.rund(kropp), -W, W, '#e2382b', 'url(#' + gSide + ')') +
+      /* glansstripe langs siden og lynmerket på døra */
+      '<g transform="' + t.side(0, 0, W + 0.3) + '">' +
+        '<path d="M-84 -31H86" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>' +
+        '<path class="fig-merke" d="M-12 -34l14-1-6 9 12-1-20 20 5-13-10 1z" fill="#fff" opacity=".94"/>' +
+        '<rect x="-98" y="-22" width="8" height="5" rx="2.5" fill="#8e939c"/>' +
+      '</g>' +
 
-      /* spoiler bakerst */
-      '<path d="M22 46h6v10h-6zM40 46h6v10h-6z" fill="#7d170b"/>' +
-      '<path d="M14 38h40c3 0 5 2 5 4s-2 4-5 4H14c-3 0-5-2-5-4s2-4 5-4z" fill="#b8271a"/>' +
-      '<path d="M14 39h40" stroke="#ff8a7c" stroke-width="1.5" stroke-linecap="round"/>' +
+      /* hjulbuene på nærsiden – de bryter glansstripa */
+      t.hjulbue(-56, 15, W + 0.2, 19, 7) + t.hjulbue(56, 15, W + 0.2, 19, 7) +
+      t.uttrukket(t.rund(kupe), -K, K, '#d8342a', '#c22c21') +
+      /* sidevinduer i kupeens nærside */
+      '<path d="' + t.sti([[31, 40, K + .2], [12, 55, K + .2], [-8, 56, K + .2], [-8, 40.5, K + .2]]) + '" fill="url(#' + gGlass + ')"/>' +
+      '<path d="' + t.sti([[-12, 40.5, K + .2], [-12, 56, K + .2], [-27, 57, K + .2], [-44, 50, K + .2], [-51, 40.5, K + .2]]) + '" fill="url(#' + gGlass + ')"/>' +
+      /* frontruta og bakruta */
+      '<path d="' + rute(ruteA, ruteB, 0.2, 0.8, K - 3) + '" fill="url(#' + gGlass + ')"/>' +
+      '<path d="' + rute([-28, 60], [-48, 52], 0.25, 0.75, K - 3) + '" fill="url(#' + gGlass + ')"/>' +
 
-      /* siden */
-      '<path d="M12 76c-4-9-1-19 8-23l26-9 86-2 6 44H24c-6 0-10-4-12-10z" fill="url(#' + gSide + ')"/>' +
-      /* fronten, vendt mot oss */
-      '<path d="M132 42l52 4c8 1 13 8 12 17l-2 15c-1 6-5 9-10 9h-46z" fill="url(#' + gFront + ')"/>' +
-      /* panseret – den lyseste flaten */
-      '<path d="M100 34l32 8 52 4c-5-8-15-13-30-15l-34-3z" fill="url(#' + gTopp + ')"/>' +
-      /* kupeen: tak, sidevindu og frontrute */
-      '<path d="M50 44c6-13 18-21 36-22l24-1c12 0 22 5 28 13l-6 9z" fill="#c42b1d"/>' +
-      '<path d="M58 44c6-10 16-16 30-17h18l4 17z" fill="url(#' + gGlass + ')"/>' +
-      '<path d="M112 27h6c9 0 17 5 22 12l6 7-30 2z" fill="url(#' + gGlass + ')"/>' +
-      '<path d="M86 22l24-1c12 0 22 5 28 13" stroke="#ff9d90" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-      '<path d="M112 27l4 21" stroke="#c42b1d" stroke-width="3"/>' +
+      /* spoilervingen */
+      t.uttrukket([[-97, 45], [-80, 45], [-80, 49], [-97, 49]], -30, 30, '#b8271a') +
 
-      /* blank lakk: lysflekk på panseret og en glansstripe langs siden */
-      '<ellipse cx="150" cy="40" rx="16" ry="4" fill="url(#' + gGlans + ')" transform="rotate(8 150 40)"/>' +
-      '<path d="M20 57h110" stroke="#fff" stroke-opacity=".32" stroke-width="3" stroke-linecap="round"/>' +
-      /* skygge nederst på siden – der lyset ikke når */
-      '<path d="M16 80h118v6H24c-4 0-7-2-8-6z" fill="rgba(0,0,0,.18)"/>' +
+      /* fronten: lykter oppe, grill og støtfanger nede */
+      '<g transform="' + t.kantplan([96, 24], [92, 32], 0.5) + '">' +
+        '<ellipse cx="-21" rx="5.5" ry="2.8" fill="#ffeeb0"/><ellipse cx="21" rx="5.5" ry="2.8" fill="#ffeeb0"/>' +
+      '</g>' +
+      '<g transform="' + t.kantplan([93, 14], [96, 24], 0.5) + '">' +
+        '<rect x="-17" y="-4" width="34" height="8" rx="3" fill="#7d170b"/>' +
+      '</g>' +
 
-      /* lynmerke på døra – vårt eget, ikke noen andres */
-      '<path class="fig-merke" d="M78 52l14-1-6 9 12-1-20 20 5-13-10 1z" fill="#fff" opacity=".94"/>' +
+      t.hjul(-56, 15, W + 1.5, 15.5, 'hjul--bak') +
+      t.hjul(56, 15, W + 1.5, 15.5, 'hjul--front') +
 
-      /* fronten: lykter, grill og støtfanger med munnen */
-      /* Små, avlange lykter – store runde leses som to øyne til. */
-      '<ellipse cx="147" cy="60" rx="5" ry="2.8" fill="#ffeeb0"/>' +
-      '<ellipse cx="186" cy="62" rx="4" ry="2.6" fill="#ffeeb0"/>' +
-      '<path d="M138 70h54l-2 8c-1 4-4 7-9 7h-40c-3 0-5-2-5-5z" fill="#7d170b"/>' +
-      '<rect x="8" y="66" width="8" height="6" rx="3" fill="#8e939c"/>' +
-
-      hjul(52, 80, 19, 'hjul--bak', 0.8) +
-      hjul(132, 82, 19, 'hjul--front', 0.8) +
-
-      ansikt('stor', [[123, 36, 6.2], [138, 38, 6.2]], {
-        vanlig: 'M155 75q11 7 22 0',
-        glad: 'M154 73q12 13 24 0z',
-        hmm: 'M157 78q9-3 18 1',
-        trott: 'M160 77q6 3 12 0'
-      }) +
+      ansikt('stor', [[-10, 0, 6.2], [10, 0, 6.2]], {
+        vanlig: 'M-10 -1q10 7 20 0',
+        glad: 'M-11 -2q11 11 22 0z',
+        hmm: 'M-8 1q8-3 16 1',
+        trott: 'M-5 0q5 3 10 0'
+      }, t.kantplan(ruteA, ruteB, 0.5), t.kantplan([93, 14], [96, 24], 0.5)) +
     '</svg>';
   }
 
@@ -292,75 +414,95 @@ var Figurer = (function () {
 
   /* Vår egen tauebil: oransje, litt skeiv antenne, noen rustprikker og et
    * stort glis – en hjelpsom venn fra verkstedet. Kranen og kroken bak er
-   * det som gjør den til en tauebil; kroken svinger når den kjører. */
+   * det som gjør den til en tauebil; kroken svinger når den kjører.
+   * Tegnet med samme kamera som racerbilen (lag3d). */
   function tauebil() {
-    var gLakk = unik('tlakk'), gGlass = unik('tglass'), gBenk = unik('tbenk'), gFront = unik('tfront');
+    var gLakk = unik('tlakk'), gGlass = unik('tglass');
+    var t = lag3d([[-94, 0, -33], [101, 88, 33]], 200, 120);
+    var W = 30, L = 28;
+    /* førerhuset med panseret, og lasteplanet bak (mot klokka, y opp) */
+    var hus = [[16, 9], [90, 9], [95, 14], [95, 37], [90, 42], [60, 44], [52, 73], [48, 77],
+               [22, 77], [16, 72]];
+    var ruteA = [60, 44], ruteB = [52, 73];
+    /* Kranarmen er en bjelke fra foten på lasteplanet skrått opp og bakover. */
+    var fot = [-44, 34], tupp = [-78, 82];
+    var dx = tupp[0] - fot[0], dy = tupp[1] - fot[1], l = Math.sqrt(dx * dx + dy * dy);
+    var nx = dy / l * 3.5, ny = -dx / l * 3.5;
+    var arm = [[fot[0] - nx, fot[1] - ny], [tupp[0] - nx, tupp[1] - ny],
+               [tupp[0] + nx, tupp[1] + ny], [fot[0] + nx, fot[1] + ny]];
+    function rute(t0, t1, z) {
+      var p = t.langs(ruteA, ruteB, t0), q = t.langs(ruteA, ruteB, t1);
+      return t.sti([[p[0], p[1], -z], [q[0], q[1], -z], [q[0], q[1], z], [p[0], p[1], z]]);
+    }
     return '' +
-    '<svg class="fig fig--taue" viewBox="0 0 200 118" role="img" aria-label="Tauebil">' +
+    '<svg class="fig fig--taue" viewBox="0 0 200 124" role="img" aria-label="Tauebil">' +
       '<defs>' +
         '<linearGradient id="' + gLakk + '" x1="0" y1="0" x2="0" y2="1">' +
           '<stop offset="0" stop-color="#ffb35c"/><stop offset=".5" stop-color="#f07f1e"/>' +
-          '<stop offset="1" stop-color="#b3560b"/>' +
+          '<stop offset="1" stop-color="#a94f0a"/>' +
         '</linearGradient>' +
         '<linearGradient id="' + gGlass + '" x1="0" y1="0" x2="0" y2="1">' +
           '<stop offset="0" stop-color="#eef9fe"/><stop offset=".55" stop-color="#a9d3ea"/>' +
           '<stop offset=".62" stop-color="#7fb2cf"/><stop offset="1" stop-color="#b9dcef"/>' +
         '</linearGradient>' +
-        '<linearGradient id="' + gFront + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#f08a24"/><stop offset="1" stop-color="#9c4a08"/>' +
-        '</linearGradient>' +
-        '<linearGradient id="' + gBenk + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#737a84"/><stop offset="1" stop-color="#454a53"/>' +
-        '</linearGradient>' +
       '</defs>' +
 
-      bakkeskygge(100, 110, 84, [52, 140]) +
+      bakkeskygge3d(t, 104, 40) +
+      /* hjulene på andre siden */
+      t.hjul(-50, 16, -L - 1, 16, 'hjul--bak', -6) +
+      t.hjul(62, 16, -W - 1, 16, 'hjul--front', -6) +
 
-      /* kranen bakerst, med wire og krok */
-      '<path d="M48 62L22 22" stroke="#5b616b" stroke-width="8" stroke-linecap="round"/>' +
-      '<path d="M44 60L24 27" stroke="rgba(255,255,255,.18)" stroke-width="2" stroke-linecap="round"/>' +
-      '<g class="krok">' +
-        '<path d="M20 22v30" stroke="#3a3f47" stroke-width="2"/>' +
-        '<path d="M20 51v7a6 6 0 1 0 6 6" stroke="#8e939c" stroke-width="3.6" fill="none" stroke-linecap="round"/>' +
+      /* rammen under, og lasteplanet med varselstriper bakerst */
+      t.uttrukket([[-86, 9], [16, 9], [16, 16], [-86, 16]], -18, 18, '#3a3f47') +
+      t.uttrukket([[-92, 16], [16, 16], [16, 34], [-92, 34]], -L, L, '#646b75') +
+      t.hjulbue(-50, 16, L + 0.2, 19, 0) +
+      '<g transform="' + t.side(-92, 34, L + 0.2) + '">' +
+        '<rect width="14" height="18" fill="#f2c33d"/>' +
+        '<path d="M2 0l6 18M8 0l6 14" stroke="#23262d" stroke-width="2.6"/>' +
       '</g>' +
-      '<circle cx="20" cy="21" r="5.5" fill="#3a3f47"/><circle cx="20" cy="21" r="2" fill="#8e939c"/>' +
 
-      /* lasteplanet, med varselstriper bakerst */
-      '<path d="M10 60h96v20H14c-2 0-4-2-4-4z" fill="url(#' + gBenk + ')"/>' +
-      '<path d="M10 70h14v10H14c-2 0-4-2-4-4z" fill="#f2c33d"/>' +
-      '<path d="M13 70l6 10M19 70l5 8" stroke="#23262d" stroke-width="2.4"/>' +
+      /* kranen: foten, armen, kroken som henger i wiren, og trinsa ytterst */
+      t.uttrukket([[-54, 34], [-34, 34], [-38, 44], [-50, 44]], -8, 8, '#4a5058') +
+      t.uttrukket(arm, -4, 4, '#5b616b') +
+      '<g transform="' + t.side(tupp[0], tupp[1], 0) + '"><g class="krok">' +
+        '<path d="M0 0v28" stroke="#2c3036" stroke-width="2"/>' +
+        '<path d="M0 27v7a6 6 0 1 0 6 6" stroke="#8e939c" stroke-width="3.6" fill="none" stroke-linecap="round"/>' +
+      '</g></g>' +
+      '<g transform="' + t.side(tupp[0], tupp[1], 4.2) + '">' +
+        '<circle r="5.5" fill="#3a3f47"/><circle r="2" fill="#8e939c"/>' +
+      '</g>' +
 
-      /* førerhuset, sett litt på skrå: siden, taket og fronten mot oss */
-      '<path d="M100 84V46c0-11 8-19 19-19h31v57z" fill="url(#' + gLakk + ')"/>' +
-      '<path d="M150 28l28 5c9 2 15 9 15 18v33h-43z" fill="url(#' + gFront + ')"/>' +
-      '<path d="M112 30c10-2 26-2 36-1" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" stroke-linecap="round" fill="none"/>' +
-      '<path d="M104 64h44" stroke="rgba(255,255,255,.25)" stroke-width="3" stroke-linecap="round"/>' +
-      '<path d="M132 58v24" stroke="rgba(0,0,0,.18)" stroke-width="2"/>' +
-      '<path d="M100 80h50v4h-50z" fill="rgba(0,0,0,.16)"/>' +
-      /* sidevindu og frontrute */
-      '<rect x="108" y="34" width="24" height="20" rx="5" fill="url(#' + gGlass + ')"/>' +
-      '<path d="M155 34l20 4c6 1 10 6 10 12v8h-30z" fill="url(#' + gGlass + ')"/>' +
-      /* varsellys på taket, skeiv antenne og noen rustprikker */
-      '<path d="M122 21h14l2 7h-18z" fill="#f2c33d"/><path d="M125 22h4l-1 5h-4z" fill="#fff6c8"/>' +
-      '<path d="M110 28q-3-10 4-17" stroke="#3a3f47" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="114" cy="11" r="2.2" fill="#d8392b"/>' +
-      '<g fill="#8e4410" opacity=".55"><circle cx="118" cy="68" r="2"/><circle cx="124" cy="73" r="1.4"/><circle cx="113" cy="75" r="1.2"/></g>' +
+      /* førerhuset */
+      t.uttrukket(t.rund(hus), -W, W, '#f07f1e', 'url(#' + gLakk + ')') +
+      t.hjulbue(62, 16, W + 0.2, 19, 7) +
+      '<g transform="' + t.side(0, 0, W + 0.2) + '">' +
+        '<path d="M20 -38H88" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>' +
+        '<g fill="#8e4410" opacity=".55"><circle cx="30" cy="-26" r="2"/><circle cx="36" cy="-21" r="1.4"/><circle cx="25" cy="-18" r="1.2"/></g>' +
+      '</g>' +
+      '<path d="' + t.sti([[22, 48, W + .2], [54, 48, W + .2], [48, 70, W + .2], [22, 70, W + .2]]) + '" fill="url(#' + gGlass + ')"/>' +
+      '<path d="' + rute(0.2, 0.8, W - 4) + '" fill="url(#' + gGlass + ')"/>' +
+      /* varsellys på taket og en skeiv antenne */
+      t.uttrukket([[30, 77], [42, 77], [41, 82], [31, 82]], -5, 5, '#f2c33d') +
+      '<g transform="' + t.side(21, 77, W - 3) + '">' +
+        '<path d="M0 0q-3-9 4-15" stroke="#3a3f47" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+        '<circle cx="4" cy="-15" r="2.2" fill="#d8392b"/>' +
+      '</g>' +
 
-      /* lykter og støtfanger – munnen sitter på støtfangeren */
-      '<ellipse cx="157" cy="64" rx="4" ry="2.6" fill="#ffeeb0"/>' +
-      '<ellipse cx="189" cy="65" rx="3.4" ry="2.4" fill="#ffeeb0"/>' +
-      '<path d="M150 70h45v9c0 4-3 7-7 7h-38z" fill="#9aa1ab"/>' +
-      '<path d="M150 71h45" stroke="#d3d8de" stroke-width="1.5"/>' +
+      /* fronten: lykter oppe, og støtfangeren under munnen */
+      '<g transform="' + t.kantplan([95, 14], [95, 37], 0.72) + '">' +
+        '<ellipse cx="-20" rx="5" ry="3.6" fill="#ffeeb0"/><ellipse cx="20" rx="5" ry="3.6" fill="#ffeeb0"/>' +
+      '</g>' +
+      t.uttrukket([[93, 5], [101, 5], [101, 13], [93, 13]], -33, 33, '#9aa1ab') +
 
-      hjul(52, 84, 19, 'hjul--bak', 0.8) +
-      hjul(140, 85, 19, 'hjul--front', 0.8) +
+      t.hjul(-50, 16, L + 1.5, 16, 'hjul--bak') +
+      t.hjul(62, 16, W + 1.5, 16, 'hjul--front') +
 
-      ansikt('stor', [[163, 46, 5.6], [177, 48, 5.6]], {
-        vanlig: 'M162 77q10 6 20 0',
-        glad: 'M161 75q11 11 22 0z',
-        hmm: 'M164 79q8-2 16 1',
-        trott: 'M167 78q5 3 10 0'
-      }) +
+      ansikt('stor', [[-10, 0, 5.8], [10, 0, 5.8]], {
+        vanlig: 'M-13 -2q13 9 26 0',
+        glad: 'M-14 -3q14 14 28 0z',
+        hmm: 'M-10 1q10-3 20 1',
+        trott: 'M-6 0q6 3 12 0'
+      }, t.kantplan(ruteA, ruteB, 0.5), t.kantplan([95, 14], [95, 37], 0.3)) +
     '</svg>';
   }
 
@@ -432,7 +574,7 @@ var Figurer = (function () {
       '<circle cx="188" cy="40" r="1.7" fill="#2e6b40"/>' +
       '<ellipse cx="178" cy="47" rx="4" ry="2.5" fill="#f08a8a" opacity=".5"/>' +
 
-      ansikt('prikk', [[168, 36, 5.2], [182, 34, 4.4]], {
+      ansikt('prikk', [[172, 36, 5.5]], {
         vanlig: 'M172 52c6 3 12 2 16-2',
         glad: 'M171 50q9 9 18-1z',
         hmm: 'M174 53q6-1 12 1',
