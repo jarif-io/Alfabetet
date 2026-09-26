@@ -22,9 +22,8 @@ var Lydbank = (function () {
   var lyd = null;            /* det ene <audio>-elementet vi spiller alt gjennom */
   var naSpiller = null;      /* avslutter det som spilles nå */
 
-  function nokkel(tekst) {
-    return String(tekst).replace(/\s+/g, ' ').trim().toLowerCase();
-  }
+  /* Samme oppslagsnøkkel som språkpakken ble laget med. */
+  var nokkel = Replikker.nokkel;
 
   /* lyd/manifest.js definerer LYDFILER. Mangler filen, eller er den tom, blir
    * spillet stille – det finnes ingen annen stemme å falle tilbake på, se
@@ -100,7 +99,6 @@ var Lydbank = (function () {
     spill: spill,
     stopp: stopp,
     lasOpp: lasOpp,
-    nokkel: nokkel,
     antallKlipp: function () { return Object.keys(filer()).length; }
   };
 })();

@@ -396,11 +396,8 @@
 
     <section class="panel-del">
       <h3>Navn på figurene</h3>
-      <div class="navnrad">
-        <label>Racerbilen<input type="text" id="inn-navn-bane" maxlength="20"></label>
-        <label>Kapteinen<input type="text" id="inn-navn-oy" maxlength="20"></label>
-        <label>Dinosauren<input type="text" id="inn-navn-dino" maxlength="20"></label>
-      </div>
+      <!-- Ett felt per verden, laget av js/spill.js fra VERDENER. -->
+      <div class="navnrad" id="inn-navn-figurer"></div>
     </section>
 
     <section class="panel-del">
@@ -434,8 +431,8 @@
 <script src="js/replikker.js"></script>
 <script src="js/lagring.js"></script>
 <script src="js/figurer.js"></script>
-<!-- Lydbanken: ferdige klipp som brukes i stedet for talesyntesen når vi har
-     dem. manifest.js lages av lag-lydbank.sh og er tom til den er kjørt. -->
+<!-- Språkpakken: ett innlest klipp per replikk. manifest.js lages av
+     lag-lydpakke.py. -->
 <script src="lyd/manifest.js"></script>
 <script src="js/lydbank.js"></script>
 <script src="js/tale.js"></script>

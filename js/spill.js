@@ -26,7 +26,17 @@ var Spill = (function () {
 
   /* ---------- skjermbytte ---------- */
 
+  /* Skjermene utenfor modusene. Kommer vi hit, er modusen forlatt – uansett
+   * hvilken vei: pila, Esc, foreldremenyen eller nullstillingen. */
+  var UTENFOR_MODUS = {
+    'skjerm-start': true,
+    'skjerm-navn': true,
+    'skjerm-meny': true,
+    'skjerm-samling': true
+  };
+
   function visSkjerm(id) {
+    if (UTENFOR_MODUS[id]) Moduser.stoppAlt();
     var alle = document.querySelectorAll('.skjerm');
     for (var i = 0; i < alle.length; i++) alle[i].hidden = (alle[i].id !== id);
     var medFigur = !!MED_FIGUR[id];
@@ -157,8 +167,8 @@ var Spill = (function () {
       b.innerHTML =
         '<span class="kartsted-figur">' + Figurer.figurFor(id) + '</span>' +
         '<span class="kartsted-navn">' + v.navn + '</span>';
-      /* Samme handling som Start-knappen, pluss at vi hopper rett dit. Trykket
-       * er den brukerhandlingen nettleseren krever før lyd kan spilles. */
+      /* Trykket er den brukerhandlingen nettleseren krever før lyd kan
+       * spilles. */
       b.addEventListener('click', function () {
         Lyd.lasOpp();
         /* Språkpakken må også låses opp inne i et ekte trykk, ellers nekter
@@ -232,12 +242,12 @@ var Spill = (function () {
     var valgt = navn || VERDENER[naVerden].standardnavn;
     Lagring.settNavn(naVerden, valgt);
     Lyd.klikk();
-    visMeny();
-    Tale.stopp();
-    Tale.rekke([Tale.velg('Hei, ' + valgt + '!', 'Hei!')]);
+    /* Figuren hilser først, så kommer spørsmålet menyen alltid stiller. */
+    visMeny([Tale.velg('Hei, ' + valgt + '!', 'Hei!'), 300]);
   }
 
-  function visMeny() {
+  /* `forst`: det som skal sies før spørsmålet, som hilsenen etter navnevalget. */
+  function visMeny(forst) {
     Tale.stopp();
     settTastLytter(null);
     var v = VERDENER[naVerden];
@@ -287,53 +297,54 @@ var Spill = (function () {
      * er fire–seks tekstetiketter ingen hjelp; spørsmålet forteller ham i det
      * minste hva skjermen er til for. Å lese opp hver flis når han trykker
      * nytter ikke – modusen starter og stopper talen i samme øyeblikk. */
-    Tale.rekke(['Hva vil du gjøre?']);
+    Tale.rekke((forst instanceof Array ? forst : []).concat(['Hva vil du gjøre?']));
   }
+
+  function alltid() { return true; }
 
   /* Modusene i den rekkefølgen han møter dem, med regelen for når hver av
-   * dem slipper til. */
+   * dem slipper til. Utforsk og løypa finnes i alle verdener; resten
+   * avhenger av om verdenen øver på bokstaver eller tall. */
   function moduser() {
-    return domeneFor(naVerden) === 'tall' ? tallmoduser() : bokstavmoduser();
-  }
-
-  /* Dinodalen. Samme maskineri som bokstavverdenene – utforsk, løype, finn –
-   * pluss «Tell», som er den egentlige telleferdigheten. */
-  function tallmoduser() {
     var v = VERDENER[naVerden];
+    var tall = domeneFor(naVerden) === 'tall';
     return [
       {
-        id: 'reiret',
+        id: tall ? 'reiret' : 'utforsk',
         bilde: 'utforsk',
         tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 6); },
         navn: v.utforsk,
-        apen: function () { return true; },
+        apen: alltid,
         start: function () {
           Lyd.klikk();
-          tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
+          tilbakeHandling = visMeny;
           Moduser.Utforsk.start(naVerden);
         }
       },
       {
-        id: 'tallrekka',
+        id: tall ? 'tallrekka' : 'loype',
         bilde: 'loype',
-        tegn: function () { return ['1', '2']; },
-        navn: 'Tallrekka',
-        apen: function () { return true; },
+        tegn: function () { return tegnFor(naVerden).slice(0, 2); },
+        navn: tall ? 'Tallrekka' : 'Alfabetløypa',
+        apen: alltid,
         start: function () {
           Lyd.klikk();
-          tilbakeHandling = function () { Moduser.Loype.stopp(); visMeny(); };
-          Moduser.Loype.start(naVerden, function () {
-            Moduser.Loype.stopp();
-            visMeny();
-          });
+          tilbakeHandling = visMeny;
+          Moduser.Loype.start(naVerden, visMeny);
         }
-      },
+      }
+    ].concat(tall ? tallmoduser() : bokstavmoduser());
+  }
+
+  /* Tallverdenen: «Tell» er den egentlige telleferdigheten. */
+  function tallmoduser() {
+    return [
       {
         id: 'tell',
         bilde: 'tell',
         tegn: function () { return [TELLETING[0].ikon]; },
         navn: 'Tell',
-        apen: function () { return true; },
+        apen: alltid,
         start: function () { Lyd.klikk(); startOppgave('tell'); }
       },
       {
@@ -343,42 +354,14 @@ var Spill = (function () {
         navn: 'Finn tallet',
         /* Å kjenne igjen tallsymbolet er vanskeligere enn å telle ting, så
          * den kommer når han har talt seg gjennom noen runder. */
-        apen: function () { return Lagring.mestrede('dino').length >= 3; },
+        apen: function () { return Lagring.mestrede(naVerden).length >= 3; },
         start: function () { Lyd.klikk(); startOppgave('finn'); }
       }
     ];
   }
 
   function bokstavmoduser() {
-    var v = VERDENER[naVerden];
     return [
-      {
-        id: 'utforsk',
-        bilde: 'utforsk',
-        tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 6); },
-        navn: v.utforsk,
-        apen: function () { return true; },
-        start: function () {
-          Lyd.klikk();
-          tilbakeHandling = function () { Moduser.Utforsk.stopp(); visMeny(); };
-          Moduser.Utforsk.start(naVerden);
-        }
-      },
-      {
-        id: 'loype',
-        bilde: 'loype',
-        tegn: function () { return ['A', 'B']; },
-        navn: 'Alfabetløypa',
-        apen: function () { return true; },
-        start: function () {
-          Lyd.klikk();
-          tilbakeHandling = function () { Moduser.Loype.stopp(); visMeny(); };
-          Moduser.Loype.start(naVerden, function () {
-            Moduser.Loype.stopp();
-            visMeny();
-          });
-        }
-      },
       {
         id: 'navn',
         bilde: 'navn',
@@ -387,7 +370,7 @@ var Spill = (function () {
         navn: 'Navnet mitt',
         /* Uten et navn i foreldremenyen finnes det ingenting å bygge. */
         mulig: function () { return navnBokstaver(Lagring.barnenavn()).length > 0; },
-        apen: function () { return true; },
+        apen: alltid,
         start: function () { Lyd.klikk(); startOppgave('navn'); }
       },
       {
@@ -395,7 +378,7 @@ var Spill = (function () {
         bilde: 'finn',
         tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 2); },
         navn: 'Finn bokstaven',
-        apen: function () { return true; },
+        apen: alltid,
         start: function () { Lyd.klikk(); startOppgave('finn'); }
       },
       {
@@ -421,13 +404,11 @@ var Spill = (function () {
      * starte. Da blir vi stående i menyen framfor å vise en tom skjerm. */
     if (type === 'navn' && !navnkoe.length) { visMeny(); return; }
     sisteModus = type;
-    /* «Fullfør runden»: da finnes det ingen vei ut før «Se hvordan det gikk»
-     * – verken via pila (Moduser.start skjuler den, se moduser.js) eller
+    /* «Fullfør runden»: da finnes det ingen vei ut før oppsummeringen –
+     * verken via pila (Oppgave.start skjuler den, se moduser.js) eller
      * Escape, som ellers ville kalt akkurat denne funksjonen. Fri utforsking
      * og Alfabetløypa har ingen runde å fullføre og er ikke berørt. */
-    tilbakeHandling = Lagring.innstilling('laasUnderveis')
-      ? null
-      : function () { Moduser.Oppgave.stopp(); visMeny(); };
+    tilbakeHandling = Lagring.innstilling('laasUnderveis') ? null : visMeny;
     Moduser.Oppgave.start(type, naVerden, navnkoe);
   }
 
@@ -482,7 +463,29 @@ var Spill = (function () {
 
   /* ---------- foreldremeny ---------- */
 
+  /* Ett navnefelt per figur, laget fra VERDENER – kommer det en verden til,
+   * kommer feltet med. */
+  var navnefelt = {};
+  function tegnNavnefelt() {
+    var rad = el('inn-navn-figurer');
+    if (rad.children.length) return;
+    Object.keys(VERDENER).forEach(function (id) {
+      var etikett = document.createElement('label');
+      var felt = document.createElement('input');
+      felt.type = 'text';
+      felt.maxLength = 20;
+      felt.id = 'inn-navn-' + id;
+      etikett.appendChild(document.createTextNode(VERDENER[id].navn));
+      etikett.appendChild(felt);
+      rad.appendChild(etikett);
+      navnefelt[id] = felt;
+    });
+  }
+
   function apneForeldre() {
+    /* En runde skal ikke fortsette bak panelet. Lukkes det, går vi uansett
+     * til menyen. */
+    Moduser.stoppAlt();
     el('foreldre').hidden = false;
     el('panel-innhold').scrollTop = 0;
 
@@ -498,13 +501,11 @@ var Spill = (function () {
 
     el('versjon').textContent = 'Versjon ' + SPILLVERSJON;
 
-    el('inn-navn-dino').value = Lagring.harNavn('dino') ? Lagring.navnFor('dino') : '';
-    el('inn-navn-dino').placeholder = VERDENER.dino.standardnavn;
-
-    el('inn-navn-bane').value = Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '';
-    el('inn-navn-bane').placeholder = VERDENER.bane.standardnavn;
-    el('inn-navn-oy').value = Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '';
-    el('inn-navn-oy').placeholder = VERDENER.oy.standardnavn;
+    tegnNavnefelt();
+    Object.keys(navnefelt).forEach(function (id) {
+      navnefelt[id].value = Lagring.harNavn(id) ? Lagring.navnFor(id) : '';
+      navnefelt[id].placeholder = VERDENER[id].standardnavn;
+    });
 
     tegnNiva();
     tegnLydbank();
@@ -532,11 +533,11 @@ var Spill = (function () {
      * valgt. Har de skrevet inn et eget navn på figuren, finnes det ikke
      * klipp for rosen med akkurat det navnet – og da skal ikke tallet late
      * som om alt er dekket. Spillet sier likevel rosen, bare uten navnet. */
-    var liste = Replikker.alle({
-      bane: Lagring.harNavn('bane') ? Lagring.navnFor('bane') : '',
-      oy: Lagring.harNavn('oy') ? Lagring.navnFor('oy') : '',
-      dino: Lagring.harNavn('dino') ? Lagring.navnFor('dino') : ''
+    var navn = {};
+    Object.keys(VERDENER).forEach(function (id) {
+      navn[id] = Lagring.harNavn(id) ? Lagring.navnFor(id) : '';
     });
+    var liste = Replikker.alle(navn);
     var har = liste.filter(function (r) { return Lydbank.har(r.tekst); }).length;
 
     var felt = el('lydbank-status');
@@ -606,9 +607,9 @@ var Spill = (function () {
     /* Tomt felt lagres også: da faller navnet tilbake til standardnavnet,
      * og barnet får døpe figuren på nytt neste gang han velger verdenen.
      * Plassholderen lover det, så feltet skal oppføre seg slik. */
-    Lagring.settNavn('bane', el('inn-navn-bane').value.trim());
-    Lagring.settNavn('oy', el('inn-navn-oy').value.trim());
-    Lagring.settNavn('dino', el('inn-navn-dino').value.trim());
+    Object.keys(navnefelt).forEach(function (id) {
+      Lagring.settNavn(id, navnefelt[id].value.trim());
+    });
     /* Barnets navn lagres også når det tømmes – den voksne skal kunne ta
      * bort «Navnet mitt» igjen. */
     Lagring.settBarnenavn(el('inn-barnenavn').value);
@@ -619,9 +620,6 @@ var Spill = (function () {
 
   /* ---------- oppstart ---------- */
 
-  /* Kobler en hendelse til et element. Mangler elementet, sier vi fra i
-   * konsollen i stedet for å kaste – ellers stopper resten av oppkoblingen,
-   * og da virker plutselig ingenting. */
   /* Søsteren til pa() for et sett elementer inne i et element. Uten den
    * kaster et oppslag med querySelectorAll hvis id-en mangler – akkurat det pa()
    * ble skrevet for å hindre, bare et annet sted i samme funksjon. */
@@ -631,6 +629,9 @@ var Spill = (function () {
     return e.querySelectorAll(velger);
   }
 
+  /* Kobler en hendelse til et element. Mangler elementet, sier vi fra i
+   * konsollen i stedet for å kaste – ellers stopper resten av oppkoblingen,
+   * og da virker plutselig ingenting. */
   function pa(id, hendelse, fn, valg) {
     var e = el(id);
     if (!e) {

@@ -1,8 +1,9 @@
 /* Oppdagerøya – tegningene
  *
  * Alt er SVG som legges rett inn i siden, slik at delene kan animeres hver
- * for seg: hjulene roterer, seilet vaier, flagget blafrer. Fargene styres
- * av CSS-variabler, så samme tegning kan skifte lakk.
+ * for seg: hjulene ruller og beina tramper. Figurene har faste farger
+ * (CSS-variabler virker ikke i stop-color); landskapene tar fargene sine
+ * fra verdenens CSS-variabler.
  */
 
 var Figurer = (function () {
@@ -177,8 +178,8 @@ var Figurer = (function () {
       '<circle cx="174" cy="34" r="2" fill="#fff" opacity=".95"/>' +
       '<path d="M172 52c6 3 12 2 16-2" fill="none" stroke="#243528"' +
             ' stroke-width="2.6" stroke-linecap="round"/>' +
-      /* to små nesebor */
-      '<g fill="#2e6b40"><circle cx="188" cy="40" r="1.7"/></g>' +
+      /* nesebor */
+      '<circle cx="188" cy="40" r="1.7" fill="#2e6b40"/>' +
 
     '</svg>';
   }
@@ -545,7 +546,8 @@ var Figurer = (function () {
    * ut. Fargene arves fra verdenens aksentfarge via CSS-variabler. */
 
   var IKONER = {
-    garasje:
+    /* Et hus: veien hjem til menyen i verdenen. */
+    hjem:
       '<svg viewBox="0 0 48 48" aria-hidden="true">' +
         '<path d="M6 22L24 8l18 14v16a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="var(--aksent)"/>' +
         '<rect x="13" y="24" width="22" height="17" rx="2" fill="#fffdf8"/>' +
@@ -553,89 +555,10 @@ var Figurer = (function () {
           '<path d="M16 29h16M16 34h16"/>' +
         '</g>' +
       '</svg>',
-    kart:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<path d="M7 12l11-4 12 4 11-4v28l-11 4-12-4-11 4z" fill="#fffdf8" stroke="var(--aksent)" stroke-width="3" stroke-linejoin="round"/>' +
-        '<path d="M14 24c5-6 12 4 19-3" fill="none" stroke="var(--aksent)" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="1 5"/>' +
-        '<path d="M33 28l6 6M39 28l-6 6" stroke="var(--aksent-mork)" stroke-width="3.4" stroke-linecap="round"/>' +
-      '</svg>',
-    finn:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<rect x="9" y="6" width="4" height="37" rx="2" fill="var(--aksent-mork)"/>' +
-        '<path d="M13 8h26l-5 8 5 8H13z" fill="#fffdf8" stroke="var(--aksent)" stroke-width="2.4"/>' +
-        '<g fill="var(--aksent)">' +
-          '<rect x="15" y="10" width="6" height="6"/><rect x="27" y="10" width="6" height="6"/>' +
-          '<rect x="21" y="16" width="6" height="6"/><rect x="33" y="15" width="4" height="7"/>' +
-        '</g>' +
-      '</svg>',
-    /* Reiret: tre egg i et rede. */
-    reir:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<ellipse cx="24" cy="34" rx="19" ry="9" fill="none" stroke="var(--aksent)" stroke-width="3.4"/>' +
-        '<g fill="#fffdf8" stroke="var(--aksent)" stroke-width="2.4">' +
-          '<ellipse cx="16" cy="27" rx="6" ry="7.5"/>' +
-          '<ellipse cx="32" cy="27" rx="6" ry="7.5"/>' +
-          '<ellipse cx="24" cy="22" rx="6.5" ry="8"/>' +
-        '</g>' +
-      '</svg>',
-    /* Tell: tre ting og en pekefinger. */
-    tell:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<g fill="var(--aksent)">' +
-          '<circle cx="12" cy="16" r="7"/><circle cx="26" cy="16" r="7"/><circle cx="40" cy="16" r="7"/>' +
-        '</g>' +
-        '<g fill="none" stroke="var(--aksent-mork)" stroke-width="3" stroke-linecap="round">' +
-          '<path d="M12 30v4M26 30v4M40 30v4"/>' +
-        '</g>' +
-        '<path d="M20 44l8-8 4 4" fill="none" stroke="var(--aksent-mork)"' +
-          ' stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '</svg>',
-    /* Alfabetløypa: en vei som svinger fra start til mål. */
-    loype:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<path d="M12 40c0-12 26-9 26-19 0-5-5-8-11-8" fill="none"' +
-          ' stroke="var(--aksent)" stroke-width="7" stroke-linecap="round"/>' +
-        '<path d="M12 40c0-12 26-9 26-19 0-5-5-8-11-8" fill="none"' +
-          ' stroke="#fffdf8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 6"/>' +
-        '<circle cx="12" cy="40" r="4.5" fill="var(--aksent-mork)"/>' +
-        '<circle cx="27" cy="13" r="5.5" fill="var(--aksent-mork)"/>' +
-      '</svg>',
-    /* Navnet mitt: to bokstaver på plass og én rute igjen. */
-    navn:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<rect x="5" y="12" width="38" height="24" rx="4" fill="#fffdf8"' +
-          ' stroke="var(--aksent)" stroke-width="3"/>' +
-        '<g fill="var(--aksent)">' +
-          '<rect x="11" y="19" width="7" height="10" rx="1.5"/>' +
-          '<rect x="20.5" y="19" width="7" height="10" rx="1.5"/>' +
-        '</g>' +
-        '<rect x="30" y="19" width="7" height="10" rx="1.5" fill="none"' +
-          ' stroke="var(--aksent)" stroke-width="2.4" stroke-dasharray="2.5 2.5"/>' +
-      '</svg>',
-    lyd:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<path d="M8 19h8l10-8v26l-10-8H8z" fill="var(--aksent)"/>' +
-        '<g fill="none" stroke="var(--aksent-mork)" stroke-width="3.2" stroke-linecap="round">' +
-          '<path d="M32 18c3 3 3 9 0 12"/>' +
-          '<path d="M37 14c5 5 5 15 0 20"/>' +
-        '</g>' +
-      '</svg>',
-    pil:
-      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
-        '<g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">' +
-          '<path d="M5 16h20"/><path d="M18 8l8 8-8 8"/>' +
-        '</g>' +
-      '</svg>',
     malflagg:
       '<svg viewBox="0 0 32 32" aria-hidden="true">' +
         '<rect x="5" y="3" width="4" height="26" rx="2" fill="currentColor"/>' +
         '<path d="M9 5h19l-4 6 4 6H9z" fill="currentColor"/>' +
-      '</svg>',
-    oye:
-      '<svg viewBox="0 0 32 32" aria-hidden="true">' +
-        '<path d="M2 16c4-7 9-10 14-10s10 3 14 10c-4 7-9 10-14 10S6 23 2 16z"' +
-          ' fill="none" stroke="currentColor" stroke-width="3"/>' +
-        '<circle cx="16" cy="16" r="5" fill="currentColor"/>' +
       '</svg>',
     stemmePa:
       '<svg viewBox="0 0 32 32" aria-hidden="true">' +
@@ -650,11 +573,6 @@ var Figurer = (function () {
         '<g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">' +
           '<path d="M21 11l8 10M29 11l-8 10"/>' +
         '</g>' +
-      '</svg>',
-    stjerne:
-      '<svg viewBox="0 0 48 48" aria-hidden="true">' +
-        '<path d="M24 5l5.6 11.6L42 18.4l-9 8.9 2.1 12.7L24 34l-11.1 6 2.1-12.7-9-8.9 12.4-1.8z" fill="#e2a017"/>' +
-        '<path d="M24 10.5l3.9 8 8.7 1.2-6.3 6.2 1.5 8.8L24 30.6z" fill="#f2c33d"/>' +
       '</svg>'
   };
 
@@ -680,23 +598,16 @@ var Figurer = (function () {
   }
 
   return {
-    bil: bil,
-    skip: skip,
     kart: kart,
     modusbilde: modusbilde,
     ikon: function (navn) { return IKONER[navn] || ''; },
     nedtelling: nedtelling,
     nedtellingOmkrets: NEDTELLING_OMKRETS,
     figurFor: function (verdenId) {
-      var f = VERDENER[verdenId].figur;
-      if (f === 'skip') return skip();
-      if (f === 'dino') return dino();
-      return bil();
+      return ({ bil: bil, skip: skip, dino: dino })[VERDENER[verdenId].figur]();
     },
     landskapFor: function (verdenId) {
-      if (verdenId === 'oy') return oy();
-      if (verdenId === 'dino') return dal();
-      return aser();
+      return ({ aser: aser, oy: oy, dal: dal })[VERDENER[verdenId].landskap]();
     }
   };
 })();

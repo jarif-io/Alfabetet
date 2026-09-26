@@ -1,7 +1,8 @@
-/* Oppdagerøya – de tre modusene
+/* Oppdagerøya – modusene: Utforsk, Oppgave og Løype
  *
- * Alle tre deler samme regel: ingenting skjer av seg selv. Barnet trykker,
- * spillet svarer i under ett sekund, og så står skjermen stille igjen.
+ * Alle deler samme regel: ingenting skjer av seg selv mens han tenker.
+ * Barnet trykker, spillet svarer i under ett sekund, og så står skjermen
+ * stille igjen.
  */
 
 var Moduser = (function () {
@@ -21,19 +22,10 @@ var Moduser = (function () {
 
   function tilfeldig(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
 
-  var TALLORD = ['null', 'én', 'to', 'tre', 'fire', 'fem', 'seks', 'sju', 'åtte'];
-  function tallord(n) { return TALLORD[n] || String(n); }
-
   /* «A, B og C» – slik en voksen ville lest det høyt. */
   function listetekst(deler) {
     if (deler.length === 1) return deler[0];
     return deler.slice(0, -1).join(', ') + ' og ' + deler[deler.length - 1];
-  }
-
-  /* Ord som «WC» er forkortelser. Gjøres de om til småbokstaver, mister
-   * talesyntesen sporet og staver dem feil – de skal stå som de står. */
-  function tilTale(ord) {
-    return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
   }
 
   /* «ell … ell for Løve» – samme formel som alfabetbøkene bruker, og kort nok
@@ -188,7 +180,7 @@ var Moduser = (function () {
     stovSky(fra, x);
     figur.style.transform = 'translateX(' + x + 'px)';
 
-    if (verdenId === 'oy') Lyd.bolge(); else Lyd.motor();
+    if (VERDENER[verdenId].figur === 'skip') Lyd.bolge(); else Lyd.motor();
 
     window.clearTimeout(kjoreTimer);
     kjoreTimer = window.setTimeout(function () {
@@ -836,7 +828,7 @@ var Moduser = (function () {
         ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
         : '';
 
-      el('oppsum-flagg').textContent = okt.verden === 'oy' ? '🏝️' : '🏁';
+      el('oppsum-flagg').textContent = VERDENER[okt.verden].flagg;
       el('oppsum-tittel').textContent = okt.type === 'navn'
         ? navnet + '!'
         : tilfeldig(VERDENER[okt.verden].ros) + '!';
@@ -906,9 +898,16 @@ var Moduser = (function () {
              280, 'Den kan du nå!']
           : [Tale.velg('Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!',
                        'Bra jobbet!')];
-      window.setTimeout(function () { Tale.rekke(hilsen); }, 700);
+      /* Rosen og hoppet kommer litt etter, med vilje. Har han allerede gått
+       * videre – en ny runde, eller tilbake – hører de ikke hjemme der han
+       * er nå, og da blir de borte. */
+      var denne = okt;
+      function fortsattHer() {
+        return okt === denne && !el('skjerm-oppsummering').hidden;
+      }
+      window.setTimeout(function () { if (fortsattHer()) Tale.rekke(hilsen); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
-      window.setTimeout(function () { hopp(); }, 400);
+      window.setTimeout(function () { if (fortsattHer()) hopp(); }, 400);
 
       Spill.settOppsummering(okt.type);
     }
@@ -965,7 +964,6 @@ var Moduser = (function () {
         return true;
       },
 
-      videre: videre,
       visMal: visMal,
 
       gjentaSporsmal: function () {
@@ -1108,7 +1106,14 @@ var Moduser = (function () {
     Utforsk: Utforsk,
     Oppgave: Oppgave,
     Loype: Loype,
-    kjorTil: kjorTil,
-    hopp: hopp
+    hopp: hopp,
+    /* Alle veier ut av en modus går gjennom dette – se Spill.visSkjerm.
+     * Uten det tikket nedtellingen videre i bakgrunnen når man gikk ut via
+     * foreldremenyen, og hoppet over en oppgave i neste runde. */
+    stoppAlt: function () {
+      Utforsk.stopp();
+      Oppgave.stopp();
+      Loype.stopp();
+    }
   };
 })();

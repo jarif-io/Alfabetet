@@ -18,7 +18,6 @@
   --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
   --font-ui: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
 
-  --r-sm: 12px;
   --r-md: 18px;
   --r-lg: 26px;
   --r-xl: 34px;
@@ -39,10 +38,6 @@
   --grunn-topp: #86b58f;
   --grunn-bunn: #5e8f6c;
   --stripe: transparent;
-
-  --lakk: #dc3327;
-  --lakk-lys: #f4574a;
-  --lakk-mork: #a4200f;
 
   --blekk: #23262d;
   --blekk-svak: #5d646f;
@@ -82,9 +77,6 @@ body[data-verden="bane"] {
   --aksent: #dc3327;
   --aksent-mork: #a4200f;
   --aksent-svak: #fdeceb;
-  --lakk: #dc3327;
-  --lakk-lys: #f4574a;
-  --lakk-mork: #a4200f;
 }
 
 /* Sjørøverøya: gullhimmel over dypt vann. */
@@ -102,9 +94,6 @@ body[data-verden="oy"] {
   --aksent: #16788f;
   --aksent-mork: #0d4c5e;
   --aksent-svak: #e2f1f5;
-  --lakk: #c8492f;
-  --lakk-lys: #e0674c;
-  --lakk-mork: #8f2f1c;
 }
 
 /* Dinodalen: frodig grønt under en varm urtidshimmel. Aksenten er grønn, så
@@ -123,9 +112,6 @@ body[data-verden="dino"] {
   --aksent: #2f8f52;
   --aksent-mork: #1d6437;
   --aksent-svak: #e6f4ea;
-  --lakk: #4f9e63;
-  --lakk-lys: #7cc48a;
-  --lakk-mork: #357a49;
 }
 
 * { box-sizing: border-box; }
@@ -783,8 +769,9 @@ body.pa-havet .ingress {
 .kartsted--oy   { --merke: #16788f; }
 .kartsted--dino { --merke: #2f8f52; }
 
-/* Skipet ligger på vannet og skal duve, ikke stå stille som et hus. */
-.kartsted--oy .kartsted-figur {
+/* Skipet ligger på vannet og skal duve, ikke stå stille som et hus – men
+   bare når «la ting bevege seg» er på, som alt annet som går av seg selv. */
+body.bevegelse .kartsted--oy .kartsted-figur {
   transform-origin: 50% 80%;
   animation: duv-pa-kartet 4200ms ease-in-out infinite;
 }
@@ -793,7 +780,7 @@ body.pa-havet .ingress {
   50%      { transform: translateY(-2%) rotate(1.6deg); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .kartsted--oy .kartsted-figur { animation: none; }
+  body.bevegelse .kartsted--oy .kartsted-figur { animation: none; }
 }
 
 /* Smakebiter: tre bokstaver og tre tall, i samme form som brikkene i spillet.
@@ -2040,8 +2027,6 @@ body[data-verden="oy"] .skilt::after {
 }
 .ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
 
-}
-
 .hjelpetekst {
   margin-top: 10px;
   border-radius: 12px;
@@ -2137,11 +2122,9 @@ body[data-verden="oy"] .skilt::after {
   .samling-rute .stor { font-size: 1.9rem; }
   /* Menyen kan komme opp i seks fliser. Stablet loddrett rant den ut av
      skjermen på telefon, og en treåring som må rulle for å finne modusen
-     sin, finner den ikke. Liggende fliser tar under halve høyden. */
-  .menyrad { gap: 6px; grid-template-columns: 1fr; }
-  /* Bildet er det han navigerer etter, så det blir med også her – bare
-     mindre. Kortene ligger i to kolonner, som er nok til at alle modusene
-     er synlige uten å rulle. */
+     sin, finner den ikke. Bildet er det han navigerer etter, så det blir med
+     også her – bare mindre. Kortene ligger i to kolonner, som er nok til at
+     alle modusene er synlige uten å rulle. */
   .menyrad { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; }
   .flis { padding: 9px 8px 10px; gap: 6px; border-radius: 20px; }
   .flis-navn { font-size: .98rem; }
@@ -2171,19 +2154,7 @@ body[data-verden="oy"] .skilt::after {
   .ibruk { max-width: 100%; white-space: normal; }
 }
 
-/* Telefon på tvers, men med bredde nok til tre kort ved siden av hverandre.
-   Stablet under hverandre får de ikke plass i 360 pikslers høyde, og da måtte
-   han rulle for å se at Dinodalen finnes.
 
-   Merk grensene: uten min-width slår denne inn på smale skjermer også, der
-   tre kort ved siden av hverandre blir 120 piksler brede hver. */
-@media (max-height: 520px) and (min-width: 561px) {
-}
-
-/* Smal OG lav – telefon på tvers med lite bredde. Da er liggende kort eneste
-   som får plass, og de må være så lave som mulig. */
-@media (max-height: 520px) and (max-width: 560px) {
-}
 
 /* Bokstavrutene er 72 px på telefon, ikke 62: en treåring treffer bredere enn
    en voksen, og 62 px er så vidt over voksenminimum. På en kort telefon får
@@ -2245,9 +2216,6 @@ body[data-verden="oy"] .skilt::after {
   .prikker { gap: 6px; padding-top: 0; }
   .prikk { width: 10px; height: 10px; }
 
-  /* Samme grep som på smal telefon: liggende fliser, ellers får ikke seks
-     moduser plass på en skjerm som bare er 360 piksler høy. */
-  .menyrad { gap: 10px; }
   /* På tvers er høyden det knappe. Kortene blir smalere, så alle står på
      én rad, og bildet krymper med dem. */
   .menyrad { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }

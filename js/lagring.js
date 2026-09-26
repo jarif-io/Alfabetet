@@ -8,16 +8,23 @@ var Lagring = (function () {
   var NOKKEL = 'bokstavlopet.v1';
   var NA_VERSJON = 6;
 
+  /* Én verdi per verden, for alle verdenene som finnes i data.js. */
+  function perVerden(verdi) {
+    var ut = {};
+    Object.keys(VERDENER).forEach(function (v) { ut[v] = verdi; });
+    return ut;
+  }
+
   var standard = {
     versjon: NA_VERSJON,
-    navn: { bane: '', oy: '', dino: '' },
+    navn: perVerden(''),
     /* Hvor mange skilt han får å velge mellom. Dette må overleve runden:
      * settes det tilbake til to hver gang, rykker han aldri varig opp, og
      * vanskegraden er bygget uten at noen merker den. */
-    antallValg: { bane: 2, oy: 2, dino: 2 },
+    antallValg: perVerden(2),
     /* Runder på rad der under halvparten satt på første forsøk. To slike
      * betyr at det ble for vanskelig, og han rykker ned igjen. */
-    svakeRunder: { bane: 0, oy: 0, dino: 0 },
+    svakeRunder: perVerden(0),
     /* Barnets eget navn. Tomt = «Navnet mitt» er ikke tilgjengelig ennå. */
     barnenavn: '',
     /* Moduser som har dukket opp på menyen. Låsingen går bare én vei: en
@@ -54,17 +61,17 @@ var Lagring = (function () {
     /* 3: menyen viser bare det barnet er klar for. «Første lyd» har hittil
      *    stått der bestandig, så den som allerede har spilt skal ikke
      *    oppleve at en modus plutselig er borte. */
-    3: function (d) { d.laasteOpp = ['forstelyd']; },
+    3: function (d) { d.laasteOpp = ['forstelyd']; }
 
     /* 4 og 5 har ingen steg med vilje. Da ble antallValg og bokstavlyd lagt
      * til, og begge har standardverdier som er nøyaktig dagens oppførsel – to
      * skilt og ingen bokstavlyd. Samtidig ble Q, W, X og Z tatt ut av
      * standardutvalget; det er en villet endring for alle, ikke noe som
-     * skal migreres bort. Har forelderen valgt bokstaver selv, står valget. */
-
-    /* 6: lydbanken kom til. Den som allerede har spilt skal ha den på, ellers
-     *    ville en gammel og en ny installasjon hørt ulike ut. */
-    6: function (d) { d.innstillinger.lydbank = standard.innstillinger.lydbank; }
+     * skal migreres bort. Har forelderen valgt bokstaver selv, står valget.
+     *
+     * 6 slo på lydbanken for gamle lagringer. Innstillingen finnes ikke
+     * lenger – språkpakken er eneste stemme – så steget er borte, men
+     * nummeret er brukt. */
 
     /* Ingen migrering 7 med vilje. Nettleserens egen talesyntese (og med den
      * stemmenavn, talefart, lydbank og bokstavlyd) ble fjernet: spillet
@@ -102,7 +109,21 @@ var Lagring = (function () {
           if (typeof lest[felt][v] === 'number') ut[felt][v] = lest[felt][v];
         });
       });
-      if (lest.framgang) ut.framgang = lest.framgang;
+      /* Framgangen er det eneste som ikke kan gjenskapes, så hver oppføring
+       * sjekkes: en skadet en skal ikke velte menyen. */
+      if (lest.framgang) {
+        Object.keys(lest.framgang).forEach(function (tegn) {
+          var f = lest.framgang[tegn];
+          if (!f || typeof f !== 'object') return;
+          ut.framgang[tegn] = {
+            riktig: +f.riktig || 0,
+            feil: +f.feil || 0,
+            dager: f.dager instanceof Array ? f.dager.filter(function (d) {
+              return typeof d === 'string';
+            }) : []
+          };
+        });
+      }
       if (lest.innstillinger) {
         for (var k in ut.innstillinger) {
           if (lest.innstillinger[k] !== undefined) {
@@ -115,9 +136,13 @@ var Lagring = (function () {
         for (var v = fra + 1; v <= NA_VERSJON; v++) {
           if (MIGRERINGER[v]) MIGRERINGER[v](ut);
         }
-        ut.versjon = NA_VERSJON;
         maaSkrives = true;
       }
+      /* Lagret av en nyere versjon – en gammel kopi fra hurtigbufferen er
+       * åpnet. Da skal vi ikke skrive ned et lavere nummer: neste gang den
+       * nyere versjonen åpnes, ville den kjørt migreringene sine om igjen og
+       * overskrevet valgene familien har gjort siden. */
+      ut.versjon = Math.max(fra, NA_VERSJON);
       return ut;
     } catch (e) {
       /* Ødelagt eller utilgjengelig lagring skal ikke stoppe spillet. */

@@ -11,8 +11,8 @@
  * For at det skal virke må vi vite nøyaktig hvilke setninger spillet lager.
  * Lista bygges derfor av de samme dataene og de samme formlene som talen
  * bruker – ikke skrevet av for hånd, som ville råtnet første gang et ord ble
- * byttet. En test i nettleseren høster det spillet faktisk sier og krever at
- * alt finnes her.
+ * byttet. test/stemme.test.js høster det spillet faktisk sier i nettleseren
+ * og krever at alt finnes her.
  *
  * Navnene på figurene kommer utenfra, siden de er ulike hos hver familie.
  * Uten dem hopper vi over de replikkene – rosen sies da uten navn i stedet,
@@ -22,12 +22,6 @@
  */
 
 var Replikker = (function () {
-
-  /* Samme formel som moduser.js bruker. Står her også, fordi lista må kunne
-   * bygges i node uten å laste hele spillet. */
-  function tilTale(ord) {
-    return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
-  }
 
   /* Filnavn av en replikk. Æ, Ø og Å skrives om, alt annet enn bokstaver og
    * tall blir bindestrek. Skal være til å lese i en filliste. */

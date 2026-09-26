@@ -28,6 +28,9 @@
  *   ord   – ordet som sies og vises
  *   ikon  – en emoji som vises stort på skjermen
  *
+ * Verdenen selv har i tillegg figur (hvilken tegning), landskap (bakgrunnen)
+ * og flagg (bildet øverst på oppsummeringen).
+ *
  * Spillet sier «L … L for Løve» – samme formel som alfabetbøkene bruker.
  */
 
@@ -91,6 +94,12 @@ var UTTALE = {
 /* Hvordan ett ord skal skrives for stemmen. Ukjente ord går rett gjennom. */
 function uttaleFor(ord) {
   return UTTALE[String(ord).toLowerCase()] || ord;
+}
+
+/* Ordet slik det sies midt i en setning: «L for løve». Forkortelser som
+ * «WC» står som de står – gjøres de om til småbokstaver, staves de feil. */
+function tilTale(ord) {
+  return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
 }
 
 /* ================= tallene ================= */
@@ -158,7 +167,8 @@ var VERDENER = {
     navn: 'Racerbanen',
     ikon: '🏁',
     figur: 'bil',
-    figurOrd: 'bilen',
+    landskap: 'aser',
+    flagg: '🏁',
     standardnavn: 'Turbo',
     navneforslag: ['Turbo', 'Lynet', 'Bulder', 'Rappen'],
     navnesporsmal: 'Hva skal racerbilen hete?',
@@ -204,7 +214,8 @@ var VERDENER = {
     navn: 'Sjørøverøya',
     ikon: '🏴‍☠️',
     figur: 'skip',
-    figurOrd: 'skipet',
+    landskap: 'oy',
+    flagg: '🏝️',
     standardnavn: 'Kaptein Rødskjegg',
     navneforslag: ['Kaptein Rødskjegg', 'Kaptein Krok', 'Kaptein Bart', 'Kaptein Kalle'],
     navnesporsmal: 'Hva skal kapteinen hete?',
@@ -264,7 +275,8 @@ var VERDENER = {
     tegn: TALL,
     ikon: '🦕',
     figur: 'dino',
-    figurOrd: 'dinosauren',
+    landskap: 'dal',
+    flagg: '🦕',
     standardnavn: 'Rex',
     navneforslag: ['Rex', 'Tass', 'Brumle', 'Piggen'],
     navnesporsmal: 'Hva skal dinosauren hete?',
