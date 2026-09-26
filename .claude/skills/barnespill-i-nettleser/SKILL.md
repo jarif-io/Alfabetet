@@ -347,13 +347,14 @@ fortsettelser til no-ops.
 gjør at den ene blir usynlig. Generer id per instans. CSS-variabler virker
 heller ikke i `stop-color` – bruk literale farger.
 
-**En figur på skrå trenger ett kamera.** Racerbilen ble tegnet for hånd i
-trekvart: siden i profil, panseret ovenfra, hjulene klemt sammen og frontruta på
-feil sted. Hver del fikk sin egen vinkel, og forelderen så det med en gang. Bygg
-heller figuren som enkle 3D-former (en sideprofil trukket ut i bredden) og
-projiser alt fra ett ortografisk kamera. Da blir hvert plan en SVG-`matrix()`,
-og øyne, lykter og hjul tegnes flatt i sitt eget plan (`lag3d` i
-`js/figurer.js`). Orker du ikke det, hold figuren i ren profil.
+**En figur på skrå trenger ett kamera – med perspektiv.** Racerbilen tegnet for
+hånd i trekvart fikk hver del sin egen vinkel. Ortografisk 3D på skrå så «vrengt»
+ut (uten perspektiv virker bakenden for stor), og ren sideprofil ble for flat.
+Det som holdt: en liten 3D-modell (tverrsnitt, sylinderhjul) projisert med
+perspektiv, flater malt bakfra, og ansiktet som hvite former i frontruta der
+lokket er kanten på det hvite (`bil3d` i `js/figurer.js`). Bilen står på skrå og
+snur seg til siden mens den kjører, så den aldri ser ut til å skli sidelengs.
+Pass på navnekollisjoner: en ny `kryss()` ble stille overskrevet av kartets.
 
 **Versaler til talesyntese blir bokstavnavn på engelsk.** Ha en tabell over
 hvordan bokstavene faktisk *heter* på norsk (`Q` → «ku», `W` → «dobbelt-ve»,

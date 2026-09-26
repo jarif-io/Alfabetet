@@ -1568,6 +1568,11 @@ body[data-verden="oy"] .skilt::after {
 }
 .fig-skygge { fill: rgba(0, 0, 0, .2); }
 
+/* Bilene står på skrå og ser på barnet, og snur seg rett bortover veien
+   mens de kjører (to tegninger av samme 3D-modell, se Figurer). */
+.fig .vis-kjor, .figur.kjorer .fig .vis-sta { display: none; }
+.figur.kjorer .fig .vis-kjor { display: inline; }
+
 /* Bilene krenger bakover når de setter fart, og nikker når de bremser. */
 .figur.kjorer .fig--bil, .figur.kjorer .fig--taue { animation: krenge 1000ms ease-out; }
 /* Kroken på tauebilen henger i wiren og svinger når den kjører – rundt

@@ -416,10 +416,10 @@ tegnet for dette spillet, i samme ånd, og barnet gir dem navn selv. Vil han at
 tauebilen skal hete Taue-Bill, kan dere skrive det inn under **For voksne** –
 rosen sies da uten navnet, siden det ikke ligger i språkpakken.
 
-Bilene er bygget som enkle 3D-former – en sideprofil trukket ut i bredden – og
-tegnet fra ett og samme kamera, litt forfra og ovenfra. Da stemmer vinklene på
-siden, panseret, ruta, lyktene og hjulene med hverandre, og hjulene ruller i sitt
-eget plan. Skipet og dinosauren er tegnet rett fra siden.
+Bilene er små 3D-modeller – tverrsnitt langs bilen, hjul som sylindere – tegnet
+med perspektiv fra ett kamera, så alle delene har samme vinkel. De står på skrå og
+ser på barnet med store øyne i frontruta, og snur seg rett bortover veien mens de
+kjører. Skipet og dinosauren er tegnet rett fra siden.
 
 ## Filene
 
