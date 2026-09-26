@@ -116,11 +116,21 @@ var hjelp = {
   fasit: async function (side) {
     var art = await side.evaluate(function () {
       var mal = document.getElementById('oppgave-mal');
+      if (mal.classList.contains('oppdrag-mal--hent')) return 'hent';
       if (mal.classList.contains('oppdrag-mal--tell')) return 'tell';
       if (mal.classList.contains('oppdrag-mal--ord')) return 'ord';
       if (mal.classList.contains('oppdrag-mal--navn')) return 'navn';
       return 'finn';
     });
+    /* «Hent»: tallet står på garasjen. Hent akkurat så mange biler. */
+    if (art === 'hent') {
+      var n = parseInt(await side.locator('#oppgave-valg .garasje-tall').textContent(), 10);
+      for (var j = 0; j < n; j++) {
+        await side.locator('#oppgave-mal .ting').nth(j).click();
+        await side.clock.runFor(60);
+      }
+      return 'hent';
+    }
     if (art === 'tell') {
       var ting = side.locator('#oppgave-mal .ting');
       var n = await ting.count();
@@ -145,7 +155,9 @@ var hjelp = {
   /* Venter til skiltene kan trykkes på, og trykker på riktig. */
   svarRiktig: async function (side) {
     var fasit = await hjelp.fasit(side);
-    var velger = '#oppgave-valg .skilt[data-bokstav="' + fasit + '"]';
+    var velger = fasit === 'hent'
+      ? '#oppgave-valg .skilt--garasje'
+      : '#oppgave-valg .skilt[data-bokstav="' + fasit + '"]';
     var klar = await hjelp.ventTil(side, function (v) {
       var k = document.querySelector(v);
       return k && !k.disabled && getComputedStyle(k).pointerEvents !== 'none';

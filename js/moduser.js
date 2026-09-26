@@ -408,16 +408,19 @@ var Moduser = (function () {
    * med én gang i stedet for å bomme to ganger på rad. */
   function oppsett() {
     var liten = Lagring.innstilling('niva') !== 'storre';
+    /* hentTall: hvor mange biler «Hent» kan be om. Små mengder først –
+     * to, tre og fire er det en treåring faktisk kan hente riktig. */
     return liten
-      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4 }
-      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5 };
+      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4) }
+      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7) };
   }
 
   var MODUSTITTEL = {
     finn: 'Finn bokstaven',
     forstelyd: 'Første lyd',
     navn: 'Navnet mitt',
-    tell: 'Tell'
+    tell: 'Tell',
+    hent: 'Hent'
   };
 
   var Oppgave = (function () {
@@ -429,8 +432,8 @@ var Moduser = (function () {
 
     /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
      * noen kjente blandes inn som hvilepunkter. */
-    function byggKo(verdenId, antall) {
-      var aktive = Lagring.aktiveTegn(verdenId);
+    function byggKo(verdenId, antall, aktive) {
+      aktive = aktive || Lagring.aktiveTegn(verdenId);
       var sortert = aktive.slice().sort(function (a, b) {
         var da = Lagring.dagerFor(a), db = Lagring.dagerFor(b);
         if (da !== db) return da - db;
@@ -521,6 +524,11 @@ var Moduser = (function () {
         return ['Hvor mange ' + okt.telleting.ord + '?', 400,
                 'Trykk på hver enkelt og tell.'];
       }
+      if (okt.type === 'hent') {
+        return okt.indeks === 0
+          ? [hentSetning(okt.verden, okt.fasit), 400, 'Trykk på garasjen når du er ferdig.']
+          : [hentSetning(okt.verden, okt.fasit)];
+      }
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
         oppslag.ord + '.', 420,
@@ -532,15 +540,17 @@ var Moduser = (function () {
       var v = VERDENER[okt.verden];
       okt.fasit = okt.ko[okt.indeks];
       okt.forsokPaDenne = 0;
+      okt.ferdigMedDenne = false;
+      okt.hjelpHent = false;
 
       tegnPrikker();
 
       var mal = el('oppgave-mal');
       mal.className = 'oppdrag-mal oppdrag-mal--' +
         (okt.type === 'finn' ? 'bokstav' : okt.type === 'navn' ? 'navn'
-          : okt.type === 'tell' ? 'tell' : 'ord');
-      if (okt.type === 'tell') {
-        el('oppgave-tekst').textContent = 'Hvor mange?';
+          : okt.type === 'tell' || okt.type === 'hent' ? 'tell' : 'ord');
+      if (okt.type === 'tell' || okt.type === 'hent') {
+        el('oppgave-tekst').textContent = okt.type === 'tell' ? 'Hvor mange?' : 'Hent';
         tegnTelleting();
       } else if (okt.type === 'finn' || okt.type === 'navn') {
         el('oppgave-tekst').textContent =
@@ -559,19 +569,32 @@ var Moduser = (function () {
 
       var valgfelt = el('oppgave-valg');
       valgfelt.innerHTML = '';
-      /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
-      var antallValg = Math.min(okt.antallValg, utvalg().length);
-      var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
-      okt.visteValg = alternativer.length;
-      alternativer.forEach(function (bokstav) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'skilt';
-        b.textContent = bokstav;
-        b.dataset.bokstav = bokstav;
-        b.addEventListener('click', function () { svar(bokstav, b); });
-        valgfelt.appendChild(b);
-      });
+      if (okt.type === 'hent') {
+        /* Ingen skilt å velge mellom – bare garasjen han leverer bilene i. */
+        var garasje = document.createElement('button');
+        garasje.type = 'button';
+        garasje.className = 'skilt skilt--garasje';
+        garasje.setAttribute('aria-label', 'Garasjen – trykk når du har hentet nok');
+        garasje.addEventListener('click', function () { lever(garasje); });
+        valgfelt.appendChild(garasje);
+        /* Alle bilene han kunne tatt, var valget – og det er alltid minst tre. */
+        okt.visteValg = el('oppgave-mal').querySelectorAll('.ting').length;
+        tegnGarasje();
+      } else {
+        /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
+        var antallValg = Math.min(okt.antallValg, utvalg().length);
+        var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
+        okt.visteValg = alternativer.length;
+        alternativer.forEach(function (bokstav) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'skilt';
+          b.textContent = bokstav;
+          b.dataset.bokstav = bokstav;
+          b.addEventListener('click', function () { svar(bokstav, b); });
+          valgfelt.appendChild(b);
+        });
+      }
 
       el('oppgave-videre').hidden = true;
 
@@ -593,11 +616,18 @@ var Moduser = (function () {
       /* Tingen trekkes tilfeldig, ikke fra tallets egen oppføring. Var det
        * alltid tre baller, kunne han svart riktig ved å kjenne igjen ballen
        * i stedet for å telle – og da måler vi hukommelse, ikke telling. */
-      okt.telleting = tilfeldig(TELLETING);
+      okt.telleting = tilfeldig(tellingFor(okt.verden));
+      /* I «Hent» står det flere biler enn han skal hente – én til tre
+       * ekstra. Oppgaven er å vite når han skal stoppe. */
+      if (okt.type === 'hent') {
+        var h = VERDENER[okt.verden].hent;
+        okt.telleting = { ord: h.flertall, ikon: h.ikon };
+        antall = Math.min(10, antall + 1 + Math.floor(Math.random() * 3));
+      }
       okt.talt = 0;
       okt.telt = [];
       tegnMengde(el('oppgave-mal'), okt.telleting.ikon, antall,
-                 'oppdrag-mal oppdrag-mal--tell mengde');
+                 'oppdrag-mal oppdrag-mal--tell' + (okt.type === 'hent' ? ' oppdrag-mal--hent' : '') + ' mengde');
 
       var ting = el('oppgave-mal').querySelectorAll('.ting');
       for (var i = 0; i < ting.length; i++) {
@@ -619,6 +649,7 @@ var Moduser = (function () {
     }
 
     function tellTing(t) {
+      if (okt.ferdigMedDenne) return;
       /* Trykk på noe som alt er talt: ta det bort igjen. Han skal kunne
        * angre og telle om, uten å måtte begynne på en ny oppgave – det er
        * halve poenget med å telle med fingeren. */
@@ -629,6 +660,14 @@ var Moduser = (function () {
         nummererPaNytt();
         Lyd.klikk();
         Tale.stopp();
+        if (okt.type === 'hent') tegnGarasje();
+        return;
+      }
+      /* Med hjelp i «Hent» er garasjen full når den er full – da kan han
+       * ikke hente flere, og runden ender alltid med at han klarte det. */
+      if (okt.type === 'hent' && okt.hjelpHent &&
+          okt.talt >= antallFor(okt.verden, okt.fasit)) {
+        spillOm(t, 'vugg', 500);
         return;
       }
       okt.telt.push(t);
@@ -638,6 +677,14 @@ var Moduser = (function () {
       spillOm(t, 'teller', 420);
       Lyd.klikk();
       Tale.stopp();
+
+      /* «Hent»: tauebilen kjører bort og henter den, og spillet teller. */
+      if (okt.type === 'hent') {
+        Tale.rekke([tellenavn(okt.talt) + '.']);
+        kjorTil(okt.verden, t);
+        tegnGarasje();
+        return;
+      }
 
       var alle = antallFor(okt.verden, okt.fasit);
       if (okt.talt >= alle) {
@@ -681,8 +728,64 @@ var Moduser = (function () {
         : 'Trykk for å se ' + merkeNavn(okt.verden).toLowerCase());
     }
 
+    /* Garasjen i «Hent»: tallet den vil ha, og bilene som er hentet. Med
+     * hjelp står det tomme plasser for resten, så han ser hvor mange som
+     * mangler, og garasjen pulserer når den er full. */
+    function tegnGarasje() {
+      var g = el('oppgave-valg').querySelector('.skilt--garasje');
+      if (!g) return;
+      var n = antallFor(okt.verden, okt.fasit);
+      var ikon = VERDENER[okt.verden].hent.ikon;
+      var vis = okt.hjelpHent ? Math.max(n, okt.talt) : okt.talt;
+      var plasser = '';
+      for (var i = 0; i < vis; i++) {
+        plasser += i < okt.talt
+          ? '<span class="garasje-plass full">' + ikon + '</span>'
+          : '<span class="garasje-plass"></span>';
+      }
+      g.innerHTML = '<span class="garasje-tall">' + okt.fasit + '</span>' +
+                    '<span class="garasje-plasser">' + plasser + '</span>';
+      g.classList.toggle('pekes', okt.hjelpHent && okt.talt === n);
+    }
+
+    /* Han trykker på garasjen: er det riktig antall, er oppgaven løst. For
+     * få: vi trenger flere, og det han har hentet blir stående. For mange:
+     * bilene kjøres ut igjen, og vi teller sammen fra start. */
+    function lever(knapp) {
+      if (okt.ferdigMedDenne) return;
+      var n = antallFor(okt.verden, okt.fasit);
+      if (!okt.talt) {
+        Tale.stopp();
+        Tale.rekke(sporsmalstale());
+        return;
+      }
+      if (okt.talt === n) { riktig(knapp); return; }
+
+      okt.forsokPaDenne += 1;
+      okt.paRad = 0;
+      Lagring.registrerFeil(okt.fasit);
+      spillOm(knapp, 'vugg', 500);
+      Lyd.proveIgjen();
+      uttrykk('hmm', 1400);
+      var forMange = okt.talt > n;
+      if (forMange) {
+        okt.telt.forEach(function (t) {
+          t.classList.remove('talt');
+          delete t.dataset.talltall;
+        });
+        okt.telt = [];
+        okt.talt = 0;
+      }
+      if (okt.forsokPaDenne >= okt.oppsett.bomForHjelp) okt.hjelpHent = true;
+      tegnGarasje();
+      Tale.stopp();
+      Tale.rekke(forMange
+        ? ['Det ble for mange.', 300, 'Vi teller sammen.']
+        : ['Vi trenger flere.']);
+    }
+
     function visMal() {
-      if (!okt || okt.type === 'forstelyd' || okt.type === 'tell') return false;
+      if (!okt || okt.type === 'forstelyd' || okt.type === 'tell' || okt.type === 'hent') return false;
       if (okt.malVist) return false;
       okt.malVist = true;
       tegnMal();
@@ -755,6 +858,7 @@ var Moduser = (function () {
     function riktig(knapp) {
       var v = VERDENER[okt.verden];
       var forsteForsok = okt.forsokPaDenne === 0;
+      okt.ferdigMedDenne = true;
 
       lasAlle();
       knapp.classList.remove('pekes');
@@ -791,7 +895,8 @@ var Moduser = (function () {
       /* Ikke lov noe vanskeligere på siste oppgave – runden slutter ved neste
        * trykk, og løftet ville aldri blitt innfridd. */
       var siste = okt.indeks + 1 >= okt.oppsett.antall;
-      var opp = !siste && okt.paRad >= okt.oppsett.opprykk &&
+      /* «Hent» har ingen skilt å velge mellom, og derfor ikke noe opprykk. */
+      var opp = !siste && okt.type !== 'hent' && okt.paRad >= okt.oppsett.opprykk &&
                 okt.antallValg < okt.oppsett.maksValg;
       if (opp) {
         okt.antallValg += 1;
@@ -807,6 +912,10 @@ var Moduser = (function () {
         ? [Tale.velg(rosord + ', ' + Lagring.navnFor(okt.verden) + '!',
                      rosord + '!')]
         : ['Der ja! Det er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.'];
+      /* Det siste tallordet er svaret: «tre biler» – så rosen. */
+      if (forsteForsok && okt.type === 'hent') {
+        ros = [hentSvar(okt.verden, okt.fasit), 300].concat(ros);
+      }
 
       Tale.stopp();
       Tale.rekke(opp ? ros.concat([350, 'Nå prøver vi en vanskeligere en.']) : ros);
@@ -841,7 +950,7 @@ var Moduser = (function () {
       /* Gikk det tungt to runder på rad, går vi ned et hakk igjen. «Navnet
        * mitt» holdes utenfor: den runden er like lang som navnet og sier
        * ingenting om hvor vanskelig bokstavene er. */
-      if (okt.type !== 'navn') {
+      if (okt.type !== 'navn' && okt.type !== 'hent') {
         Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
       }
 
@@ -883,7 +992,8 @@ var Moduser = (function () {
         brikke.style.animationDelay = (okt.oppsett.antall * 130 + 160 + n * 90) + 'ms';
         brikke.innerHTML = okt.type === 'navn'
           ? '<b>' + b + '</b>'
-          : '<b>' + b + '</b><i>' + ordFor(okt.verden, b).ikon + '</i>';
+          : '<b>' + b + '</b><i>' + (okt.type === 'hent'
+              ? VERDENER[okt.verden].hent.ikon : ordFor(okt.verden, b).ikon) + '</i>';
         brikker.appendChild(brikke);
       });
 
@@ -952,7 +1062,7 @@ var Moduser = (function () {
             opprykk: opps.opprykk
           };
         } else {
-          ko = byggKo(verdenId, opps.antall);
+          ko = byggKo(verdenId, opps.antall, type === 'hent' ? opps.hentTall : null);
         }
 
         okt = {

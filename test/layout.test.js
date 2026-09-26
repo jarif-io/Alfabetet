@@ -175,6 +175,13 @@ module.exports = async function (t) {
     await hjelp.tilVerden(side, 'Dinodalen');
     await hjelp.velgModus(side, 'Tell');
     await mål('Tell');
+    await hjelp.tilbake(side);
+    await hjelp.tilbake(side);
+
+    await hjelp.tilVerden(side, 'Verkstedet');
+    await hjelp.velgModus(side, 'Hent');
+    await side.locator('#oppgave-mal .ting').first().click();
+    await mål('Hent');
 
     ok(side.feil.length === 0, sk.navn + ': ingen feil i konsollen' + (side.feil.length ? ' – ' + side.feil.join(' | ') : ''));
     await side.context().close();

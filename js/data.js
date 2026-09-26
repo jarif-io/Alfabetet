@@ -88,7 +88,9 @@ var UTTALE = {
   'juice': 'jus',
   'yoghurt': 'jogurt',
   'quiz': 'kviss',
-  'cowboy': 'kauboi'
+  'cowboy': 'kauboi',
+  /* Trykket skal ligge på «fikk», ikke på «tra». */
+  'trafikklys': 'tra-fikklys'
 };
 
 /* Hvordan ett ord skal skrives for stemmen. Ukjente ord går rett gjennom. */
@@ -296,6 +298,56 @@ var VERDENER = {
       '9':  { ord: 'bananer',   ikon: '🍌' },
       '10': { ord: 'jordbær',   ikon: '🍓' }
     }
+  },
+
+  /* Verkstedet: tauebilens sted, og det andre stedet med tall. Samme tall
+   * som Dinodalen – framgangen deles, for det er tallene som skal læres,
+   * ikke stedet – men med ting fra verkstedet og veien, og med «Hent»:
+   * spillet ber om et antall biler, og han henter dem selv. Det er prøven på
+   * om han kan telle, ikke bare ramse opp tallrekka.
+   *
+   * Tauebilen er vår egen – oransje, med kran og krok – i samme ånd som
+   * bilfilmene, men ingen andres figur. Navneforslagene er våre egne. */
+  taue: {
+    id: 'taue',
+    navn: 'Verkstedet',
+    domene: 'tall',
+    tegn: TALL,
+    ikon: '🔧',
+    figur: 'tauebil',
+    landskap: 'aser',
+    flagg: '🔧',
+    standardnavn: 'Rusken',
+    navneforslag: ['Rusken', 'Bolten', 'Mutter', 'Vinsj'],
+    navnesporsmal: 'Hva skal tauebilen hete?',
+    utforsk: 'Verktøykassa',
+    samling: 'Verkstedveggen',
+    oppdrag: 'Kjør til',
+    ros: ['Godt slept', 'Kjempebra', 'Så flink du er', 'Det klarte du'],
+    /* Tingene «Tell» teller her. Trekkes tilfeldig, som i Dinodalen. */
+    telleting: [
+      { ord: 'biler',      ikon: '🚗' },
+      { ord: 'busser',     ikon: '🚌' },
+      { ord: 'lastebiler', ikon: '🚚' },
+      { ord: 'traktorer',  ikon: '🚜' },
+      { ord: 'skruer',     ikon: '🔩' },
+      { ord: 'nøkler',     ikon: '🔑' },
+      { ord: 'pakker',     ikon: '📦' }
+    ],
+    /* Det «Hent» ber om: «Hent tre biler.» */
+    hent: { entall: 'bil', flertall: 'biler', ikon: '🚗' },
+    ord: {
+      '1':  { ord: 'bil',          ikon: '🚗' },
+      '2':  { ord: 'nøkler',       ikon: '🔑' },
+      '3':  { ord: 'busser',       ikon: '🚌' },
+      '4':  { ord: 'trafikklys',   ikon: '🚦' },
+      '5':  { ord: 'lastebiler',   ikon: '🚚' },
+      '6':  { ord: 'traktorer',    ikon: '🚜' },
+      '7':  { ord: 'skruer',       ikon: '🔩' },
+      '8':  { ord: 'politibiler',  ikon: '🚓' },
+      '9':  { ord: 'pakker',       ikon: '📦' },
+      '10': { ord: 'bensinpumper', ikon: '⛽' }
+    }
   }
 };
 
@@ -323,6 +375,19 @@ function navnPaTegn(verdenId, tegn) {
 function antallFor(verdenId, tegn) {
   return domeneFor(verdenId) === 'tall' ? parseInt(tegn, 10) : 0;
 }
+
+/* Tingene «Tell» trekker fra i denne verdenen. */
+function tellingFor(verdenId) {
+  return VERDENER[verdenId].telleting || TELLETING;
+}
+
+/* «Hent tre biler.» og svaret «tre biler.» – én bil, men to biler. */
+function hentTing(verdenId, tall) {
+  var h = VERDENER[verdenId].hent;
+  return tallnavnFor(tall) + ' ' + (tall === '1' ? h.entall : h.flertall);
+}
+function hentSetning(verdenId, tall) { return 'Hent ' + hentTing(verdenId, tall) + '.'; }
+function hentSvar(verdenId, tall) { return hentTing(verdenId, tall) + '.'; }
 
 /* Henter oppslaget for ett tegn i én verden – en bokstav eller et tall. */
 function ordFor(verdenId, tegn) {

@@ -100,6 +100,60 @@ module.exports = async function (t) {
   ok(s2.feil.length === 0, 'ingen feil i konsollen etter foreldremenyen' + (s2.feil.length ? ' – ' + s2.feil.join(' | ') : ''));
   await s2.context().close();
 
+  /* ---------- «Hent»: for mange, for få, og hjelpen som sørger for at
+   * runden alltid ender med at han klarte det ---------- */
+  var s6 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s6, 'Verkstedet');
+  await hjelp.velgModus(s6, 'Hent');
+  function hentTilstand() {
+    return s6.evaluate(function () {
+      var g = document.querySelector('#oppgave-valg .skilt--garasje');
+      return {
+        n: parseInt(g.querySelector('.garasje-tall').textContent, 10),
+        biler: document.querySelectorAll('#oppgave-mal .ting').length,
+        hentet: document.querySelectorAll('#oppgave-mal .ting.talt').length,
+        plasser: g.querySelectorAll('.garasje-plass').length,
+        pekes: g.classList.contains('pekes'),
+        riktig: g.classList.contains('riktig')
+      };
+    });
+  }
+  var h = await hentTilstand();
+  ok(h.biler > h.n && h.biler <= Math.min(10, h.n + 3), 'Hent: flere biler enn han skal hente (' + h.biler + ' biler, hent ' + h.n + ')');
+  var biler = s6.locator('#oppgave-mal .ting');
+  for (var b = 0; b <= h.n; b++) { await biler.nth(b).click(); await s6.clock.runFor(60); }
+  await s6.locator('#oppgave-valg .skilt--garasje').click();
+  await s6.clock.runFor(200);
+  h = await hentTilstand();
+  ok(h.hentet === 0, 'Hent: for mange – bilene kjøres ut igjen (' + h.hentet + ' igjen)');
+  ok(h.plasser === h.n, 'Hent: med hjelp viser garasjen ' + h.n + ' plasser (' + h.plasser + ')');
+  for (var c = 0; c <= h.n; c++) { await biler.nth(c).click(); await s6.clock.runFor(60); }
+  h = await hentTilstand();
+  ok(h.hentet === h.n, 'Hent: med hjelp kan han ikke hente flere enn garasjen vil ha (' + h.hentet + '/' + h.n + ')');
+  ok(h.pekes, 'Hent: garasjen viser at den er full');
+  await s6.locator('#oppgave-valg .skilt--garasje').click();
+  await s6.clock.runFor(200);
+  h = await hentTilstand();
+  ok(h.riktig, 'Hent: riktig antall levert er riktig svar');
+
+  /* For få: det han har hentet blir stående, og garasjen ber om flere. */
+  await hjelp.ventTil(s6, function (forrige) {
+    var p = document.querySelectorAll('#oppgave-prikker .prikk');
+    return p[1] && p[1].classList.contains('na');
+  });
+  await s6.clock.runFor(300);
+  h = await hentTilstand();
+  await biler.nth(0).click();
+  await s6.clock.runFor(60);
+  if (h.n > 1) {
+    await s6.locator('#oppgave-valg .skilt--garasje').click();
+    await s6.clock.runFor(200);
+    var fa = await hentTilstand();
+    ok(fa.hentet === 1 && !fa.riktig, 'Hent: for få – det han har hentet blir stående (' + fa.hentet + ')');
+  }
+  ok(s6.feil.length === 0, 'Hent: ingen feil i konsollen' + (s6.feil.length ? ' – ' + s6.feil.join(' | ') : ''));
+  await s6.context().close();
+
   /* ---------- figuren viser hva som skjedde ----------
    * Glad ved riktig svar, «hmm» ved bom, vanlig igjen på menyen – og
    * pupillene ser mot fingeren. */

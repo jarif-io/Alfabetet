@@ -103,7 +103,8 @@ var Replikker = (function () {
         var oppslag = ordFor(id, tegn);
         if (!oppslag) return;
         if (tall) {
-          legg('ord', visningsordFor(id, tegn) + '.');
+          legg('ord', visningsordFor(id, tegn) + '.',
+               tallnavnFor(tegn) + ' ' + uttaleFor(oppslag.ord) + '.');
         } else {
           var navn = bokstavnavnFor(tegn), ord = tilTale(oppslag.ord);
           legg('ord', navn + ' for ' + ord + '.',
@@ -132,11 +133,21 @@ var Replikker = (function () {
       });
     });
 
-    /* --- tellingen --- */
-    TELLETING.forEach(function (t) {
-      legg('telling', 'Hvor mange ' + t.ord + '?',
-           'Hvor mange ' + uttaleFor(t.ord) + '?');
-      legg('telling', t.ord + '.', uttaleFor(t.ord) + '.');
+    /* --- tellingen, med tingene fra hver verden --- */
+    Object.keys(VERDENER).forEach(function (id) {
+      tellingFor(id).forEach(function (t) {
+        legg('telling', 'Hvor mange ' + t.ord + '?',
+             'Hvor mange ' + uttaleFor(t.ord) + '?');
+        legg('telling', t.ord + '.', uttaleFor(t.ord) + '.');
+      });
+      /* «Hent tre biler.» og svaret «tre biler.», for alle ti tallene – så
+       * trengs ingen nye klipp om spennet i oppsett() endres. */
+      if (VERDENER[id].hent) {
+        TALL.forEach(function (tall) {
+          legg('telling', hentSetning(id, tall));
+          legg('telling', hentSvar(id, tall));
+        });
+      }
     });
 
     /* --- faste setninger --- */
@@ -155,7 +166,11 @@ var Replikker = (function () {
       'Den kan du nå!',
       'Det er navnet ditt!',
       'Der var hele alfabetet! Fra a til å.',
-      'Der var alle tallene! Fra én til ti.'
+      'Der var alle tallene! Fra én til ti.',
+      'Trykk på garasjen når du er ferdig.',
+      'Det ble for mange.',
+      'Vi teller sammen.',
+      'Vi trenger flere.'
     ].forEach(function (t) { legg('setning', t); });
 
     return ut;

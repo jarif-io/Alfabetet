@@ -166,11 +166,12 @@ var Spill = (function () {
   }
 
   /* Stedene på forsidekartet, i prosent av kartflaten. Tallene følger
-   * tegningen i Figurer.kart(): banen ligger på sletta i vest, dinosauren
-   * ved vulkanen i øst, og skipet ute på åpent hav – på sjøen, der et skip
-   * hører hjemme. */
+   * tegningen i Figurer.kart(): banen ligger på sletta i vest, verkstedet i
+   * nord, dinosauren ved vulkanen i øst, og skipet ute på åpent hav – på
+   * sjøen, der et skip hører hjemme. */
   var KARTSTEDER = {
     bane: { x: 37, y: 61 },
+    taue: { x: 38, y: 34 },
     dino: { x: 70, y: 33 },
     oy:   { x: 83.5, y: 78 }
   };
@@ -363,16 +364,29 @@ var Spill = (function () {
     ].concat(tall ? tallmoduser() : bokstavmoduser());
   }
 
-  /* Tallverdenen: «Tell» er den egentlige telleferdigheten. */
+  /* Tallverdenene: «Tell» er den egentlige telleferdigheten, og «Hent» –
+   * bare i verdenene som har noe å hente – er prøven på den. */
   function tallmoduser() {
+    var v = VERDENER[naVerden];
     return [
       {
         id: 'tell',
         bilde: 'tell',
-        tegn: function () { return [TELLETING[0].ikon]; },
+        tegn: function () { return [tellingFor(naVerden)[0].ikon]; },
         navn: 'Tell',
         apen: alltid,
         start: function () { Lyd.klikk(); startOppgave('tell'); }
+      },
+      {
+        id: 'hent',
+        bilde: 'hent',
+        tegn: function () { return [v.hent.ikon]; },
+        navn: 'Hent',
+        /* Stedets eget spill, så det står der fra første dag. Tallene er
+         * små i starten (se oppsett() i moduser.js). */
+        mulig: function () { return !!v.hent; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('hent'); }
       },
       {
         id: 'finntall',

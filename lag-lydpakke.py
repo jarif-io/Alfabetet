@@ -23,7 +23,8 @@ ned fra sherpa-onnx sine utgivelser første gang skriptet kjøres.
 Bruk
 ----
     pip install sherpa-onnx lameenc numpy
-    python3 lag-lydpakke.py
+    python3 lag-lydpakke.py          lager klippene som mangler
+    python3 lag-lydpakke.py --alt    lager alle på nytt
 
 Ferdige filer trengs bare å lages på nytt hvis ordene i js/data.js endres.
 Klippene ligger i repoet, så spillet virker uten at noen kjører dette.
@@ -186,19 +187,24 @@ def main():
     liste = replikker()
     print('%d replikker å lese inn.' % len(liste))
 
-    tts = lag_tts(hent_modell())
     os.makedirs(UT, exist_ok=True)
+    alt = '--alt' in sys.argv
 
-    # Rydd bort klipp fra en tidligere kjøring, ellers blir gamle filer
-    # liggende igjen som ingen lenger peker på.
+    # Klipp som allerede finnes, lages ikke på nytt: det sparer tid, og et
+    # ord han kjenner skal ikke plutselig høres litt annerledes ut. Klipp
+    # ingen replikk peker på lenger, ryddes bort.
+    trengs = set(r['id'] + '.mp3' for r in liste)
     for f in os.listdir(UT):
-        if f.endswith('.mp3'):
+        if f.endswith('.mp3') and (alt or f not in trengs):
             os.remove(os.path.join(UT, f))
+    nye = [r for r in liste if not os.path.exists(os.path.join(UT, r['id'] + '.mp3'))]
+    print('%d mangler klipp.' % len(nye))
 
-    manifest = {}
+    tts = lag_tts(hent_modell()) if nye else None
+    manifest = {r['nokkel']: r['id'] + '.mp3' for r in liste}
     bytes_sum = 0
     korte = []
-    for i, r in enumerate(liste):
+    for i, r in enumerate(nye):
         # «uttale» er teksten skrevet slik stemmen leser den riktig; for de
         # aller fleste replikkene er den lik teksten selv. Se UTTALE i data.js.
         a = tts.generate(r.get('uttale') or r['tekst'], sid=0, speed=FART)
@@ -211,9 +217,7 @@ def main():
         with open(os.path.join(UT, fil), 'wb') as f:
             f.write(data)
         bytes_sum += len(data)
-        manifest[r['nokkel']] = fil
-        if (i + 1) % 50 == 0:
-            print('  %d/%d' % (i + 1, len(liste)))
+        print('  ' + r['tekst'])
 
     with open(os.path.join(UT, 'manifest.js'), 'w') as f:
         f.write(
@@ -228,7 +232,7 @@ def main():
             'var LYDFILER = ' + json.dumps(manifest, ensure_ascii=False,
                                            indent=1, sort_keys=True) + ';\n')
 
-    print('\nFerdig: %d klipp, %.1f MB i lyd/.' % (len(manifest), bytes_sum / 1e6))
+    print('\nFerdig: %d klipp i pakken, %d nye (%.1f MB).' % (len(manifest), len(nye), bytes_sum / 1e6))
     if korte:
         print('Mistenkelig korte klipp (sjekk dem):')
         for t, s in korte[:10]:

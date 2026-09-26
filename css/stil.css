@@ -114,6 +114,23 @@ body[data-verden="dino"] {
   --aksent-svak: #e6f4ea;
 }
 
+/* Verkstedet: asfalt og oransje, som tauebilen. */
+body[data-verden="taue"] {
+  --himmel-topp: #74c4e8;
+  --himmel-bunn: #ffd9a0;
+  --sol: rgba(255, 226, 168, .9);
+  --as-fjern: #b9cfc0;
+  --as-bak: #93b59e;
+  --as-fram: #6d9f7e;
+  --tre: #4c8a63;
+  --grunn-topp: #55595f;
+  --grunn-bunn: #3b3e44;
+  --stripe: #f2c33d;
+  --aksent: #e07a1f;
+  --aksent-mork: #a4520c;
+  --aksent-svak: #fdf0e2;
+}
+
 * { box-sizing: border-box; }
 
 /* Uten dette markerer iOS tekst og åpner hurtigmeny når man trykker litt
@@ -280,7 +297,8 @@ body.bevegelse .scene-landskap .lag--fram { transform: translateX(max(-160px, ca
 }
 
 /* Lys kantlinje øverst på asfalten – veier har kanter. */
-body[data-verden="bane"] .scene-grunn::before {
+body[data-verden="bane"] .scene-grunn::before,
+body[data-verden="taue"] .scene-grunn::before {
   content: "";
   position: absolute;
   left: 0; right: 0; top: 7px;
@@ -776,6 +794,7 @@ body.pa-havet .ingress {
 .kartsted--bane { --merke: #dc3327; }
 .kartsted--oy   { --merke: #16788f; }
 .kartsted--dino { --merke: #2f8f52; }
+.kartsted--taue { --merke: #e07a1f; }
 
 /* Skipet ligger på vannet og skal duve, ikke stå stille som et hus – men
    bare når «la ting bevege seg» er på, som alt annet som går av seg selv. */
@@ -936,6 +955,9 @@ body.bevegelse .kartsted--oy .kartsted-figur {
 .mb-hoyttaler path { fill: var(--blekk); }
 .mb-hoyttaler .mb-bolge { fill: none; stroke: var(--blekk); stroke-width: 3; stroke-linecap: round; }
 .mb-ikon { font-size: 30px; text-anchor: middle; }
+.mb-ikon--liten { font-size: 19px; }
+.mb-garasje { fill: var(--aksent); }
+.mb-garasje-tall { fill: #fff; font-family: var(--font-display); font-weight: 800; font-size: 18px; text-anchor: middle; }
 .mb-ting rect { fill: var(--flate); stroke: var(--aksent); stroke-width: 3; }
 .mb-merke { fill: var(--aksent); }
 .mb-merketall { fill: #fff; font-size: 11px; }
@@ -1283,6 +1305,55 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   border-radius: 0 0 4px 4px;
   background: linear-gradient(to right, #8a8f99, #b9bec7 40%, #7d838d);
 }
+/* «Hent»: garasjen han leverer bilene i. Større enn et skilt, uten stolpe,
+   med tallet den vil ha og en rad med bilene som er hentet. Dobbel klasse,
+   så størrelsene for skilt på telefon lenger ned ikke krymper den. */
+.valg .skilt--garasje {
+  width: auto;
+  height: auto;
+  min-width: 170px;
+  min-height: 130px;
+  padding: 12px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 30px 30px 18px 18px;
+  transform: none;
+}
+.skilt--garasje::after { display: none; }
+/* Et tak, så skiltet blir en garasje. */
+.skilt--garasje::before {
+  content: "";
+  position: absolute;
+  left: 8%; right: 8%;
+  bottom: 100%;
+  height: 22px;
+  background: var(--aksent);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.garasje-tall { font-size: 3.2rem; line-height: 1; }
+.garasje-plasser {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  max-width: 230px;
+  min-height: 32px;
+}
+.garasje-plass {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 2px dashed rgba(35, 38, 45, .3);
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  line-height: 1;
+}
+.garasje-plass.full { border: none; background: var(--aksent-svak); }
+
 body[data-verden="oy"] .skilt::after {
   background: linear-gradient(to right, #7d5330, #a9713f 40%, #6b4322);
 }
@@ -1421,7 +1492,16 @@ body[data-verden="oy"] .skilt::after {
 .fig-skygge { fill: rgba(0, 0, 0, .2); }
 
 /* Bilene krenger bakover når de setter fart, og nikker når de bremser. */
-.figur.kjorer .fig--bil { animation: krenge 1000ms ease-out; }
+.figur.kjorer .fig--bil, .figur.kjorer .fig--taue { animation: krenge 1000ms ease-out; }
+/* Kroken på tauebilen henger i wiren og svinger når den kjører. */
+.krok { transform-box: view-box; transform-origin: 20px 22px; }
+.figur.kjorer .krok { animation: sving 1000ms ease-in-out; }
+@keyframes sving {
+  0%, 100% { transform: none; }
+  25% { transform: rotate(14deg); }
+  60% { transform: rotate(-8deg); }
+  85% { transform: rotate(3deg); }
+}
 @keyframes krenge {
   0%, 100% { transform: none; }
   16% { transform: rotate(-3deg); }

@@ -247,6 +247,75 @@ var Figurer = (function () {
     '</svg>';
   }
 
+  /* ---------- tauebilen ---------- */
+
+  /* Vår egen tauebil: oransje, litt skeiv antenne, noen rustprikker og et
+   * stort glis – en hjelpsom venn fra verkstedet. Kranen og kroken bak er
+   * det som gjør den til en tauebil; kroken svinger når den kjører. */
+  function tauebil() {
+    var gLakk = unik('tlakk'), gGlass = unik('tglass'), gBenk = unik('tbenk');
+    return '' +
+    '<svg class="fig fig--taue" viewBox="0 0 200 118" role="img" aria-label="Tauebil">' +
+      '<defs>' +
+        '<linearGradient id="' + gLakk + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#ffb35c"/><stop offset=".5" stop-color="#f07f1e"/>' +
+          '<stop offset="1" stop-color="#b3560b"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="' + gGlass + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#eef9fe"/><stop offset=".55" stop-color="#a9d3ea"/>' +
+          '<stop offset=".62" stop-color="#7fb2cf"/><stop offset="1" stop-color="#b9dcef"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="' + gBenk + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#737a84"/><stop offset="1" stop-color="#454a53"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+
+      bakkeskygge(100, 110, 82, [52, 152]) +
+
+      /* kranen bakerst, med wire og krok */
+      '<path d="M48 62L22 22" stroke="#5b616b" stroke-width="8" stroke-linecap="round"/>' +
+      '<path d="M44 60L24 27" stroke="rgba(255,255,255,.18)" stroke-width="2" stroke-linecap="round"/>' +
+      '<g class="krok">' +
+        '<path d="M20 22v30" stroke="#3a3f47" stroke-width="2"/>' +
+        '<path d="M20 51v7a6 6 0 1 0 6 6" stroke="#8e939c" stroke-width="3.6" fill="none" stroke-linecap="round"/>' +
+      '</g>' +
+      '<circle cx="20" cy="21" r="5.5" fill="#3a3f47"/><circle cx="20" cy="21" r="2" fill="#8e939c"/>' +
+
+      /* lasteplanet, med varselstriper bakerst */
+      '<path d="M10 60h96v20H14c-2 0-4-2-4-4z" fill="url(#' + gBenk + ')"/>' +
+      '<path d="M10 70h14v10H14c-2 0-4-2-4-4z" fill="#f2c33d"/>' +
+      '<path d="M13 70l6 10M19 70l5 8" stroke="#23262d" stroke-width="2.4"/>' +
+
+      /* førerhuset */
+      '<path d="M100 82V46c0-11 8-19 19-19h32c9 0 15 4 19 11l12 20c3 4 4 8 4 12v12z" fill="url(#' + gLakk + ')"/>' +
+      '<path d="M112 30c10-2 26-2 38 0" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" stroke-linecap="round" fill="none"/>' +
+      '<path d="M104 64h80" stroke="rgba(255,255,255,.25)" stroke-width="3" stroke-linecap="round"/>' +
+      '<path d="M132 58v24" stroke="rgba(0,0,0,.18)" stroke-width="2"/>' +
+      /* sidevindu og frontrute */
+      '<rect x="108" y="34" width="22" height="20" rx="5" fill="url(#' + gGlass + ')"/>' +
+      '<path d="M136 32h16c7 0 12 3 15 8l12 18h-43z" fill="url(#' + gGlass + ')"/>' +
+      /* varsellys på taket, skeiv antenne og noen rustprikker */
+      '<path d="M122 21h14l2 7h-18z" fill="#f2c33d"/><path d="M125 22h4l-1 5h-4z" fill="#fff6c8"/>' +
+      '<path d="M110 28q-3-10 4-17" stroke="#3a3f47" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="114" cy="11" r="2.2" fill="#d8392b"/>' +
+      '<g fill="#8e4410" opacity=".55"><circle cx="118" cy="68" r="2"/><circle cx="124" cy="73" r="1.4"/><circle cx="113" cy="75" r="1.2"/></g>' +
+
+      /* lykt og støtfanger – munnen sitter på støtfangeren */
+      '<circle cx="183" cy="62" r="4.5" fill="#ffe9a0"/>' +
+      '<path d="M168 70h20c4 0 7 3 6 7l-1 3c-1 3-3 4-6 4h-19z" fill="#9aa1ab"/>' +
+
+      hjul(52, 84, 19, 'hjul--bak') +
+      hjul(152, 84, 19, 'hjul--front') +
+
+      ansikt('stor', [[148, 45, 6], [162, 46, 6]], {
+        vanlig: 'M173 75q8 5 16 0',
+        glad: 'M172 73q9 10 18 0z',
+        hmm: 'M175 77q6-2 12 1',
+        trott: 'M177 76q5 3 10 0'
+      }) +
+    '</svg>';
+  }
+
   /* ---------- dinosauren ---------- */
 
   /* Vår egen dinosaur – en rolig, rund planteeter med plater på ryggen.
@@ -432,6 +501,16 @@ var Figurer = (function () {
                   (k + 1) + '</text>';
       }
 
+    } else if (art === 'hent') {
+      /* Biler som hentes inn i garasjen: to biler, pila, og garasjen som
+       * sier hvor mange den vil ha. */
+      inni =
+        '<text class="mb-ikon mb-ikon--liten" x="17" y="24" dy=".35em">' + n(0, '🚗') + '</text>' +
+        '<text class="mb-ikon mb-ikon--liten" x="17" y="50" dy=".35em">' + n(0, '🚗') + '</text>' +
+        pil(34, 37) +
+        '<path class="mb-garasje" d="M54 32l20-15 20 15v28H54z"/>' +
+        '<text class="mb-garasje-tall" x="74" y="44" dy=".35em">2</text>';
+
     } else {
       inni = brikke(35, 20, 30, 30, n(0, '?'));
     }
@@ -568,12 +647,19 @@ var Figurer = (function () {
         '<path d="M474 566c48 20 100 12 168-16"/>' +
       '</g>' +
 
-      /* Hytta på sletta, og brygga som peker ut mot skipet. */
+      /* Verkstedet i nord, med vei ned til racerbanen. Tauebilen står
+         foran garasjeporten (se KARTSTEDER i spill.js). */
+      '<path d="M396 262C402 316 410 362 402 414" fill="none" stroke="#8d9299" stroke-width="26" stroke-linecap="round"/>' +
+      '<path d="M396 262C402 316 410 362 402 414" fill="none" stroke="#fdfaf2" stroke-width="3" stroke-dasharray="12 16" opacity=".8"/>' +
       '<g>' +
-        '<path d="M416 302l34-28 34 28z" fill="#c0763f"/>' +
-        '<rect x="426" y="302" width="48" height="30" rx="5" fill="#f4e5c2"/>' +
-        '<rect x="442" y="313" width="16" height="19" rx="3" fill="#a9743c"/>' +
+        '<rect x="322" y="196" width="118" height="70" rx="6" fill="#ecdcb6"/>' +
+        '<path d="M310 202L381 158l71 44z" fill="#b85a2a"/>' +
+        '<rect x="352" y="214" width="58" height="52" rx="4" fill="#9aa1ab"/>' +
+        '<path d="M356 226h50M356 238h50M356 250h50" stroke="#7d838d" stroke-width="3"/>' +
+        '<rect x="362" y="170" width="38" height="18" rx="5" fill="#e07a1f"/>' +
+        '<circle cx="381" cy="179" r="4.5" fill="none" stroke="#fff" stroke-width="3"/>' +
       '</g>' +
+      /* Brygga som peker ut mot skipet. */
       '<g>' +
         '<path d="M642 542l78 40-8 15-78-40z" fill="#c08a4f"/>' +
         '<g stroke="#96612f" stroke-width="3.5" stroke-linecap="round">' +
@@ -586,9 +672,7 @@ var Figurer = (function () {
       '</g>' +
 
       /* Palmer, steiner og kryss – noe å peke på i mellomrommene. */
-      palme(252, 318, 1.05, false) +
-      palme(300, 236, 0.9, true) +
-      palme(432, 196, 0.95, false) +
+      palme(244, 352, 1.05, false) +
       palme(238, 470, 1, true) +
       palme(322, 622, 1.05, false) +
       palme(556, 596, 0.95, true) +
@@ -741,7 +825,7 @@ var Figurer = (function () {
     nedtelling: nedtelling,
     nedtellingOmkrets: NEDTELLING_OMKRETS,
     figurFor: function (verdenId) {
-      return ({ bil: bil, skip: skip, dino: dino })[VERDENER[verdenId].figur]();
+      return ({ bil: bil, skip: skip, dino: dino, tauebil: tauebil })[VERDENER[verdenId].figur]();
     },
     landskapFor: function (verdenId) {
       return ({ aser: aser, oy: oy, dal: dal })[VERDENER[verdenId].landskap]();
