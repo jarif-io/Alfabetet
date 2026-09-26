@@ -1,11 +1,11 @@
 # Oppdagerøya
 
 Et rolig spill på norsk om **bokstaver og tall**, laget for en treåring som liker
-biler, sjørøvere og dinosaurer. Det kjører i nettleseren, virker uten internett,
+biler, tauebiler, sjørøvere og dinosaurer. Det kjører i nettleseren, virker uten internett,
 og lagrer framgangen lokalt på maskinen.
 
-Forsiden er et kart over øya. Racerbanen, Dinodalen og Sjørøverøya ligger som
-steder på kartet, og han trykker rett på det stedet han vil til.
+Forsiden er et kart over øya. Racerbanen, Verkstedet, Dinodalen og Sjørøverøya
+ligger som steder på kartet, og han trykker rett på det stedet han vil til.
 
 Alt er lagt opp for en som **ikke kan lese**: hver bokstav og hvert tall har et
 bilde han kan kjenne igjen og navngi, oppgavene sies høyt, og resultatet vises
@@ -29,15 +29,15 @@ som krever et trykk før den vil spille noe.
 
 ## Slik spiller han
 
-Forsiden er et øykart. De tre verdenene ligger som steder på kartet —
-**Racerbanen** på sletta, **Dinodalen** ved vulkanen og **Sjørøverøya** ute på
-sjøen — og han trykker rett på det stedet han vil til. Kartet er det eneste
+Forsiden er et øykart. De fire verdenene ligger som steder på kartet —
+**Racerbanen** på sletta, **Verkstedet** i nord, **Dinodalen** ved vulkanen og
+**Sjørøverøya** ute på sjøen — og han trykker rett på det stedet han vil til. Kartet er det eneste
 stedet verden velges, og tilbakeknappen fører alltid helt hjem dit.
 
 Så gir han figuren sin et navn. Navnet brukes gjennom hele spillet.
 
-Racerbanen og Sjørøverøya handler om bokstaver. **Dinodalen handler om tall**, og ligger for
-seg selv med vilje: tall og bokstaver skal ikke blandes på samme skjerm, og et
+Racerbanen og Sjørøverøya handler om bokstaver. **Dinodalen og Verkstedet handler om
+tall**, og ligger for seg selv med vilje: tall og bokstaver skal ikke blandes på samme skjerm, og et
 barn skjønner «her bor tallene» raskere enn noen forklaring. Telleren i toppen,
 samlingen og vanskegraden holdes også hver for seg, så ti tall ikke blandes inn
 blant 25 bokstaver.
@@ -63,10 +63,12 @@ Fem ting å gjøre, ordnet fra lettest til vanskeligst:
 | **Finn bokstaven** | Spillet sier en bokstav, og han velger blant skiltene. Bokstaven er skjult bak et spørsmålstegn han kan trykke på hvis han trenger å se den — ellers ville oppgaven bare vært å finne to like. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? Dette er den vanskeligste, og den kommer ofte først rundt fire år. |
 
-### I Dinodalen
+### I Dinodalen og Verkstedet
 
-Her er tallene fra **1 til 10**. Dinosauren trasker bortover på samme måte som
-bilen kjører, og alt annet fungerer som i bokstavverdenene.
+Her er tallene fra **1 til 10**. Dinosauren trasker og tauebilen kjører bortover
+på samme måte som racerbilen, og alt annet fungerer som i bokstavverdenene.
+Framgangen i tall er felles for de to stedene – det er tallene som skal læres,
+ikke stedet.
 
 | | Hva det er |
 | --- | --- |
@@ -74,6 +76,15 @@ bilen kjører, og alt annet fungerer som i bokstavverdenene.
 | **Tallrekka** | Fra 1 til 10, ett trykk om gangen, med mengden ved siden av. Samme rolige tur som Alfabetløypa. |
 | **Tell** | Et antall ting vises. Han **trykker på hver enkelt**, og spillet teller høyt: «én … to … tre». Så velger han tallet. |
 | **Finn tallet** | Hør tallet, og velg riktig skilt. Kommer når tre tall sitter — å kjenne igjen tallsymbolet er vanskeligere enn å telle ting. |
+| **Hent** (Verkstedet) | «Hent tre biler!» Han trykker på én bil om gangen, tauebilen henter den, og spillet teller høyt. Så trykker han på garasjen. |
+
+**Hvorfor «Hent»?** Å telle ordentlig er mer enn å ramse opp tallene. Det er å
+vite at det siste tallordet er *hvor mange* – og å kunne stoppe der. Det står
+derfor alltid én til tre biler for mye, og oppgaven er å vite når han har nok.
+Ble det for mange, kjøres bilene ut igjen og dere teller sammen; for få, og
+garasjen ber om flere. Med hjelp viser garasjen tomme plasser og tar ikke imot
+flere enn den skal ha, så runden alltid ender med at han klarte det. Tallene er
+2–4 på «helt liten» og 2–7 på «litt større».
 
 **Hvorfor må han trykke på hver ting i «Tell»?** Fordi det er dette som *er* å
 telle: å peke på hver ting nøyaktig én gang og sette ett tallord til hver. Å se
@@ -106,8 +117,10 @@ sterkeste koblingen: tegnet på skjermen og tasten under fingeren er det samme.
 `Esc` går tilbake. Spillet tåler at en treåring hamrer på tastaturet — taster som
 holdes nede teller ikke, og det er en liten sperre mellom hvert utslag.
 
-**Trykk på bilen eller skipet**, så tuter den og hopper. Det er det første han
-prøver, og da skal det skje noe.
+**Trykk på figuren**, så sier den fra og hopper: bilen tuter, skipet ringer i
+skipsklokka, og dinosauren brøler (vennlig). Det er det første han prøver, og da
+skal det skje noe. Figurene har ansikt: de blir glade av et riktig svar, ser
+«hmm» ut etter et bom, og pupillene ser mot fingeren hans når han rører skjermen.
 
 **Nedtellingen etter hvert svar** teller ned fra 3 til 0 og går videre av seg
 selv — det finnes ingen knapp å lete etter og treffe for hver eneste oppgave.
@@ -132,9 +145,20 @@ Spillet er med vilje rolig. Det er ikke en innstilling, men måten det er laget 
 - **Feiringen er kort.** Riktig svar gir ett sekund med figur, lyd og en stjerne —
   så stille.
 - **Ingen blindvei.** Bommer han, viser spillet svaret og lar ham trykke på det
-  selv, slik at runden alltid ender med at han fikk det til.
+  selv, slik at runden alltid ender med at han fikk det til. Hjelpen er med
+  vilje roligere enn å klare det selv – figuren kjører ikke og blir ikke glad –
+  så det aldri lønner seg å bomme.
+- **Lytt først.** Svarskiltene sover, dempet og ikke trykkbare, mens spørsmålet
+  leses, og spretter opp når det er ferdig. Å trykke tilfeldig mens stemmen
+  snakker gjør ingenting. I «Tell» våkner tallskiltene først når alt er talt, så
+  telling er veien til svaret.
+- **En naturlig pause.** Etter fire runder på rad er figuren trøtt på
+  oppsummeringen, stemmen sier «Nå trenger vi en pause», og pila rundt («en
+  runde til») er borte. Det er ingen lås, men spillet ber aldri om mer.
+  Telleren nullstilles etter en halvtime uten runder.
 - **En runde er kort** — fem oppgaver på standardnivået, et par minutter — og
-  slutter av seg selv. Spillet maser aldri om «en runde til».
+  slutter av seg selv. På oppsummeringen er huset (hjem til menyen) hovedvalget;
+  pila rundt er der, men spillet maser aldri om «en runde til».
 
 Fra start er alt stilt inn på de aller minste: **fem oppgaver i en runde**, to skilt å
 se på, og hjelp allerede etter ett bom. Vanskegraden stiger til tre skilt etter fire
@@ -194,7 +218,7 @@ nederst hele tiden, så du aldri mister veien ut. Der kan du:
 - Slå på **«vis alle modusene på menyen»** hvis du heller vil ha alt framme enn å la
   spillet slippe til én om gangen.
 - Se **hvilke bokstaver han sitter godt i** og hvilke som henger igjen.
-- Bytte navn på figurene. Tømmer du feltet, heter figuren standardnavnet igjen, og
+- Bytte navn på figurene (racerbilen, kapteinen, dinosauren og tauebilen). Tømmer du feltet, heter figuren standardnavnet igjen, og
   barnet får døpe den på nytt neste gang han velger verdenen.
 - **Nullstille all framgang.** Knappen må holdes inne i to sekunder, og en fylling
   viser at det skjer noe. Før lå den bak en ja/nei-dialog — det var ett trykk til på
@@ -292,8 +316,12 @@ python3 lag-lydpakke.py
 
 Skriptet henter stemmemodellen første gang (~64 MB, havner i `stemme/`, som
 ikke er i repoet), leser inn alle replikkene og skriver `lyd/manifest.js`.
-Kjør `node bygg-enfil.js` etterpå hvis dere bruker enfil-utgaven — den legger
-klippene inn i selve filen, så den fortsatt er én fil som virker uten nett.
+Skriptet lager bare klippene som mangler – de som finnes fra før, blir liggende
+byte for byte, så et ord han kjenner høres likt ut. `python3 lag-lydpakke.py
+--alt` lager alle på nytt; det trengs hvis dere endrer uttalen av et ord som
+allerede har klipp. Kjør `node bygg-enfil.js` etterpå hvis dere bruker
+enfil-utgaven — den legger klippene inn i selve filen, så den fortsatt er én fil
+som virker uten nett.
 
 ### Når et nytt ord blir lest feil
 
@@ -328,8 +356,8 @@ trenger.
 node bygg-enfil.js
 ```
 
-Det lager **`oppdageroya.html`** — hele spillet i én fil på rundt 220 KB, med
-skriftene og alt annet inni. Den kan sendes på e-post, AirDropes til en iPad,
+Det lager **`oppdageroya.html`** — hele spillet i én fil på rundt 3 MB, med
+skriftene, stemmen og alt annet inni. Den kan sendes på e-post, AirDropes til en iPad,
 legges på en minnepinne eller åpnes rett fra Nedlastinger. Ingen server, ingen
 mapper som må følge med, virker uten nett.
 
@@ -372,9 +400,12 @@ med den siste, tving fram en fersk kopi slik:
 
 ## Om figurene
 
-Lynet McQueen (Disney/Pixar) og Kaptein Sabeltann (Terje Formoe) er beskyttede
-figurer, og er ikke brukt her. Racerbilen og skipet er tegnet for dette spillet, i
-samme ånd, og barnet gir dem navn selv.
+Lynet McQueen og Taue-Bill (Disney/Pixar) og Kaptein Sabeltann (Terje Formoe) er
+beskyttede figurer, og er ikke brukt her. Racerbilen med øyne i frontruta,
+tauebilen med kran og krok, og sjørøverkapteinen med rødt skjegg og papegøye er
+tegnet for dette spillet, i samme ånd, og barnet gir dem navn selv. Vil han at
+tauebilen skal hete Taue-Bill, kan dere skrive det inn under **For voksne** –
+rosen sies da uten navnet, siden det ikke ligger i språkpakken.
 
 ## Filene
 
@@ -394,7 +425,28 @@ js/spill.js       navigasjon, scene, tastatur og foreldremeny
 lag-lydpakke.py   leser inn alle replikkene med en norsk nevral stemme
 lyd/              språkpakken: ett lydklipp per replikk, og manifest.js
 bygg-enfil.js     limer alt sammen til én fil du kan flytte rundt
+test/             testene: spillet i en ekte nettleser, rett fra file://
 ```
+
+## Testene
+
+```bash
+NODE_PATH=$(npm root -g) node test/kjor.js          # alle
+NODE_PATH=$(npm root -g) node test/kjor.js layout   # bare layout.test.js
+```
+
+Testene kjører spillet i Chromium via Playwright, rett fra `file://` slik dere
+åpner det, med falsk klokke så nedtellingene spoles fram. Det trengs ingen
+`package.json` – Playwright hentes fra den globale installasjonen
+(`npm install -g playwright`). Rundt 300 påstander fordelt på fire skript:
+
+- **navigasjon** – hvert sted, hver modus og en hel runde; ansikt, blikk, dybde,
+  «lytt først», «tell først», «Hent» og pausen.
+- **layout** – ti skjermstørrelser: ingenting utenfor, trykkflater på minst
+  44 px, `[hidden]` er usynlig, og kartet stemmer med tegningen.
+- **lagring** – oppgradering fra gamle og nyere versjoner, og skadede data.
+- **stemme** – hver replikk har et klipp, og det spillet faktisk sier, finnes i
+  pakken.
 
 
 Framgang og innstillinger lagres i nettleserens `localStorage` — ingen innlogging,

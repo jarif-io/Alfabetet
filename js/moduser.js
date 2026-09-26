@@ -788,7 +788,7 @@ var Moduser = (function () {
       if (!g) return;
       var n = antallFor(okt.verden, okt.fasit);
       var ikon = VERDENER[okt.verden].hent.ikon;
-      var vis = okt.hjelpHent ? Math.max(n, okt.talt) : okt.talt;
+      var vis = okt.hjelpHent ? n : okt.talt;
       var plasser = '';
       for (var i = 0; i < vis; i++) {
         plasser += i < okt.talt

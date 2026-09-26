@@ -91,11 +91,7 @@ module.exports = async function (t) {
   ok(await hjelp.skjerm(s2) === 'skjerm-meny', 'foreldremenyen lukkes til menyen');
   await hjelp.velgModus(s2, 'Finn bokstaven');
   await s2.clock.runFor(4000);
-  var naIndeks = await s2.evaluate(function () {
-    var p = document.querySelectorAll('#oppgave-prikker .prikk');
-    for (var i = 0; i < p.length; i++) if (p[i].classList.contains('na')) return i;
-    return -1;
-  });
+  var naIndeks = await hjelp.oppgaveNr(s2);
   ok(naIndeks === 0, 'ny runde etter foreldremenyen står fortsatt på første oppgave (sto på ' + naIndeks + ')');
 
   /* Samme for løypa: den skal ikke gå videre i bakgrunnen og flytte figuren

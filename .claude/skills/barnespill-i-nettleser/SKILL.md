@@ -93,6 +93,17 @@ seg selv – men det samme gjelder «barnet kan alltid gå fortere» når selve
 det å kunne trykke er kilden til uroen. Da er riktig svar å ta bort
 trykkflaten, ikke å beholde en snarvei ingen treåring bruker riktig.
 
+**Lytt først, tell først.** Et barn som ikke leser, trykker på det som ser
+trykkbart ut – også mens stemmen stiller spørsmålet. Svarskiltene sover derfor
+(dempet, `pointer-events: none`, og sjekket i koden for tastaturet) til
+spørsmålet er ferdig lest, og spretter opp da. I «Tell» våkner tallskiltene
+først når alt er talt. Et nummer per spørsmål sørger for at et avbrutt spørsmål
+aldri vekker skiltene for et nytt.
+
+**Hjelpen skal være kjedeligere enn å klare det.** Kjører figuren og jubler
+etter hjelp også, lærer en treåring fort at bom gir samme fest. Etter hjelp:
+grønt skilt, ingen kjøring, ingen glede, ingen stjerne.
+
 **Mestring, ikke belønningsdryss.** Framgangen skal være synlig og ekte
 (bokstaver som samles på en vegg over uker), vanskegraden skal stige merkbart
 og sies høyt, og en runde skal alltid ende med at barnet fikk det til – to bom
@@ -127,11 +138,13 @@ dem dere leser om denne uka.
 Dette er kjernen. Å lese koden og tenke «dette ser riktig ut» tok feil hver
 eneste gang det gjaldt noe visuelt eller noe som krysser en plattformgrense.
 
-Kjør spillet på en lokal server (`npx http-server -p 8137`) og styr det med
-Playwright fra et lite skript per problemområde. Skriptene er billige, kan
-kjøres om igjen etter hver endring, og blir et regresjonsnett: i dette
-prosjektet endte vi med et par hundre påstander fordelt på ~15 skript
-(`regr.js`, `mobil2.js`, `panel2.js`, `stemme2.js`, `migrering.js` …).
+Regresjonsnettet ligger i `test/` og kjøres med
+`NODE_PATH=$(npm root -g) node test/kjor.js` – rett fra `file://`, uten server,
+med Playwrights falske klokke så nedtellingene spoles fram. Fire skript
+(navigasjon, layout, lagring, stemme) og rundt 300 påstander. Legg nye
+påstander i det skriptet som passer, og se dem feile uten rettelsen før du
+ser dem holde med den. (Tidligere lå ~15 løse skript utenfor repoet og gikk
+tapt – derfor ligger de nå i det.)
 
 **Mål geometri, ikke inntrykk.** For layoutfeil: hent `getBoundingClientRect()`
 for elementene og sjekk faktisk overlapp, at ingenting stikker utenfor
@@ -386,6 +399,21 @@ rulling og `[hidden]`, men ikke Safaris egne særheter. Da er svaret å fjerne
 det som *er* Safari-skjørt (som `dominant-baseline`) og si tydelig fra om at
 den siste milen må sjekkes på en ekte telefon.
 
+**Falsk klokke og CSS-animasjoner går i ulik takt.** `page.clock` styrer
+`setTimeout`, men CSS-animasjoner går i ekte tid. Mål ikke etter en fast pause:
+vent på `document.getAnimations()` (de endelige) sine `finished`. Og klikk
+aldri på noe som har `pointer-events: none` mens klokka står – Playwright venter
+på at elementet skal ta imot trykket, klokka går ikke, og testen henger til
+tidsavbrudd. Spol klokka fram til tilstanden er riktig først.
+
+**Et kort uttrykk skal gå tilbake til det som sto, ikke til ingenting.** Et
+«glad i ett sekund» etter et trykk visket ut den trøtte pausen. Og på iPhone
+utløser det å skjule adresselinja en `resize` – nullstill posisjon der, aldri
+tilstand.
+
+**Sorter tegn i tegnsettets rekkefølge.** `.sort()` gir 1, 10, 2 og Å før Æ.
+Bruk `tegnFor(verden).indexOf`.
+
 ## 6. Prosessfeller
 
 **Skriptede tekstredigeringer trenger ankere som sjekkes – og i riktig
@@ -417,6 +445,10 @@ sammen, og velg elementene på navn slik at neste omlegging ikke gjør det
 samme. Tell påstander, ikke skript: et skript som «kjørte» med null påstander
 har ikke testet noe.
 
+**Språkpakken lages inkrementelt.** `lag-lydpakke.py` lager bare klippene som
+mangler, så kjente ord høres likt ut og git slipper å bytte ut hundrevis av
+mp3-er. Endres uttalen av et ord som alt har klipp, kjør med `--alt`.
+
 **Én ting om gangen, verifisert, så commit.** Hver endring: reproduser
 symptomet, rett, kjør regresjonsskriptene, sjekk i nettleseren, commit med en
 norsk melding som beskriver hva barnet merker, push til utviklingsgrenen, og
@@ -425,7 +457,7 @@ bygg om enfil-versjonen hvis den er publisert.
 ## 7. Sjekkliste før du sier deg ferdig
 
 - [ ] Symptomet forelderen meldte er reprodusert *og* borte, verifisert i nettleser.
-- [ ] Regresjonsskriptene kjører grønt (og et nytt dekker feilen du nettopp rettet).
+- [ ] `node test/kjor.js` er grønt (og en ny påstand dekker feilen du nettopp rettet).
 - [ ] Testet med lagret tilstand fra før, ikke bare tom `localStorage`.
 - [ ] Testet i mobilbredde, liggende og stående, på den skjermen det gjaldt.
 - [ ] Kjørt gjennom en matrise av telefonstørrelser, ikke bare én – 360×640,
