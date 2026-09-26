@@ -174,11 +174,17 @@
       <div class="oppsum-stjerner" id="oppsum-stjerner" aria-hidden="true"></div>
       <div class="oppsum-brikker" id="oppsum-brikker"></div>
       <div class="oppsum-ny" id="oppsum-ny" hidden></div>
-      <p class="oppsum-tekst" id="oppsum-tekst"></p>
+      <!-- Symboler, ikke ord – han kan ikke lese «Tilbake». Huset fører hjem
+           til menyen og er hovedvalget; pila rundt er en runde til, noe han
+           kan velge selv, men som spillet aldri foreslår. -->
       <div class="knapperad">
-        <button class="knapp" id="oppsum-igjen" type="button"><span>En runde til</span></button>
-        <button class="knapp knapp--flat" id="oppsum-tilbake" type="button">Tilbake</button>
+        <button class="knapp knapp--ikon" id="oppsum-tilbake" type="button"
+                aria-label="Tilbake til menyen"><span class="knapp-ikon" aria-hidden="true"></span></button>
+        <button class="knapp knapp--flat knapp--ikon" id="oppsum-igjen" type="button"
+                aria-label="En runde til"><span class="knapp-ikon" aria-hidden="true"></span></button>
       </div>
+      <!-- Til den voksne som sitter ved siden av. -->
+      <p class="oppsum-tekst" id="oppsum-tekst"></p>
     </div>
   </section>
 
@@ -265,9 +271,9 @@
         </p>
       </details>
       <details class="hjelpetekst">
-        <summary>Med tall — Dinodalen</summary>
+        <summary>Med tall — Dinodalen og Verkstedet</summary>
         <p>
-          <b>Reiret:</b> fri utforsking. Trykk på et tall og se hvor mange
+          <b>Reiret / Verktøykassa:</b> fri utforsking. Trykk på et tall og se hvor mange
           det er.<br><br>
           <b>Tallrekka:</b> fra 1 til 10, ett trykk om gangen.<br><br>
           <b>Tell:</b> trykk på hver ting og tell dem, og velg tallet. Det er
@@ -276,7 +282,15 @@
           kan telle om.<br><br>
           <b>Finn tallet:</b> spillet sier et tall, han velger riktig skilt.
           Å kjenne igjen tallsymbolet er vanskeligere enn å telle, så den
-          kommer når han har talt seg gjennom noen runder.
+          kommer når han har talt seg gjennom noen runder.<br><br>
+          <b>Hent</b> (bare i Verkstedet): «Hent tre biler!» Han trykker på
+          én bil om gangen, tauebilen henter den, og spillet teller høyt. Så
+          trykker han på garasjen. Det står alltid flere biler enn han skal
+          ha – oppgaven er å vite når han skal stoppe. Det er den ekte prøven
+          på om et barn kan telle, ikke bare ramse opp tallene. Ble det for
+          mange, kjøres bilene ut igjen og dere teller sammen; for få, og
+          garasjen ber om flere. Med hjelp viser garasjen tomme plasser for
+          resten.
         </p>
       </details>
       <p class="merknad">
@@ -396,11 +410,8 @@
 
     <section class="panel-del">
       <h3>Navn på figurene</h3>
-      <div class="navnrad">
-        <label>Racerbilen<input type="text" id="inn-navn-bane" maxlength="20"></label>
-        <label>Kapteinen<input type="text" id="inn-navn-oy" maxlength="20"></label>
-        <label>Dinosauren<input type="text" id="inn-navn-dino" maxlength="20"></label>
-      </div>
+      <!-- Ett felt per verden, laget av js/spill.js fra VERDENER. -->
+      <div class="navnrad" id="inn-navn-figurer"></div>
     </section>
 
     <section class="panel-del">
@@ -434,8 +445,8 @@
 <script src="js/replikker.js"></script>
 <script src="js/lagring.js"></script>
 <script src="js/figurer.js"></script>
-<!-- Lydbanken: ferdige klipp som brukes i stedet for talesyntesen når vi har
-     dem. manifest.js lages av lag-lydbank.sh og er tom til den er kjørt. -->
+<!-- Språkpakken: ett innlest klipp per replikk. manifest.js lages av
+     lag-lydpakke.py. -->
 <script src="lyd/manifest.js"></script>
 <script src="js/lydbank.js"></script>
 <script src="js/tale.js"></script>

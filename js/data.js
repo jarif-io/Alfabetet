@@ -28,13 +28,17 @@
  *   ord   – ordet som sies og vises
  *   ikon  – en emoji som vises stort på skjermen
  *
+ * Verdenen selv har i tillegg figur (hvilken tegning), figurnavn (slik den
+ * voksne omtaler den i foreldremenyen), landskap (bakgrunnen) og flagg
+ * (bildet øverst på oppsummeringen).
+ *
  * Spillet sier «L … L for Løve» – samme formel som alfabetbøkene bruker.
  */
 
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-09-09 · 15';
+var SPILLVERSJON = '2026-09-26 · 16';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -85,12 +89,20 @@ var UTTALE = {
   'juice': 'jus',
   'yoghurt': 'jogurt',
   'quiz': 'kviss',
-  'cowboy': 'kauboi'
+  'cowboy': 'kauboi',
+  /* Trykket skal ligge på «fikk», ikke på «tra». */
+  'trafikklys': 'tra-fikklys'
 };
 
 /* Hvordan ett ord skal skrives for stemmen. Ukjente ord går rett gjennom. */
 function uttaleFor(ord) {
   return UTTALE[String(ord).toLowerCase()] || ord;
+}
+
+/* Ordet slik det sies midt i en setning: «L for løve». Forkortelser som
+ * «WC» står som de står – gjøres de om til småbokstaver, staves de feil. */
+function tilTale(ord) {
+  return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
 }
 
 /* ================= tallene ================= */
@@ -158,7 +170,9 @@ var VERDENER = {
     navn: 'Racerbanen',
     ikon: '🏁',
     figur: 'bil',
-    figurOrd: 'bilen',
+    figurnavn: 'Racerbilen',
+    landskap: 'aser',
+    flagg: '🏁',
     standardnavn: 'Turbo',
     navneforslag: ['Turbo', 'Lynet', 'Bulder', 'Rappen'],
     navnesporsmal: 'Hva skal racerbilen hete?',
@@ -204,7 +218,9 @@ var VERDENER = {
     navn: 'Sjørøverøya',
     ikon: '🏴‍☠️',
     figur: 'skip',
-    figurOrd: 'skipet',
+    figurnavn: 'Kapteinen',
+    landskap: 'oy',
+    flagg: '🏝️',
     standardnavn: 'Kaptein Rødskjegg',
     navneforslag: ['Kaptein Rødskjegg', 'Kaptein Krok', 'Kaptein Bart', 'Kaptein Kalle'],
     navnesporsmal: 'Hva skal kapteinen hete?',
@@ -264,7 +280,9 @@ var VERDENER = {
     tegn: TALL,
     ikon: '🦕',
     figur: 'dino',
-    figurOrd: 'dinosauren',
+    figurnavn: 'Dinosauren',
+    landskap: 'dal',
+    flagg: '🦕',
     standardnavn: 'Rex',
     navneforslag: ['Rex', 'Tass', 'Brumle', 'Piggen'],
     navnesporsmal: 'Hva skal dinosauren hete?',
@@ -283,6 +301,57 @@ var VERDENER = {
       '8':  { ord: 'stjerner',  ikon: '⭐' },
       '9':  { ord: 'bananer',   ikon: '🍌' },
       '10': { ord: 'jordbær',   ikon: '🍓' }
+    }
+  },
+
+  /* Verkstedet: tauebilens sted, og det andre stedet med tall. Samme tall
+   * som Dinodalen – framgangen deles, for det er tallene som skal læres,
+   * ikke stedet – men med ting fra verkstedet og veien, og med «Hent»:
+   * spillet ber om et antall biler, og han henter dem selv. Det er prøven på
+   * om han kan telle, ikke bare ramse opp tallrekka.
+   *
+   * Tauebilen er vår egen – oransje, med kran og krok – i samme ånd som
+   * bilfilmene, men ingen andres figur. Navneforslagene er våre egne. */
+  taue: {
+    id: 'taue',
+    navn: 'Verkstedet',
+    domene: 'tall',
+    tegn: TALL,
+    ikon: '🔧',
+    figur: 'tauebil',
+    figurnavn: 'Tauebilen',
+    landskap: 'aser',
+    flagg: '🔧',
+    standardnavn: 'Rusken',
+    navneforslag: ['Rusken', 'Bolten', 'Mutter', 'Vinsj'],
+    navnesporsmal: 'Hva skal tauebilen hete?',
+    utforsk: 'Verktøykassa',
+    samling: 'Verkstedveggen',
+    oppdrag: 'Kjør til',
+    ros: ['Godt slept', 'Kjempebra', 'Så flink du er', 'Det klarte du'],
+    /* Tingene «Tell» teller her. Trekkes tilfeldig, som i Dinodalen. */
+    telleting: [
+      { ord: 'biler',      ikon: '🚗' },
+      { ord: 'busser',     ikon: '🚌' },
+      { ord: 'lastebiler', ikon: '🚚' },
+      { ord: 'traktorer',  ikon: '🚜' },
+      { ord: 'skruer',     ikon: '🔩' },
+      { ord: 'nøkler',     ikon: '🔑' },
+      { ord: 'pakker',     ikon: '📦' }
+    ],
+    /* Det «Hent» ber om: «Hent tre biler.» */
+    hent: { entall: 'bil', flertall: 'biler', ikon: '🚗' },
+    ord: {
+      '1':  { ord: 'bil',          ikon: '🚗' },
+      '2':  { ord: 'nøkler',       ikon: '🔑' },
+      '3':  { ord: 'busser',       ikon: '🚌' },
+      '4':  { ord: 'trafikklys',   ikon: '🚦' },
+      '5':  { ord: 'lastebiler',   ikon: '🚚' },
+      '6':  { ord: 'traktorer',    ikon: '🚜' },
+      '7':  { ord: 'skruer',       ikon: '🔩' },
+      '8':  { ord: 'politibiler',  ikon: '🚓' },
+      '9':  { ord: 'pakker',       ikon: '📦' },
+      '10': { ord: 'bensinpumper', ikon: '⛽' }
     }
   }
 };
@@ -311,6 +380,19 @@ function navnPaTegn(verdenId, tegn) {
 function antallFor(verdenId, tegn) {
   return domeneFor(verdenId) === 'tall' ? parseInt(tegn, 10) : 0;
 }
+
+/* Tingene «Tell» trekker fra i denne verdenen. */
+function tellingFor(verdenId) {
+  return VERDENER[verdenId].telleting || TELLETING;
+}
+
+/* «Hent tre biler.» og svaret «tre biler.» – én bil, men to biler. */
+function hentTing(verdenId, tall) {
+  var h = VERDENER[verdenId].hent;
+  return tallnavnFor(tall) + ' ' + (tall === '1' ? h.entall : h.flertall);
+}
+function hentSetning(verdenId, tall) { return 'Hent ' + hentTing(verdenId, tall) + '.'; }
+function hentSvar(verdenId, tall) { return hentTing(verdenId, tall) + '.'; }
 
 /* Henter oppslaget for ett tegn i én verden – en bokstav eller et tall. */
 function ordFor(verdenId, tegn) {

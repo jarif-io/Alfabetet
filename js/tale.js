@@ -52,6 +52,10 @@ var Tale = (function () {
     },
 
     si: si,
+    vent: vent,
+
+    /* Om spillet faktisk kan si noe nå – stemmen på og pakken lastet. */
+    kanSnakke: pa,
 
     /* Velger den første varianten vi har lydklipp for. Finnes ingen av dem,
      * velges den siste – som regel den enkleste, navneløse varianten – i

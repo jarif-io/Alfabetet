@@ -1,7 +1,8 @@
-/* Oppdagerøya – de tre modusene
+/* Oppdagerøya – modusene: Utforsk, Oppgave og Løype
  *
- * Alle tre deler samme regel: ingenting skjer av seg selv. Barnet trykker,
- * spillet svarer i under ett sekund, og så står skjermen stille igjen.
+ * Alle deler samme regel: ingenting skjer av seg selv mens han tenker.
+ * Barnet trykker, spillet svarer i under ett sekund, og så står skjermen
+ * stille igjen.
  */
 
 var Moduser = (function () {
@@ -21,19 +22,10 @@ var Moduser = (function () {
 
   function tilfeldig(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
 
-  var TALLORD = ['null', 'én', 'to', 'tre', 'fire', 'fem', 'seks', 'sju', 'åtte'];
-  function tallord(n) { return TALLORD[n] || String(n); }
-
   /* «A, B og C» – slik en voksen ville lest det høyt. */
   function listetekst(deler) {
     if (deler.length === 1) return deler[0];
     return deler.slice(0, -1).join(', ') + ' og ' + deler[deler.length - 1];
-  }
-
-  /* Ord som «WC» er forkortelser. Gjøres de om til småbokstaver, mister
-   * talesyntesen sporet og staver dem feil – de skal stå som de står. */
-  function tilTale(ord) {
-    return ord === ord.toUpperCase() ? ord : ord.toLowerCase();
   }
 
   /* «ell … ell for Løve» – samme formel som alfabetbøkene bruker, og kort nok
@@ -144,6 +136,28 @@ var Moduser = (function () {
   /* ================= figuren på bakken ================= */
 
   var kjoreTimer = null;
+  var uttrykkTimer = null;
+  var varigUttrykk = null;
+
+  /* Ansiktet på figuren: 'glad', 'hmm', 'trott' eller null (vanlig). Uten ms
+   * blir det stående (glad på oppsummeringen, trøtt i pausen). Med ms går det
+   * tilbake dit etter en stund – et kort uttrykk varer bare så lenge det
+   * hører til noe som skjedde, og visker ikke ut det som står. */
+  function uttrykk(navn, ms) {
+    var figur = el('figur');
+    window.clearTimeout(uttrykkTimer);
+    if (!ms) varigUttrykk = navn;
+    var vis = navn || varigUttrykk;
+    if (vis) figur.dataset.uttrykk = vis; else delete figur.dataset.uttrykk;
+    if (ms) uttrykkTimer = window.setTimeout(function () { uttrykk(varigUttrykk); }, ms);
+  }
+
+  /* Hvor langt figuren har kjørt. Landskapet bak glir etter i dybden, se
+   * .scene-landskap i stil.css. */
+  function settPosisjon(figur, x) {
+    figur.style.transform = 'translateX(' + x + 'px)';
+    document.body.style.setProperty('--kjort', (x - 24) + 'px');
+  }
 
   function naVaerendeX(figur) {
     var m = /translateX\((-?[\d.]+)px\)/.exec(figur.style.transform || '');
@@ -186,9 +200,10 @@ var Moduser = (function () {
     figur.classList.toggle('speilet', x < fra - 4);
     figur.classList.add('kjorer');
     stovSky(fra, x);
-    figur.style.transform = 'translateX(' + x + 'px)';
+    settPosisjon(figur, x);
+    uttrykk('glad', 1100);
 
-    if (verdenId === 'oy') Lyd.bolge(); else Lyd.motor();
+    if (VERDENER[verdenId].figur === 'skip') Lyd.bolge(); else Lyd.motor();
 
     window.clearTimeout(kjoreTimer);
     kjoreTimer = window.setTimeout(function () {
@@ -196,10 +211,13 @@ var Moduser = (function () {
     }, 1000);
   }
 
+  /* Bare posisjonen: ansiktet nullstilles når modusen forlates (stoppAlt).
+   * Kalles også ved omskalering – og på iPhone er det nok at adresselinja
+   * skjules, så den må ikke viske ut pausen på oppsummeringen. */
   function stillFigurTilStart() {
     var figur = el('figur');
     figur.classList.remove('speilet', 'kjorer');
-    figur.style.transform = 'translateX(24px)';
+    settPosisjon(figur, 24);
   }
 
   /* Et lite hopp. Treåringer trykker på figuren fordi den er der, og da
@@ -207,8 +225,10 @@ var Moduser = (function () {
   function hopp() {
     var figur = el('figur');
     if (!figur || el('figurbane').hidden) return;
-    spillOm(figur, 'hopper', 620);
-    Lyd.tut();
+    spillOm(figur, 'hopper', 680);
+    uttrykk('glad', 900);
+    var v = document.body.getAttribute('data-verden');
+    Lyd.tut(v ? VERDENER[v].figur : 'bil');
   }
 
   /* ================= belønninger ================= */
@@ -394,16 +414,38 @@ var Moduser = (function () {
    * med én gang i stedet for å bomme to ganger på rad. */
   function oppsett() {
     var liten = Lagring.innstilling('niva') !== 'storre';
+    /* hentTall: hvor mange biler «Hent» kan be om. Små mengder først –
+     * to, tre og fire er det en treåring faktisk kan hente riktig. */
     return liten
-      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4 }
-      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5 };
+      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4) }
+      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7) };
+  }
+
+  /* Etter noen runder på rad foreslår figuren en pause: den er trøtt på
+   * oppsummeringen, og pila rundt («en runde til») er borte. Det er ingen
+   * lås – han kan gå et annet sted – men spillet ber aldri om mer. Telles i
+   * fanen (sessionStorage) og nullstilles etter en halvtime uten runder. */
+  var PAUSE_ETTER = 4;
+  var PAUSE_NULLSTILL_MS = 30 * 60 * 1000;
+  function rundeFerdig() {
+    try {
+      var lagret = JSON.parse(window.sessionStorage.getItem('oppdageroya.runder') || 'null');
+      var n = lagret && Date.now() - lagret.sist < PAUSE_NULLSTILL_MS ? lagret.antall : 0;
+      n += 1;
+      window.sessionStorage.setItem('oppdageroya.runder',
+        JSON.stringify({ antall: n, sist: Date.now() }));
+      return n >= PAUSE_ETTER;
+    } catch (e) {
+      return false;
+    }
   }
 
   var MODUSTITTEL = {
     finn: 'Finn bokstaven',
     forstelyd: 'Første lyd',
     navn: 'Navnet mitt',
-    tell: 'Tell'
+    tell: 'Tell',
+    hent: 'Hent'
   };
 
   var Oppgave = (function () {
@@ -415,8 +457,8 @@ var Moduser = (function () {
 
     /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
      * noen kjente blandes inn som hvilepunkter. */
-    function byggKo(verdenId, antall) {
-      var aktive = Lagring.aktiveTegn(verdenId);
+    function byggKo(verdenId, antall, aktive) {
+      aktive = aktive || Lagring.aktiveTegn(verdenId);
       var sortert = aktive.slice().sort(function (a, b) {
         var da = Lagring.dagerFor(a), db = Lagring.dagerFor(b);
         if (da !== db) return da - db;
@@ -465,6 +507,26 @@ var Moduser = (function () {
       return ko;
     }
 
+    /* «Lytt først». Skiltene sover mens spørsmålet leses, og våkner når det
+     * er ferdig – et barn som trykker tilfeldig mens stemmen snakker, treffer
+     * ingenting, og et som lytter, ser dem sprette opp. Uten stemme våkner de
+     * etter litt over ett sekund. Nummeret gjør at et avbrutt spørsmål (han
+     * trykket «Hør igjen», eller gikk ut) aldri vekker skiltene for et nytt. */
+    function lyttForst(tale, etterpa) {
+      var denne = okt, nr = ++okt.spmNr;
+      okt.lytter = true;
+      el('skjerm-oppgave').classList.add('lytter');
+      Tale.stopp();
+      var minst = Tale.kanSnakke() ? 400 : 1200;
+      Promise.race([Promise.all([Tale.rekke(tale), Tale.vent(minst)]), Tale.vent(10000)])
+        .then(function () {
+          if (okt !== denne || nr !== okt.spmNr) return;
+          okt.lytter = false;
+          el('skjerm-oppgave').classList.remove('lytter');
+          if (etterpa) etterpa();
+        });
+    }
+
     function tegnPrikker() {
       var felt = el('oppgave-prikker');
       felt.innerHTML = '';
@@ -507,6 +569,11 @@ var Moduser = (function () {
         return ['Hvor mange ' + okt.telleting.ord + '?', 400,
                 'Trykk på hver enkelt og tell.'];
       }
+      if (okt.type === 'hent') {
+        return okt.indeks === 0
+          ? [hentSetning(okt.verden, okt.fasit), 400, 'Trykk på garasjen når du er ferdig.']
+          : [hentSetning(okt.verden, okt.fasit)];
+      }
       var oppslag = ordFor(okt.verden, okt.fasit);
       return [
         oppslag.ord + '.', 420,
@@ -518,15 +585,17 @@ var Moduser = (function () {
       var v = VERDENER[okt.verden];
       okt.fasit = okt.ko[okt.indeks];
       okt.forsokPaDenne = 0;
+      okt.ferdigMedDenne = false;
+      okt.hjelpHent = false;
 
       tegnPrikker();
 
       var mal = el('oppgave-mal');
       mal.className = 'oppdrag-mal oppdrag-mal--' +
         (okt.type === 'finn' ? 'bokstav' : okt.type === 'navn' ? 'navn'
-          : okt.type === 'tell' ? 'tell' : 'ord');
-      if (okt.type === 'tell') {
-        el('oppgave-tekst').textContent = 'Hvor mange?';
+          : okt.type === 'tell' || okt.type === 'hent' ? 'tell' : 'ord');
+      if (okt.type === 'tell' || okt.type === 'hent') {
+        el('oppgave-tekst').textContent = okt.type === 'tell' ? 'Hvor mange?' : 'Hent';
         tegnTelleting();
       } else if (okt.type === 'finn' || okt.type === 'navn') {
         el('oppgave-tekst').textContent =
@@ -545,24 +614,41 @@ var Moduser = (function () {
 
       var valgfelt = el('oppgave-valg');
       valgfelt.innerHTML = '';
-      /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
-      var antallValg = Math.min(okt.antallValg, utvalg().length);
-      var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
-      okt.visteValg = alternativer.length;
-      alternativer.forEach(function (bokstav) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'skilt';
-        b.textContent = bokstav;
-        b.dataset.bokstav = bokstav;
-        b.addEventListener('click', function () { svar(bokstav, b); });
-        valgfelt.appendChild(b);
-      });
+      if (okt.type === 'hent') {
+        /* Ingen skilt å velge mellom – bare garasjen han leverer bilene i. */
+        var garasje = document.createElement('button');
+        garasje.type = 'button';
+        garasje.className = 'skilt skilt--garasje';
+        garasje.setAttribute('aria-label', 'Garasjen – trykk når du har hentet nok');
+        garasje.addEventListener('click', function () { lever(garasje); });
+        valgfelt.appendChild(garasje);
+        /* Alle bilene han kunne tatt, var valget – og det er alltid minst tre. */
+        okt.visteValg = el('oppgave-mal').querySelectorAll('.ting').length;
+        tegnGarasje();
+      } else {
+        /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
+        var antallValg = Math.min(okt.antallValg, utvalg().length);
+        var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
+        okt.visteValg = alternativer.length;
+        alternativer.forEach(function (bokstav) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'skilt';
+          b.textContent = bokstav;
+          b.dataset.bokstav = bokstav;
+          b.addEventListener('click', function () { svar(bokstav, b); });
+          valgfelt.appendChild(b);
+        });
+      }
 
       el('oppgave-videre').hidden = true;
 
-      Tale.stopp();
-      Tale.rekke(sporsmalstale());
+      /* «Tell først»: tallskiltene våkner når alt er talt. Da er svaret
+       * det siste tallordet han sa – telling er veien til svaret, ikke en
+       * omvei rundt det. */
+      valgfelt.classList.toggle('sover', okt.type === 'tell');
+
+      lyttForst(sporsmalstale());
     }
 
     /* «Tell»: tingene han skal telle. Han kan trykke på hver enkelt, og da
@@ -579,11 +665,18 @@ var Moduser = (function () {
       /* Tingen trekkes tilfeldig, ikke fra tallets egen oppføring. Var det
        * alltid tre baller, kunne han svart riktig ved å kjenne igjen ballen
        * i stedet for å telle – og da måler vi hukommelse, ikke telling. */
-      okt.telleting = tilfeldig(TELLETING);
+      okt.telleting = tilfeldig(tellingFor(okt.verden));
+      /* I «Hent» står det flere biler enn han skal hente – én til tre
+       * ekstra. Oppgaven er å vite når han skal stoppe. */
+      if (okt.type === 'hent') {
+        var h = VERDENER[okt.verden].hent;
+        okt.telleting = { ord: h.flertall, ikon: h.ikon };
+        antall = Math.min(10, antall + 1 + Math.floor(Math.random() * 3));
+      }
       okt.talt = 0;
       okt.telt = [];
       tegnMengde(el('oppgave-mal'), okt.telleting.ikon, antall,
-                 'oppdrag-mal oppdrag-mal--tell mengde');
+                 'oppdrag-mal oppdrag-mal--tell' + (okt.type === 'hent' ? ' oppdrag-mal--hent' : '') + ' mengde');
 
       var ting = el('oppgave-mal').querySelectorAll('.ting');
       for (var i = 0; i < ting.length; i++) {
@@ -605,6 +698,7 @@ var Moduser = (function () {
     }
 
     function tellTing(t) {
+      if (okt.ferdigMedDenne || okt.lytter) return;
       /* Trykk på noe som alt er talt: ta det bort igjen. Han skal kunne
        * angre og telle om, uten å måtte begynne på en ny oppgave – det er
        * halve poenget med å telle med fingeren. */
@@ -615,6 +709,16 @@ var Moduser = (function () {
         nummererPaNytt();
         Lyd.klikk();
         Tale.stopp();
+        if (okt.type === 'hent') tegnGarasje();
+        if (okt.type === 'tell') el('oppgave-valg').classList.add('sover');
+        return;
+      }
+      /* Med hjelp i «Hent» er garasjen full når den er full – da kan han
+       * ikke hente flere, og runden ender alltid med at han klarte det. */
+      if (okt.type === 'hent' && okt.hjelpHent &&
+          okt.talt >= antallFor(okt.verden, okt.fasit)) {
+        spillOm(t, 'vugg', 500);
+        Lyd.proveIgjen();
         return;
       }
       okt.telt.push(t);
@@ -625,7 +729,16 @@ var Moduser = (function () {
       Lyd.klikk();
       Tale.stopp();
 
+      /* «Hent»: tauebilen kjører bort og henter den, og spillet teller. */
+      if (okt.type === 'hent') {
+        Tale.rekke([tellenavn(okt.talt) + '.']);
+        kjorTil(okt.verden, t);
+        tegnGarasje();
+        return;
+      }
+
       var alle = antallFor(okt.verden, okt.fasit);
+      el('oppgave-valg').classList.toggle('sover', okt.talt < alle);
       if (okt.talt >= alle) {
         /* Det siste tallordet han sier *er* svaret. Uten den koblingen har han
          * bare ramset opp tallrekka mens han pekte. */
@@ -667,8 +780,64 @@ var Moduser = (function () {
         : 'Trykk for å se ' + merkeNavn(okt.verden).toLowerCase());
     }
 
+    /* Garasjen i «Hent»: tallet den vil ha, og bilene som er hentet. Med
+     * hjelp står det tomme plasser for resten, så han ser hvor mange som
+     * mangler, og garasjen pulserer når den er full. */
+    function tegnGarasje() {
+      var g = el('oppgave-valg').querySelector('.skilt--garasje');
+      if (!g) return;
+      var n = antallFor(okt.verden, okt.fasit);
+      var ikon = VERDENER[okt.verden].hent.ikon;
+      var vis = okt.hjelpHent ? n : okt.talt;
+      var plasser = '';
+      for (var i = 0; i < vis; i++) {
+        plasser += i < okt.talt
+          ? '<span class="garasje-plass full">' + ikon + '</span>'
+          : '<span class="garasje-plass"></span>';
+      }
+      g.innerHTML = '<span class="garasje-tall">' + okt.fasit + '</span>' +
+                    '<span class="garasje-plasser">' + plasser + '</span>';
+      g.classList.toggle('pekes', okt.hjelpHent && okt.talt === n);
+    }
+
+    /* Han trykker på garasjen: er det riktig antall, er oppgaven løst. For
+     * få: vi trenger flere, og det han har hentet blir stående. For mange:
+     * bilene kjøres ut igjen, og vi teller sammen fra start. */
+    function lever(knapp) {
+      if (okt.ferdigMedDenne || okt.lytter) return;
+      var n = antallFor(okt.verden, okt.fasit);
+      if (!okt.talt) {
+        Tale.stopp();
+        Tale.rekke(sporsmalstale());
+        return;
+      }
+      if (okt.talt === n) { riktig(knapp); return; }
+
+      okt.forsokPaDenne += 1;
+      okt.paRad = 0;
+      Lagring.registrerFeil(okt.fasit);
+      spillOm(knapp, 'vugg', 500);
+      Lyd.proveIgjen();
+      uttrykk('hmm', 1400);
+      var forMange = okt.talt > n;
+      if (forMange) {
+        okt.telt.forEach(function (t) {
+          t.classList.remove('talt');
+          delete t.dataset.talltall;
+        });
+        okt.telt = [];
+        okt.talt = 0;
+      }
+      if (okt.forsokPaDenne >= okt.oppsett.bomForHjelp) okt.hjelpHent = true;
+      tegnGarasje();
+      Tale.stopp();
+      Tale.rekke(forMange
+        ? ['Det ble for mange.', 300, 'Vi teller sammen.']
+        : ['Vi trenger flere.']);
+    }
+
     function visMal() {
-      if (!okt || okt.type === 'forstelyd' || okt.type === 'tell') return false;
+      if (!okt || okt.type === 'forstelyd' || okt.type === 'tell' || okt.type === 'hent') return false;
       if (okt.malVist) return false;
       okt.malVist = true;
       tegnMal();
@@ -688,7 +857,8 @@ var Moduser = (function () {
     }
 
     function svar(bokstav, knapp) {
-      if (knapp.disabled) return;
+      /* Tastaturet går utenom CSS, så søvnen sjekkes her også. */
+      if (knapp.disabled || okt.lytter || el('oppgave-valg').classList.contains('sover')) return;
 
       if (bokstav === okt.fasit) { riktig(knapp); return; }
 
@@ -700,12 +870,12 @@ var Moduser = (function () {
       spillOm(knapp, 'vugg', 500);
       knapp.disabled = true;
       Lyd.proveIgjen();
+      uttrykk('hmm', 1400);
 
       if (okt.forsokPaDenne >= okt.oppsett.bomForHjelp) {
         hjelp();
       } else {
-        Tale.stopp();
-        Tale.rekke(['Prøv en gang til.', 300].concat(sporsmalstale()));
+        lyttForst(['Prøv en gang til.', 300].concat(sporsmalstale()));
       }
     }
 
@@ -728,18 +898,20 @@ var Moduser = (function () {
          * gjorde. */
         if (!alle[i].classList.contains('feil')) alle[i].classList.add('borte');
       }
-      riktigKnapp.classList.add('pekes');
-      Tale.stopp();
       /* Navnet sies for seg. Det er samme ytring som ellers i spillet, og
        * kan derfor gjenbruke det samme innspilte klippet – i tillegg til at
-       * det blir en pause rett foran det han skal høre etter. */
-      Tale.rekke(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
-                  300, 'Trykk på den.']);
+       * det blir en pause rett foran det han skal høre etter. Skiltet
+       * sover mens det sies, og pulsen starter når det våkner – også om
+       * han ber om å høre det igjen underveis. */
+      riktigKnapp.classList.add('pekes');
+      lyttForst(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
+                 300, 'Trykk på den.']);
     }
 
     function riktig(knapp) {
       var v = VERDENER[okt.verden];
       var forsteForsok = okt.forsokPaDenne === 0;
+      okt.ferdigMedDenne = true;
 
       lasAlle();
       knapp.classList.remove('pekes');
@@ -753,7 +925,11 @@ var Moduser = (function () {
         spillOm(el('oppgave-mal').querySelector('.navnrute.na'), 'lander', 520);
       }
 
-      kjorTil(okt.verden, knapp);
+      /* Riktig på første forsøk: figuren kjører dit og blir glad. Etter
+       * hjelp: bare et rolig grønt skilt. Hjelpen skal aldri være morsommere
+       * enn å klare det selv, ellers lønner det seg å bomme med vilje. */
+      if (forsteForsok) kjorTil(okt.verden, knapp);
+      else knapp.classList.add('rolig');
 
       if (forsteForsok) {
         okt.riktigForste += 1;
@@ -776,7 +952,8 @@ var Moduser = (function () {
       /* Ikke lov noe vanskeligere på siste oppgave – runden slutter ved neste
        * trykk, og løftet ville aldri blitt innfridd. */
       var siste = okt.indeks + 1 >= okt.oppsett.antall;
-      var opp = !siste && okt.paRad >= okt.oppsett.opprykk &&
+      /* «Hent» har ingen skilt å velge mellom, og derfor ikke noe opprykk. */
+      var opp = !siste && okt.type !== 'hent' && okt.paRad >= okt.oppsett.opprykk &&
                 okt.antallValg < okt.oppsett.maksValg;
       if (opp) {
         okt.antallValg += 1;
@@ -792,6 +969,10 @@ var Moduser = (function () {
         ? [Tale.velg(rosord + ', ' + Lagring.navnFor(okt.verden) + '!',
                      rosord + '!')]
         : ['Der ja! Det er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.'];
+      /* Det siste tallordet er svaret: «tre biler» – så rosen. */
+      if (forsteForsok && okt.type === 'hent') {
+        ros = [hentSvar(okt.verden, okt.fasit), 300].concat(ros);
+      }
 
       Tale.stopp();
       Tale.rekke(opp ? ros.concat([350, 'Nå prøver vi en vanskeligere en.']) : ros);
@@ -826,7 +1007,7 @@ var Moduser = (function () {
       /* Gikk det tungt to runder på rad, går vi ned et hakk igjen. «Navnet
        * mitt» holdes utenfor: den runden er like lang som navnet og sier
        * ingenting om hvor vanskelig bokstavene er. */
-      if (okt.type !== 'navn') {
+      if (okt.type !== 'navn' && okt.type !== 'hent') {
         Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
       }
 
@@ -836,10 +1017,12 @@ var Moduser = (function () {
         ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
         : '';
 
-      el('oppsum-flagg').textContent = okt.verden === 'oy' ? '🏝️' : '🏁';
-      el('oppsum-tittel').textContent = okt.type === 'navn'
-        ? navnet + '!'
+      var pause = rundeFerdig();
+      el('oppsum-flagg').textContent = VERDENER[okt.verden].flagg;
+      el('oppsum-tittel').textContent = pause ? 'Nå tar vi en pause'
+        : okt.type === 'navn' ? navnet + '!'
         : tilfeldig(VERDENER[okt.verden].ros) + '!';
+      el('oppsum-igjen').hidden = pause;
 
       /* En treåring kan ikke lese en resultatliste. Han kan telle stjerner
        * og kjenne igjen bokstavene sine, så det er det oppsummeringen viser.
@@ -861,14 +1044,18 @@ var Moduser = (function () {
       brikker.classList.toggle('oppsum-brikker--navn', okt.type === 'navn');
       var funnet = okt.type === 'navn'
         ? okt.ko.slice()
-        : Object.keys(okt.telling).sort();
+        : Object.keys(okt.telling).sort(function (a, b) {
+            /* Tegnsettets egen rekkefølge: 2 før 10, og Æ Ø Å til slutt. */
+            return tegnFor(okt.verden).indexOf(a) - tegnFor(okt.verden).indexOf(b);
+          });
       funnet.forEach(function (b, n) {
         var brikke = document.createElement('span');
         brikke.className = 'oppsum-brikke';
         brikke.style.animationDelay = (okt.oppsett.antall * 130 + 160 + n * 90) + 'ms';
         brikke.innerHTML = okt.type === 'navn'
           ? '<b>' + b + '</b>'
-          : '<b>' + b + '</b><i>' + ordFor(okt.verden, b).ikon + '</i>';
+          : '<b>' + b + '</b><i>' + (okt.type === 'hent'
+              ? VERDENER[okt.verden].hent.ikon : ordFor(okt.verden, b).ikon) + '</i>';
         brikker.appendChild(brikke);
       });
 
@@ -899,6 +1086,10 @@ var Moduser = (function () {
       el('oppsum-tekst').textContent = tekst;
 
       Lyd.ferdig();
+      /* Slutten av runden: figuren kjører helt bort, over målstreken. Den er
+       * glad – eller trøtt, når det er tid for en pause. */
+      kjorTil(okt.verden, 1);
+      uttrykk(pause ? 'trott' : 'glad');
       var hilsen = okt.type === 'navn'
         ? navnetTalt(okt.ko)
         : okt.nyeMestrede.length
@@ -906,9 +1097,19 @@ var Moduser = (function () {
              280, 'Den kan du nå!']
           : [Tale.velg('Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!',
                        'Bra jobbet!')];
-      window.setTimeout(function () { Tale.rekke(hilsen); }, 700);
+      if (pause) hilsen = hilsen.concat([400, 'Nå trenger vi en pause.']);
+      /* Rosen og hoppet kommer litt etter, med vilje. Har han allerede gått
+       * videre – en ny runde, eller tilbake – hører de ikke hjemme der han
+       * er nå, og da blir de borte. */
+      var denne = okt;
+      function fortsattHer() {
+        return okt === denne && !el('skjerm-oppsummering').hidden;
+      }
+      window.setTimeout(function () { if (fortsattHer()) Tale.rekke(hilsen); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
-      window.setTimeout(function () { hopp(); }, 400);
+      window.setTimeout(function () {
+        if (fortsattHer() && !pause) { hopp(); uttrykk('glad'); }
+      }, 1000);
 
       Spill.settOppsummering(okt.type);
     }
@@ -929,7 +1130,7 @@ var Moduser = (function () {
             opprykk: opps.opprykk
           };
         } else {
-          ko = byggKo(verdenId, opps.antall);
+          ko = byggKo(verdenId, opps.antall, type === 'hent' ? opps.hentTall : null);
         }
 
         okt = {
@@ -948,7 +1149,8 @@ var Moduser = (function () {
           forsokPaDenne: 0,
           riktigForste: 0,
           telling: {},
-          nyeMestrede: []
+          nyeMestrede: [],
+          spmNr: 0
         };
 
         Spill.visSkjerm('skjerm-oppgave');
@@ -965,16 +1167,25 @@ var Moduser = (function () {
         return true;
       },
 
-      videre: videre,
       visMal: visMal,
 
       gjentaSporsmal: function () {
         if (!okt) return;
-        Tale.stopp();
-        Tale.rekke(sporsmalstale());
+        if (okt.ferdigMedDenne) {
+          Tale.stopp();
+          Tale.rekke(sporsmalstale());
+          return;
+        }
+        lyttForst(sporsmalstale());
       },
 
-      stopp: function () { stoppNedtelling(); Spill.settTastLytter(null); Tale.stopp(); }
+      stopp: function () {
+        stoppNedtelling();
+        Spill.settTastLytter(null);
+        Tale.stopp();
+        if (okt) okt.spmNr += 1;
+        el('skjerm-oppgave').classList.remove('lytter');
+      }
     };
   })();
 
@@ -1108,7 +1319,16 @@ var Moduser = (function () {
     Utforsk: Utforsk,
     Oppgave: Oppgave,
     Loype: Loype,
-    kjorTil: kjorTil,
-    hopp: hopp
+    hopp: hopp,
+    stillFigurTilStart: stillFigurTilStart,
+    /* Alle veier ut av en modus går gjennom dette – se Spill.visSkjerm.
+     * Uten det tikket nedtellingen videre i bakgrunnen når man gikk ut via
+     * foreldremenyen, og hoppet over en oppgave i neste runde. */
+    stoppAlt: function () {
+      Utforsk.stopp();
+      Oppgave.stopp();
+      Loype.stopp();
+      uttrykk(null);
+    }
   };
 })();
