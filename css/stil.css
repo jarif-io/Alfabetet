@@ -811,6 +811,57 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   body.bevegelse .kartsted--oy .kartsted-figur { animation: none; }
 }
 
+/* ---------- overraskelsene på kartet ----------
+   Bare når han trykker, og bare et øyeblikk (se Spill: start-kart). Ingenting
+   her går av seg selv eller i sløyfe. */
+.overraskelse { cursor: pointer; }
+.treff { fill: transparent; }
+.rok, .kiste, .fisk, .plask { opacity: 0; }
+.rok, .kiste, .fisk, .nal { transform-box: fill-box; transform-origin: center; }
+.kiste { transform-origin: 50% 100%; }
+.overraskelse.spiller .rok { animation: rok 1300ms ease-out; }
+@keyframes rok {
+  0% { opacity: 0; transform: translateY(10px) scale(.5); }
+  25% { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-70px) scale(1.5); }
+}
+.overraskelse.spiller .maake { animation: maake 1400ms ease-in-out; }
+@keyframes maake {
+  0%, 100% { transform: none; opacity: 1; }
+  40% { transform: translate(90px, -110px) rotate(-10deg); opacity: 0; }
+  60% { transform: translate(-60px, -60px); opacity: 0; }
+}
+.overraskelse.spiller .kiste { animation: kiste 1300ms cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes kiste {
+  0% { opacity: 0; transform: translateY(20px) scale(.3); }
+  30% { opacity: 1; transform: translateY(-30px) scale(1.1); }
+  80% { opacity: 1; transform: translateY(-26px) scale(1); }
+  100% { opacity: 0; transform: translateY(-26px) scale(1); }
+}
+.overraskelse.spiller .kokos { animation: kokos 1100ms cubic-bezier(.5, 0, .7, 1); }
+@keyframes kokos {
+  0% { transform: none; }
+  50% { transform: translateY(44px); }
+  65% { transform: translateY(34px); }
+  80% { transform: translateY(44px); opacity: 1; }
+  100% { transform: translateY(44px); opacity: 0; }
+}
+.overraskelse.spiller .fisk { animation: fisk 1100ms ease-in-out; }
+@keyframes fisk {
+  0% { opacity: 0; transform: translate(0, 18px) rotate(-40deg); }
+  15% { opacity: 1; }
+  50% { transform: translate(40px, -70px) rotate(0deg); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate(80px, 18px) rotate(40deg); }
+}
+.overraskelse.spiller .plask { animation: plask 500ms ease-out 650ms; }
+@keyframes plask {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-14px); }
+}
+.overraskelse.spiller .nal { animation: snurr 1300ms cubic-bezier(.2, .8, .3, 1); }
+@keyframes snurr { to { transform: rotate(720deg); } }
+
 /* Smakebiter: tre bokstaver og tre tall, i samme form som brikkene i spillet.
    Sier uten ord hva dette handler om. */
 .startbrikker {

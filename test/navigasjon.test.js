@@ -293,6 +293,37 @@ module.exports = async function (t) {
   ok(s8.feil.length === 0, 'pausen: ingen feil' + (s8.feil.length ? ' – ' + s8.feil.join(' | ') : ''));
   await s8.context().close();
 
+  /* ---------- overraskelsene på kartet ----------
+   * Et trykk spiller et øyeblikk og stopper; et trykk til mens den spiller,
+   * gjør ingenting; og ingenting går av seg selv. */
+  var s9 = await t.nySide({ lagret: lagret });
+  var hvaListe = await s9.evaluate(function () {
+    return Array.prototype.map.call(document.querySelectorAll('.overraskelse'), function (o) {
+      return o.getAttribute('data-hva');
+    });
+  });
+  ok(hvaListe.length === 6, 'kartet har seks overraskelser (' + hvaListe.join(', ') + ')');
+  for (var o = 0; o < hvaListe.length; o++) {
+    var hva = hvaListe[o];
+    var sentrum = await s9.evaluate(function (h) {
+      var r = document.querySelector('.overraskelse[data-hva="' + h + '"] .treff').getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }, hva);
+    await s9.mouse.click(sentrum.x, sentrum.y);
+    var spiller = await s9.evaluate(function (h) {
+      return document.querySelector('.overraskelse[data-hva="' + h + '"]').classList.contains('spiller');
+    }, hva);
+    ok(spiller, 'overraskelsen ' + hva + ' spiller når han trykker');
+    await s9.clock.runFor(1500);
+    var ferdig = await s9.evaluate(function (h) {
+      return !document.querySelector('.overraskelse[data-hva="' + h + '"]').classList.contains('spiller');
+    }, hva);
+    ok(ferdig, 'overraskelsen ' + hva + ' er ferdig etter et øyeblikk');
+  }
+  ok(await hjelp.skjerm(s9) === 'skjerm-start', 'overraskelsene tar ham ikke bort fra kartet');
+  ok(s9.feil.length === 0, 'overraskelsene: ingen feil' + (s9.feil.length ? ' – ' + s9.feil.join(' | ') : ''));
+  await s9.context().close();
+
   /* ---------- «Ro på skjermen» ----------
    * Med bevegelse av skal ingenting på forsiden gå i sløyfe. */
   var s3 = await t.nySide({ lagret: hjelp.lagring({ innstillinger: { bevegelse: false } }) });

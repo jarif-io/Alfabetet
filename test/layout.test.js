@@ -82,6 +82,9 @@ function sjekkKart() {
 
   var steder = Array.prototype.slice.call(document.querySelectorAll('.kartsted'));
   steder.forEach(function (s) { s.style.pointerEvents = 'none'; s.style.visibility = 'hidden'; });
+  /* Treffsirklene til overraskelsene er usynlige – de er ikke land. */
+  var treff = Array.prototype.slice.call(document.querySelectorAll('.treff'));
+  treff.forEach(function (t) { t.style.pointerEvents = 'none'; });
   var HAV = ['#63c7c9', '#80d4d1', '#a4e2dc'];
   steder.forEach(function (s) {
     var id = (/kartsted--(\w+)/.exec(s.className) || [])[1];
@@ -96,6 +99,22 @@ function sjekkKart() {
     if (id !== 'oy' && paSjo) ut.push(id + ' står i vannet');
   });
   steder.forEach(function (s) { s.style.pointerEvents = ''; s.style.visibility = ''; });
+  treff.forEach(function (t) { t.style.pointerEvents = ''; });
+
+  /* Overraskelsene: minst 44 px å treffe, midten treffer overraskelsen selv,
+   * og de skygger ikke for kartstedene. */
+  treff.forEach(function (t) {
+    var r = t.getBoundingClientRect();
+    var hva = t.parentNode.getAttribute('data-hva');
+    if (r.width < 43.5 || r.height < 43.5) ut.push('overraskelsen ' + hva + ' er for liten å treffe (' + Math.round(r.width) + ' px)');
+    var under = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    if (!under || under.closest('.overraskelse') !== t.parentNode) ut.push('midten av overraskelsen ' + hva + ' er dekket');
+  });
+  steder.forEach(function (s) {
+    var r = s.querySelector('.kartsted-figur').getBoundingClientRect();
+    var under = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    if (!under || under.closest('.kartsted') !== s) ut.push('kartstedet ' + s.className + ' er dekket i midten');
+  });
 
   /* Figurene (det som faktisk males) skal ikke ligge oppå hverandre. */
   var figurer = steder.map(function (s) {

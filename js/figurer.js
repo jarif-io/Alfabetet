@@ -582,6 +582,18 @@ var Figurer = (function () {
       '<path d="M-15-15L15 15M15-15L-15 15"/></g>';
   }
 
+  /* En overraskelse på kartet: tegningen, pluss en usynlig treffsirkel rundt
+   * den. Sirkelen er så stor at den er minst 44 px også der kartet er minst
+   * (liggende telefon), for det er ikke bare tegningen han sikter på. Hva som
+   * skjer ved trykk, står i CSS (.overraskelse.spiller) og i Spill: ett
+   * lite øyeblikk, så stille igjen. */
+  var TREFF = 110;
+  function overraskelse(hva, cx, cy, innhold) {
+    return '<g class="overraskelse" data-hva="' + hva + '">' +
+      '<circle class="treff" cx="' + cx + '" cy="' + cy + '" r="' + TREFF + '"/>' +
+      innhold + '</g>';
+  }
+
   function bolge(x, y) {
     return '<path d="M' + x + ' ' + y + 'c9-8 18-8 27 0 9 8 18 8 27 0"' +
            ' fill="none" stroke="#e6f8f4" stroke-width="6"' +
@@ -623,6 +635,11 @@ var Figurer = (function () {
       '<path d="M578 142h42l11 17c-21 8-45 8-64 0z" fill="#ea7a33"/>' +
       '<path d="M586 164l-8 30M608 164l7 25M598 168l0 34" stroke="#ea7a33"' +
             ' stroke-width="6" stroke-linecap="round" fill="none" opacity=".75"/>' +
+      overraskelse('vulkan', 600, 112,
+        '<g class="rok" fill="#e4dfda">' +
+          '<circle cx="588" cy="126" r="11"/><circle cx="606" cy="118" r="13"/>' +
+          '<circle cx="597" cy="104" r="9"/>' +
+        '</g>') +
 
       /* Racerbanen: asfalt, midtstripe og målstrek. */
       '<ellipse cx="370" cy="500" rx="123" ry="71" fill="#8ecb7f" opacity=".8"/>' +
@@ -675,7 +692,9 @@ var Figurer = (function () {
       palme(244, 352, 1.05, false) +
       palme(238, 470, 1, true) +
       palme(322, 622, 1.05, false) +
-      palme(556, 596, 0.95, true) +
+      overraskelse('palme', 556, 575,
+        palme(556, 596, 0.95, true) +
+        '<circle class="kokos" cx="548" cy="569" r="5.5" fill="#6b4322"/>') +
       palme(742, 452, 1, false) +
       palme(778, 336, 0.85, true) +
       stein(556, 340, 1) +
@@ -683,21 +702,51 @@ var Figurer = (function () {
       stein(626, 618, 0.9) +
       kryss(276, 380, 1) +
       kryss(568, 636, 0.9) +
-      kryss(768, 418, 0.85) +
+      overraskelse('skatt', 768, 418,
+        kryss(768, 418, 0.85) +
+        '<g class="kiste">' +
+          '<rect x="750" y="396" width="36" height="22" rx="3" fill="#a9713f"/>' +
+          '<path d="M750 398c0-12 8-16 18-16s18 4 18 16z" fill="#8d5a2c"/>' +
+          '<rect x="750" y="396" width="36" height="4" fill="#f2c33d"/>' +
+          '<rect x="765" y="400" width="6" height="8" rx="1.5" fill="#f2c33d"/>' +
+          '<g fill="#ffe27a"><circle cx="744" cy="380" r="3"/><circle cx="794" cy="376" r="3.5"/>' +
+          '<circle cx="770" cy="368" r="2.5"/></g>' +
+        '</g>') +
 
       /* Havet rundt: skvalpesteiner, bølger og et kompass i hjørnet. */
       stein(140, 626, 1.1) +
-      stein(902, 206, 1) +
+      overraskelse('maake', 902, 196,
+        stein(902, 206, 1) +
+        '<g class="maake">' +
+          '<path d="M896 196v6M903 196v6" stroke="#ea7a33" stroke-width="2" stroke-linecap="round"/>' +
+          '<ellipse cx="899" cy="189" rx="11" ry="7.5" fill="#fff"/>' +
+          '<path d="M890 187q9-7 18 0" stroke="#9aa7ad" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+          '<circle cx="909" cy="180" r="5.5" fill="#fff"/>' +
+          '<path d="M913 180l7 2-7 2z" fill="#f2c33d"/>' +
+          '<circle cx="910.5" cy="179" r="1.2" fill="#23262d"/>' +
+        '</g>') +
       bolge(78, 214) +
       bolge(880, 470) +
-      bolge(430, 736) +
       bolge(196, 108) +
-      '<g transform="translate(122,714)">' +
-        '<circle r="46" fill="rgba(255,253,244,.88)"/>' +
-        '<circle r="46" fill="none" stroke="#b07a44" stroke-width="4"/>' +
-        '<path d="M-34 0L0-10 34 0 0 10z" fill="#7a5b45" opacity=".7"/>' +
-        '<path d="M0-34L10 0 0 34-10 0z" fill="#ea7a33"/>' +
-      '</g>' +
+      overraskelse('fisk', 360, 770,
+        bolge(330, 764) +
+        '<g class="fisk">' +
+          '<path d="M346 770l-12-8v16z" fill="#e0701a"/>' +
+          '<ellipse cx="360" cy="770" rx="15" ry="8.5" fill="#f08a24"/>' +
+          '<circle cx="368" cy="768" r="1.8" fill="#23262d"/>' +
+        '</g>' +
+        '<g class="plask" fill="#e6f8f4">' +
+          '<circle cx="432" cy="772" r="4"/><circle cx="444" cy="764" r="3"/><circle cx="420" cy="766" r="3"/>' +
+        '</g>') +
+      overraskelse('kompass', 122, 714,
+        '<g transform="translate(122,714)">' +
+          '<circle r="46" fill="rgba(255,253,244,.88)"/>' +
+          '<circle r="46" fill="none" stroke="#b07a44" stroke-width="4"/>' +
+          '<g class="nal">' +
+            '<path d="M-34 0L0-10 34 0 0 10z" fill="#7a5b45" opacity=".7"/>' +
+            '<path d="M0-34L10 0 0 34-10 0z" fill="#ea7a33"/>' +
+          '</g>' +
+        '</g>') +
     '</svg>';
   }
 

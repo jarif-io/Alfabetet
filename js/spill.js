@@ -810,6 +810,18 @@ var Spill = (function () {
       });
     }
 
+    /* Overraskelsene på kartet: et trykk, ett lite øyeblikk, så stille igjen.
+     * Mens en spiller, gjør et nytt trykk på den ingenting. Kartstedene er
+     * knapper oppå tegningen, så de vinner der de ligger. */
+    pa('start-kart', 'click', function (e) {
+      var o = e.target.closest && e.target.closest('.overraskelse');
+      if (!o || o.classList.contains('spiller')) return;
+      Lyd.lasOpp();
+      o.classList.add('spiller');
+      Lyd.overraskelse(o.getAttribute('data-hva'));
+      window.setTimeout(function () { o.classList.remove('spiller'); }, 1400);
+    });
+
     /* Trykk på bilen eller skipet: den tuter og hopper. Ingen læring i det,
      * men det er det første en treåring prøver, og da skal noe skje. */
     pa('figur', 'click', function () { Moduser.hopp(); });
