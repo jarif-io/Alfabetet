@@ -29,7 +29,7 @@
   --himmel-topp: #9bd6f0;
   --himmel-bunn: #ffe7c9;
   --sol: rgba(255, 236, 190, .85);
-  --as-fjern: #c2dcc6;
+  --as-fjern: #c4dde3;
   --as-bak: #9ec9a8;
   --as-fram: #7bb18c;
   --tre: #4c8a63;
@@ -67,7 +67,7 @@ body[data-verden="bane"] {
   --himmel-topp: #6cc0ec;
   --himmel-bunn: #ffdcae;
   --sol: rgba(255, 226, 168, .9);
-  --as-fjern: #b6d3ba;
+  --as-fjern: #b8d6df;
   --as-bak: #8fbb9c;
   --as-fram: #6aa47f;
   --tre: #4c8a63;
@@ -102,7 +102,7 @@ body[data-verden="dino"] {
   --himmel-topp: #78d0d4;
   --himmel-bunn: #ffd9a8;
   --sol: rgba(255, 226, 168, .9);
-  --as-fjern: #a8c9b0;
+  --as-fjern: #aed0d4;
   --as-bak: #7fae86;
   --as-fram: #5c9468;
   --bregne: #3f8f5a;
@@ -119,7 +119,7 @@ body[data-verden="taue"] {
   --himmel-topp: #74c4e8;
   --himmel-bunn: #ffd9a0;
   --sol: rgba(255, 226, 168, .9);
-  --as-fjern: #b9cfc0;
+  --as-fjern: #bbd5dc;
   --as-bak: #93b59e;
   --as-fram: #6d9f7e;
   --tre: #4c8a63;
@@ -725,6 +725,13 @@ body.pa-havet .ingress {
   margin: 0 auto;
   /* Navnelappene stikker litt utenfor stedene sine – de skal ikke klippes. */
   overflow: visible;
+  /* Et diorama: øya vippes litt bakover, som et kart som ligger på et bord,
+     og stedene står oppreist på den (se .kartsted). preserve-3d lar dem
+     reise seg ut av flaten i stedet for å bli trykt flate inn i den. */
+  --vipp: 22deg;
+  transform: perspective(1400px) rotateX(var(--vipp));
+  transform-origin: 50% 60%;
+  transform-style: preserve-3d;
 }
 /* Ingen ramme og ingen skygge: kartet skal ikke se ut som et kort som
    ligger oppå noe, det skal være det samme havet som resten av skjermen. */
@@ -739,7 +746,11 @@ body.pa-havet .ingress {
    tegningen i stedet for å bli små flekker på en stor skjerm. */
 .kartsted {
   position: absolute;
-  transform: translate(-50%, -50%);
+  /* Rettet opp igjen mot kartets vipping, og løftet fra bunnen, så hele
+     figuren står over kartflaten. Alle transformene under må ha med både
+     sentreringen og oppreisingen. */
+  transform: translate(-50%, -50%) rotateX(calc(-1 * var(--vipp)));
+  transform-origin: 50% 100%;
   width: 22%;
   /* Tegningen krymper med kartet, men trykkflaten skal aldri under 44×44 –
      bilen er lav og flat, og ble 43 px høy på en liggende telefon. Boksen er
@@ -764,8 +775,8 @@ body.pa-havet .ingress {
   transition: transform var(--mykt);
 }
 @keyframes sted-inn {
-  from { opacity: 0; transform: translate(-50%, -50%) translateY(12px) scale(.92); }
-  to   { opacity: 1; transform: translate(-50%, -50%); }
+  from { opacity: 0; transform: translate(-50%, -50%) rotateX(calc(-1 * var(--vipp))) translateY(12px) scale(.92); }
+  to   { opacity: 1; transform: translate(-50%, -50%) rotateX(calc(-1 * var(--vipp))); }
 }
 .kartsted-figur {
   display: block;
@@ -789,8 +800,8 @@ body.pa-havet .ingress {
   box-shadow: var(--sk-1);
   border-bottom: 3px solid var(--merke, var(--aksent));
 }
-.kartsted:hover { transform: translate(-50%, -50%) scale(1.06); }
-.kartsted:active { transform: translate(-50%, -50%) scale(.98); }
+.kartsted:hover { transform: translate(-50%, -50%) rotateX(calc(-1 * var(--vipp))) scale(1.06); }
+.kartsted:active { transform: translate(-50%, -50%) rotateX(calc(-1 * var(--vipp))) scale(.98); }
 
 .kartsted--bane { --merke: #dc3327; }
 .kartsted--oy   { --merke: #16788f; }

@@ -306,6 +306,29 @@ module.exports = async function (t) {
     });
   });
   ok(hvaListe.length === 6, 'kartet har seks overraskelser (' + hvaListe.join(', ') + ')');
+
+  /* Figurene er tegnet på nytt i 2,5D. Det som får dem til å leve, må
+   * fortsatt være der – og ingen id i dokumentet kan finnes to ganger, ellers
+   * blir en gradient borte. */
+  var figurFeil = await s9.evaluate(function () {
+    var ut = [], ider = {};
+    document.querySelectorAll('[id]').forEach(function (e) {
+      if (ider[e.id]) ut.push('dobbel id ' + e.id);
+      ider[e.id] = true;
+    });
+    ['bane', 'oy', 'dino', 'taue'].forEach(function (v) {
+      var svg = document.querySelector('.kartsted--' + v + ' svg.fig');
+      ['u-vanlig', 'u-glad', 'u-hmm', 'u-trott'].forEach(function (u) {
+        if (!svg.querySelector('.' + u)) ut.push(v + ' mangler ' + u);
+      });
+      if (!svg.querySelector('.pupill')) ut.push(v + ' mangler pupiller');
+    });
+    ['bane', 'taue'].forEach(function (v) {
+      if (document.querySelectorAll('.kartsted--' + v + ' svg.fig .hjul').length < 2) ut.push(v + ' mangler hjul');
+    });
+    return ut;
+  });
+  ok(figurFeil.length === 0, 'figurene har uttrykk, pupiller og hjul, og ingen id er dobbel (' + figurFeil.join('; ') + ')');
   for (var o = 0; o < hvaListe.length; o++) {
     var hva = hvaListe[o];
     var sentrum = await s9.evaluate(function (h) {

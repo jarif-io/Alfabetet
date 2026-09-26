@@ -76,8 +76,9 @@ function sjekk() {
 function sjekkKart() {
   var ut = [];
   var kart = document.getElementById('start-kart');
-  var r = kart.getBoundingClientRect();
-  var forhold = r.width / r.height;
+  /* Layoutboksen, ikke den vippede (kartet er et diorama, se .kart): det er
+   * den prosentposisjonene til stedene regnes ut fra. */
+  var forhold = kart.offsetWidth / kart.offsetHeight;
   if (Math.abs(forhold - 1000 / 820) > 0.02) ut.push('kartets sideforhold ' + forhold.toFixed(3) + ' ≠ 1000/820');
 
   var steder = Array.prototype.slice.call(document.querySelectorAll('.kartsted'));
