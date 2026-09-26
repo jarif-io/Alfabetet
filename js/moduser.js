@@ -137,15 +137,19 @@ var Moduser = (function () {
 
   var kjoreTimer = null;
   var uttrykkTimer = null;
+  var varigUttrykk = null;
 
-  /* Ansiktet på figuren: 'glad', 'hmm', 'trott' eller null (vanlig). Med ms
-   * går det tilbake til vanlig av seg selv – ett uttrykk varer bare så lenge
-   * det hører til noe som skjedde. */
+  /* Ansiktet på figuren: 'glad', 'hmm', 'trott' eller null (vanlig). Uten ms
+   * blir det stående (glad på oppsummeringen, trøtt i pausen). Med ms går det
+   * tilbake dit etter en stund – et kort uttrykk varer bare så lenge det
+   * hører til noe som skjedde, og visker ikke ut det som står. */
   function uttrykk(navn, ms) {
     var figur = el('figur');
     window.clearTimeout(uttrykkTimer);
-    if (navn) figur.dataset.uttrykk = navn; else delete figur.dataset.uttrykk;
-    if (ms) uttrykkTimer = window.setTimeout(function () { uttrykk(null); }, ms);
+    if (!ms) varigUttrykk = navn;
+    var vis = navn || varigUttrykk;
+    if (vis) figur.dataset.uttrykk = vis; else delete figur.dataset.uttrykk;
+    if (ms) uttrykkTimer = window.setTimeout(function () { uttrykk(varigUttrykk); }, ms);
   }
 
   /* Hvor langt figuren har kjørt. Landskapet bak glir etter i dybden, se
@@ -207,11 +211,13 @@ var Moduser = (function () {
     }, 1000);
   }
 
+  /* Bare posisjonen: ansiktet nullstilles når modusen forlates (stoppAlt).
+   * Kalles også ved omskalering – og på iPhone er det nok at adresselinja
+   * skjules, så den må ikke viske ut pausen på oppsummeringen. */
   function stillFigurTilStart() {
     var figur = el('figur');
     figur.classList.remove('speilet', 'kjorer');
     settPosisjon(figur, 24);
-    uttrykk(null);
   }
 
   /* Et lite hopp. Treåringer trykker på figuren fordi den er der, og da
@@ -506,15 +512,13 @@ var Moduser = (function () {
      * ingenting, og et som lytter, ser dem sprette opp. Uten stemme våkner de
      * etter litt over ett sekund. Nummeret gjør at et avbrutt spørsmål (han
      * trykket «Hør igjen», eller gikk ut) aldri vekker skiltene for et nytt. */
-    function vent(ms) { return new Promise(function (f) { window.setTimeout(f, ms); }); }
-
     function lyttForst(tale, etterpa) {
       var denne = okt, nr = ++okt.spmNr;
       okt.lytter = true;
       el('skjerm-oppgave').classList.add('lytter');
       Tale.stopp();
       var minst = Tale.kanSnakke() ? 400 : 1200;
-      Promise.race([Promise.all([Tale.rekke(tale), vent(minst)]), vent(10000)])
+      Promise.race([Promise.all([Tale.rekke(tale), Tale.vent(minst)]), Tale.vent(10000)])
         .then(function () {
           if (okt !== denne || nr !== okt.spmNr) return;
           okt.lytter = false;
@@ -714,6 +718,7 @@ var Moduser = (function () {
       if (okt.type === 'hent' && okt.hjelpHent &&
           okt.talt >= antallFor(okt.verden, okt.fasit)) {
         spillOm(t, 'vugg', 500);
+        Lyd.proveIgjen();
         return;
       }
       okt.telt.push(t);
@@ -896,11 +901,11 @@ var Moduser = (function () {
       /* Navnet sies for seg. Det er samme ytring som ellers i spillet, og
        * kan derfor gjenbruke det samme innspilte klippet – i tillegg til at
        * det blir en pause rett foran det han skal høre etter. Skiltet
-       * begynner å pulsere når det er sagt, ikke før. */
+       * sover mens det sies, og pulsen starter når det våkner – også om
+       * han ber om å høre det igjen underveis. */
+      riktigKnapp.classList.add('pekes');
       lyttForst(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
-                 300, 'Trykk på den.'], function () {
-        riktigKnapp.classList.add('pekes');
-      });
+                 300, 'Trykk på den.']);
     }
 
     function riktig(knapp) {
@@ -1039,7 +1044,10 @@ var Moduser = (function () {
       brikker.classList.toggle('oppsum-brikker--navn', okt.type === 'navn');
       var funnet = okt.type === 'navn'
         ? okt.ko.slice()
-        : Object.keys(okt.telling).sort();
+        : Object.keys(okt.telling).sort(function (a, b) {
+            /* Tegnsettets egen rekkefølge: 2 før 10, og Æ Ø Å til slutt. */
+            return tegnFor(okt.verden).indexOf(a) - tegnFor(okt.verden).indexOf(b);
+          });
       funnet.forEach(function (b, n) {
         var brikke = document.createElement('span');
         brikke.className = 'oppsum-brikke';

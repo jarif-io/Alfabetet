@@ -115,13 +115,14 @@ var Lagring = (function () {
         Object.keys(lest.framgang).forEach(function (tegn) {
           var f = lest.framgang[tegn];
           if (!f || typeof f !== 'object') return;
-          ut.framgang[tegn] = {
+          /* Felter en nyere versjon kan ha lagt til, blir med videre. */
+          ut.framgang[tegn] = Object.assign({}, f, {
             riktig: +f.riktig || 0,
             feil: +f.feil || 0,
             dager: f.dager instanceof Array ? f.dager.filter(function (d) {
               return typeof d === 'string';
             }) : []
-          };
+          });
         });
       }
       if (lest.innstillinger) {

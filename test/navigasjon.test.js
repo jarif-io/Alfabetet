@@ -48,6 +48,16 @@ module.exports = async function (t) {
         var tente = await side.locator('#oppsum-stjerner .tent').count();
         var alle = await side.locator('#oppsum-stjerner .oppsum-stjerne').count();
         ok(alle > 0 && tente === alle, sted + '/' + modus + ': alle stjernene tent når alt satt første gang (' + tente + '/' + alle + ')');
+        var rekkefolge = await side.evaluate(function () {
+          var tegn = Array.prototype.map.call(document.querySelectorAll('#oppsum-brikker .oppsum-brikke b'),
+            function (b) { return b.textContent; });
+          var verden = document.body.getAttribute('data-verden');
+          var sortert = tegn.slice().sort(function (a, b) {
+            return tegnFor(verden).indexOf(a) - tegnFor(verden).indexOf(b);
+          });
+          return { tegn: tegn.join(','), riktig: document.getElementById('oppsum-brikker').classList.contains('oppsum-brikker--navn') || tegn.join() === sortert.join() };
+        });
+        ok(rekkefolge.riktig, sted + '/' + modus + ': oppsummeringen står i tegnsettets rekkefølge (' + rekkefolge.tegn + ')');
       } else {
         ok(false, sted + '/' + modus + ': ukjent skjerm ' + skjerm);
       }
@@ -73,6 +83,9 @@ module.exports = async function (t) {
   await s2.clock.runFor(500);
   await s2.locator('#tannhjul').click();
   await s2.locator('#voksenboble-apne').click();
+  var etiketter = (await s2.locator('#inn-navn-figurer label').allTextContents()).join(', ');
+  ok(/Racerbilen/.test(etiketter) && /Kapteinen/.test(etiketter) && /Dinosauren/.test(etiketter) && /Tauebilen/.test(etiketter),
+     'foreldremenyen har ett navnefelt per figur, merket med figuren (' + etiketter + ')');
   await s2.locator('#foreldre-lukk').click();
   await s2.clock.runFor(200);
   ok(await hjelp.skjerm(s2) === 'skjerm-meny', 'foreldremenyen lukkes til menyen');
@@ -170,11 +183,16 @@ module.exports = async function (t) {
   await s4.locator('#oppgave-valg .skilt:not([data-bokstav="' + fasit + '"])').first().click();
   await s4.clock.runFor(200);
   ok(await ansikt() === 'hmm', 'figuren ser «hmm» ut etter et bom (' + await ansikt() + ')');
+  /* Ber han om å høre det igjen mens hjelpen sies, skal pulsen likevel
+   * komme når skiltene våkner. */
+  await s4.evaluate(function () { Moduser.Oppgave.gjentaSporsmal(); });
   await s4.clock.runFor(2000);
   ok(await ansikt() === 'vanlig', '«hmm» går over av seg selv (' + await ansikt() + ')');
   await hjelp.ventTil(s4, function (v) {
     var k = document.querySelector(v); return k && !k.disabled;
   }, '#oppgave-valg .skilt[data-bokstav="' + fasit + '"]');
+  await hjelp.vaken(s4);
+  ok(await s4.locator('#oppgave-valg .skilt.pekes').count() === 1, 'hjelpen peker fortsatt på svaret etter «hør igjen»');
   var forHjelp = await s4.locator('#figur').evaluate(function (f) { return f.style.transform; });
   await s4.locator('#oppgave-valg .skilt[data-bokstav="' + fasit + '"]').click();
   await s4.clock.runFor(200);
@@ -268,6 +286,12 @@ module.exports = async function (t) {
       await s8.clock.runFor(300);
     } else {
       ok(!oppsum.igjen && oppsum.ansikt === 'trott', 'runde 4: figuren er trøtt, og «en runde til» er borte (' + JSON.stringify(oppsum) + ')');
+      await s8.locator('#figur').click();
+      await s8.clock.runFor(1500);
+      await s8.setViewportSize({ width: 1024, height: 700 });
+      await s8.clock.runFor(300);
+      var fortsatt = await s8.evaluate(function () { return document.getElementById('figur').dataset.uttrykk || 'vanlig'; });
+      ok(fortsatt === 'trott', 'pausen står seg når han trykker på figuren og skjermen endrer størrelse (' + fortsatt + ')');
     }
   }
   ok(s8.feil.length === 0, 'pausen: ingen feil' + (s8.feil.length ? ' – ' + s8.feil.join(' | ') : ''));

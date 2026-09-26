@@ -272,8 +272,9 @@ body.pa-havet.bevegelse .scene-skyer { animation: sjodriv 150s linear infinite; 
   position: absolute;
   left: 0; right: 0; bottom: 0;
   /* Litt bredere enn skjermen, så det finnes landskap å gli inn fra når
-     lagene forskyves (under). */
-  width: calc(100% + 160px);
+     lagene forskyves (under) – men ikke mer enn det som faktisk flyttes,
+     ellers havner høyre del av tegningen utenfor på telefon. */
+  width: 112%;
 }
 /* Dybde: når figuren kjører bortover, glir lagene forbi i ulik fart – det
    fjerne sakte, det nære fortere. --kjort settes av Moduser når figuren
@@ -281,9 +282,9 @@ body.pa-havet.bevegelse .scene-skyer { animation: sjodriv 150s linear infinite; 
 body.bevegelse .scene-landskap .lag {
   transition: transform 980ms cubic-bezier(.42, .05, .18, 1);
 }
-body.bevegelse .scene-landskap .lag--fjern { transform: translateX(max(-160px, calc(var(--kjort, 0px) * -.03))); }
-body.bevegelse .scene-landskap .lag--bak { transform: translateX(max(-160px, calc(var(--kjort, 0px) * -.07))); }
-body.bevegelse .scene-landskap .lag--fram { transform: translateX(max(-160px, calc(var(--kjort, 0px) * -.13))); }
+body.bevegelse .scene-landskap .lag--fjern { transform: translateX(max(-12vw, calc(var(--kjort, 0px) * -.03))); }
+body.bevegelse .scene-landskap .lag--bak { transform: translateX(max(-12vw, calc(var(--kjort, 0px) * -.07))); }
+body.bevegelse .scene-landskap .lag--fram { transform: translateX(max(-12vw, calc(var(--kjort, 0px) * -.13))); }
 .scene-landskap .lag--fjern { height: 184px; }
 .scene-landskap .lag--bak { height: 150px; opacity: .9; }
 .scene-landskap .lag--fram { height: 118px; }
@@ -1411,7 +1412,7 @@ body[data-verden="oy"] .skilt::after {
   opacity: .45;
 }
 
-.skilt.vugg { animation: vugg 460ms ease-in-out; }
+.skilt.vugg, .ting.vugg { animation: vugg 460ms ease-in-out; }
 @keyframes vugg {
   0%, 100% { transform: rotate(0) translateX(0); }
   20% { transform: rotate(0) translateX(-9px); }

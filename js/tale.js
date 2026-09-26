@@ -52,6 +52,7 @@ var Tale = (function () {
     },
 
     si: si,
+    vent: vent,
 
     /* Om spillet faktisk kan si noe nå – stemmen på og pakken lastet. */
     kanSnakke: pa,

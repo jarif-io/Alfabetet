@@ -48,13 +48,16 @@ module.exports = async function (t) {
    * versjonsnummer – da ville en nyere versjon kjørt migreringene sine om
    * igjen neste gang og overskrevet valgene familien har gjort. */
   s = await sjekk('lagring fra en nyere versjon',
-    JSON.stringify({ versjon: 99, navn: { bane: 'Rappen' }, framgang: framgang, innstillinger: { stemme: false } }), 'Rappen');
+    JSON.stringify({ versjon: 99, navn: { bane: 'Rappen' },
+      framgang: { B: { riktig: 3, feil: 0, dager: TRE_DAGER, sist: '2026-01-03' } },
+      innstillinger: { stemme: false } }), 'Rappen');
   await hjelp.velgModus(s, 'Finn bokstaven');
   await hjelp.svarRiktig(s);
   await s.clock.runFor(300);
   lest = await hjelp.lest(s);
   ok(lest && lest.versjon === 99, 'nyere lagring beholder versjonsnummeret sitt (' + (lest && lest.versjon) + ')');
   ok(lest && lest.framgang.B.dager.length === 3, 'nyere lagring: framgangen er urørt');
+  ok(lest && lest.framgang.B.sist === '2026-01-03', 'nyere lagring: felter en nyere versjon la til, blir med videre');
   await s.context().close();
 
   /* En skadet oppføring i framgangen skal ikke velte menyen eller samlingen. */

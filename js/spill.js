@@ -126,9 +126,14 @@ var Spill = (function () {
   var blikkTimer = null;
   function blikk(e) {
     var figurer = document.querySelectorAll('svg.fig');
+    /* Alle målene leses før noe skrives: vekslet vi, måtte nettleseren
+     * regne ut siden på nytt for hver figur ved hver fingerbevegelse. */
+    var mal = Array.prototype.map.call(figurer, function (f) {
+      return f.getBoundingClientRect();
+    });
     for (var i = 0; i < figurer.length; i++) {
       var f = figurer[i];
-      var r = f.getBoundingClientRect();
+      var r = mal[i];
       if (!r.width) continue;
       var dx = e.clientX - (r.left + r.width / 2);
       var dy = e.clientY - (r.top + r.height / 3);
@@ -516,7 +521,7 @@ var Spill = (function () {
       felt.type = 'text';
       felt.maxLength = 20;
       felt.id = 'inn-navn-' + id;
-      etikett.appendChild(document.createTextNode(VERDENER[id].navn));
+      etikett.appendChild(document.createTextNode(VERDENER[id].figurnavn));
       etikett.appendChild(felt);
       rad.appendChild(etikett);
       navnefelt[id] = felt;
@@ -690,8 +695,10 @@ var Spill = (function () {
     for (var i = 0; i < lyttIkoner.length; i++) {
       lyttIkoner[i].innerHTML = Figurer.ikon('stemmePa');
     }
-    el('oppsum-tilbake').querySelector('.knapp-ikon').innerHTML = Figurer.ikon('hjem');
-    el('oppsum-igjen').querySelector('.knapp-ikon').innerHTML = Figurer.ikon('igjen');
+    [['#oppsum-tilbake', 'hjem'], ['#oppsum-igjen', 'igjen']].forEach(function (k) {
+      var ikon = document.querySelector(k[0] + ' .knapp-ikon');
+      if (ikon) ikon.innerHTML = Figurer.ikon(k[1]);
+    });
 
     pa('tilbake', 'click', function () {
       Lyd.klikk();

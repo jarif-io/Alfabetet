@@ -193,12 +193,18 @@ def main():
     # Klipp som allerede finnes, lages ikke på nytt: det sparer tid, og et
     # ord han kjenner skal ikke plutselig høres litt annerledes ut. Klipp
     # ingen replikk peker på lenger, ryddes bort.
+    # ponytail: et klipp kjennes igjen på filnavnet alene. Endres bare
+    # UTTALE for et ord som har klipp, eller to setninger kortes ned til
+    # samme filnavn, lages det ikke på nytt – kjør da med --alt (eller slett
+    # det ene klippet). Lagre uttalen i manifestet hvis dette blir vanlig.
     trengs = set(r['id'] + '.mp3' for r in liste)
     for f in os.listdir(UT):
         if f.endswith('.mp3') and (alt or f not in trengs):
             os.remove(os.path.join(UT, f))
     nye = [r for r in liste if not os.path.exists(os.path.join(UT, r['id'] + '.mp3'))]
     print('%d mangler klipp.' % len(nye))
+    if not alt:
+        print('(Endret du uttalen av et ord som alt har klipp? Kjør med --alt.)')
 
     tts = lag_tts(hent_modell()) if nye else None
     manifest = {r['nokkel']: r['id'] + '.mp3' for r in liste}

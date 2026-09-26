@@ -28,8 +28,9 @@
  *   ord   – ordet som sies og vises
  *   ikon  – en emoji som vises stort på skjermen
  *
- * Verdenen selv har i tillegg figur (hvilken tegning), landskap (bakgrunnen)
- * og flagg (bildet øverst på oppsummeringen).
+ * Verdenen selv har i tillegg figur (hvilken tegning), figurnavn (slik den
+ * voksne omtaler den i foreldremenyen), landskap (bakgrunnen) og flagg
+ * (bildet øverst på oppsummeringen).
  *
  * Spillet sier «L … L for Løve» – samme formel som alfabetbøkene bruker.
  */
@@ -169,6 +170,7 @@ var VERDENER = {
     navn: 'Racerbanen',
     ikon: '🏁',
     figur: 'bil',
+    figurnavn: 'Racerbilen',
     landskap: 'aser',
     flagg: '🏁',
     standardnavn: 'Turbo',
@@ -216,6 +218,7 @@ var VERDENER = {
     navn: 'Sjørøverøya',
     ikon: '🏴‍☠️',
     figur: 'skip',
+    figurnavn: 'Kapteinen',
     landskap: 'oy',
     flagg: '🏝️',
     standardnavn: 'Kaptein Rødskjegg',
@@ -277,6 +280,7 @@ var VERDENER = {
     tegn: TALL,
     ikon: '🦕',
     figur: 'dino',
+    figurnavn: 'Dinosauren',
     landskap: 'dal',
     flagg: '🦕',
     standardnavn: 'Rex',
@@ -315,6 +319,7 @@ var VERDENER = {
     tegn: TALL,
     ikon: '🔧',
     figur: 'tauebil',
+    figurnavn: 'Tauebilen',
     landskap: 'aser',
     flagg: '🔧',
     standardnavn: 'Rusken',
