@@ -239,7 +239,10 @@ module.exports = async function (t) {
   });
   ok(sover.lytter && !sover.treff && !sover.svart, 'mens spørsmålet leses, sover skiltene og et trykk gjør ingenting (' + JSON.stringify(sover) + ')');
   var tast = await s7.locator('#oppgave-valg .skilt').first().getAttribute('data-bokstav');
-  await s7.keyboard.press(tast);
+  /* Sendt direkte: Playwright kjenner ikke Æ, Ø og Å som taster. */
+  await s7.evaluate(function (k) {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+  }, tast);
   ok(await s7.locator('#oppgave-valg .skilt.feil, #oppgave-valg .skilt.riktig').count() === 0, 'tastaturet kan heller ikke svare mens spørsmålet leses');
   await s7.clock.runFor(1400);
   ok(await s7.evaluate(function () { return !document.getElementById('skjerm-oppgave').classList.contains('lytter'); }),
