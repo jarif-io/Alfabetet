@@ -85,6 +85,13 @@ var hjelp = {
     return false;
   },
 
+  /* Skiltene og tingene sover mens spørsmålet leses («lytt først»). */
+  vaken: function (side) {
+    return hjelp.ventTil(side, function () {
+      return !document.getElementById('skjerm-oppgave').classList.contains('lytter');
+    });
+  },
+
   skjerm: function (side) {
     return side.evaluate(function () {
       var s = document.querySelector('.skjerm:not([hidden])');
@@ -114,6 +121,7 @@ var hjelp = {
   /* Svaret på oppgaven som står framme, funnet på samme måte som barnet
    * kan: telle tingene, lese bildet, eller trykke på spørsmålstegnet. */
   fasit: async function (side) {
+    await hjelp.vaken(side);
     var art = await side.evaluate(function () {
       var mal = document.getElementById('oppgave-mal');
       if (mal.classList.contains('oppdrag-mal--hent')) return 'hent';

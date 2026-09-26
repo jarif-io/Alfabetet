@@ -293,6 +293,7 @@ var LYDFILER = {
  "ni pakker.": "ord-ni-pakker.mp3",
  "ni.": "tallnavn-ni.mp3",
  "nå prøver vi en vanskeligere en.": "setning-naa-proever-vi-en-vanskeligere-en.mp3",
+ "nå trenger vi en pause.": "setning-naa-trenger-vi-en-pause.mp3",
  "nøkkel.": "ordet-noekkel.mp3",
  "nøkler.": "telling-noekler.mp3",
  "o for ost.": "ord-o-for-ost.mp3",

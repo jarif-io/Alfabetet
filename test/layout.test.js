@@ -180,6 +180,7 @@ module.exports = async function (t) {
 
     await hjelp.tilVerden(side, 'Verkstedet');
     await hjelp.velgModus(side, 'Hent');
+    await hjelp.vaken(side);
     await side.locator('#oppgave-mal .ting').first().click();
     await mål('Hent');
 

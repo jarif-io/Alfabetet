@@ -170,7 +170,8 @@ var Replikker = (function () {
       'Trykk på garasjen når du er ferdig.',
       'Det ble for mange.',
       'Vi teller sammen.',
-      'Vi trenger flere.'
+      'Vi trenger flere.',
+      'Nå trenger vi en pause.'
     ].forEach(function (t) { legg('setning', t); });
 
     return ut;

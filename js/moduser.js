@@ -415,6 +415,25 @@ var Moduser = (function () {
       : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7) };
   }
 
+  /* Etter noen runder på rad foreslår figuren en pause: den er trøtt på
+   * oppsummeringen, og pila rundt («en runde til») er borte. Det er ingen
+   * lås – han kan gå et annet sted – men spillet ber aldri om mer. Telles i
+   * fanen (sessionStorage) og nullstilles etter en halvtime uten runder. */
+  var PAUSE_ETTER = 4;
+  var PAUSE_NULLSTILL_MS = 30 * 60 * 1000;
+  function rundeFerdig() {
+    try {
+      var lagret = JSON.parse(window.sessionStorage.getItem('oppdageroya.runder') || 'null');
+      var n = lagret && Date.now() - lagret.sist < PAUSE_NULLSTILL_MS ? lagret.antall : 0;
+      n += 1;
+      window.sessionStorage.setItem('oppdageroya.runder',
+        JSON.stringify({ antall: n, sist: Date.now() }));
+      return n >= PAUSE_ETTER;
+    } catch (e) {
+      return false;
+    }
+  }
+
   var MODUSTITTEL = {
     finn: 'Finn bokstaven',
     forstelyd: 'Første lyd',
@@ -480,6 +499,28 @@ var Moduser = (function () {
         }
       }
       return ko;
+    }
+
+    /* «Lytt først». Skiltene sover mens spørsmålet leses, og våkner når det
+     * er ferdig – et barn som trykker tilfeldig mens stemmen snakker, treffer
+     * ingenting, og et som lytter, ser dem sprette opp. Uten stemme våkner de
+     * etter litt over ett sekund. Nummeret gjør at et avbrutt spørsmål (han
+     * trykket «Hør igjen», eller gikk ut) aldri vekker skiltene for et nytt. */
+    function vent(ms) { return new Promise(function (f) { window.setTimeout(f, ms); }); }
+
+    function lyttForst(tale, etterpa) {
+      var denne = okt, nr = ++okt.spmNr;
+      okt.lytter = true;
+      el('skjerm-oppgave').classList.add('lytter');
+      Tale.stopp();
+      var minst = Tale.kanSnakke() ? 400 : 1200;
+      Promise.race([Promise.all([Tale.rekke(tale), vent(minst)]), vent(10000)])
+        .then(function () {
+          if (okt !== denne || nr !== okt.spmNr) return;
+          okt.lytter = false;
+          el('skjerm-oppgave').classList.remove('lytter');
+          if (etterpa) etterpa();
+        });
     }
 
     function tegnPrikker() {
@@ -598,8 +639,12 @@ var Moduser = (function () {
 
       el('oppgave-videre').hidden = true;
 
-      Tale.stopp();
-      Tale.rekke(sporsmalstale());
+      /* «Tell først»: tallskiltene våkner når alt er talt. Da er svaret
+       * det siste tallordet han sa – telling er veien til svaret, ikke en
+       * omvei rundt det. */
+      valgfelt.classList.toggle('sover', okt.type === 'tell');
+
+      lyttForst(sporsmalstale());
     }
 
     /* «Tell»: tingene han skal telle. Han kan trykke på hver enkelt, og da
@@ -649,7 +694,7 @@ var Moduser = (function () {
     }
 
     function tellTing(t) {
-      if (okt.ferdigMedDenne) return;
+      if (okt.ferdigMedDenne || okt.lytter) return;
       /* Trykk på noe som alt er talt: ta det bort igjen. Han skal kunne
        * angre og telle om, uten å måtte begynne på en ny oppgave – det er
        * halve poenget med å telle med fingeren. */
@@ -661,6 +706,7 @@ var Moduser = (function () {
         Lyd.klikk();
         Tale.stopp();
         if (okt.type === 'hent') tegnGarasje();
+        if (okt.type === 'tell') el('oppgave-valg').classList.add('sover');
         return;
       }
       /* Med hjelp i «Hent» er garasjen full når den er full – da kan han
@@ -687,6 +733,7 @@ var Moduser = (function () {
       }
 
       var alle = antallFor(okt.verden, okt.fasit);
+      el('oppgave-valg').classList.toggle('sover', okt.talt < alle);
       if (okt.talt >= alle) {
         /* Det siste tallordet han sier *er* svaret. Uten den koblingen har han
          * bare ramset opp tallrekka mens han pekte. */
@@ -752,7 +799,7 @@ var Moduser = (function () {
      * få: vi trenger flere, og det han har hentet blir stående. For mange:
      * bilene kjøres ut igjen, og vi teller sammen fra start. */
     function lever(knapp) {
-      if (okt.ferdigMedDenne) return;
+      if (okt.ferdigMedDenne || okt.lytter) return;
       var n = antallFor(okt.verden, okt.fasit);
       if (!okt.talt) {
         Tale.stopp();
@@ -805,7 +852,8 @@ var Moduser = (function () {
     }
 
     function svar(bokstav, knapp) {
-      if (knapp.disabled) return;
+      /* Tastaturet går utenom CSS, så søvnen sjekkes her også. */
+      if (knapp.disabled || okt.lytter || el('oppgave-valg').classList.contains('sover')) return;
 
       if (bokstav === okt.fasit) { riktig(knapp); return; }
 
@@ -822,8 +870,7 @@ var Moduser = (function () {
       if (okt.forsokPaDenne >= okt.oppsett.bomForHjelp) {
         hjelp();
       } else {
-        Tale.stopp();
-        Tale.rekke(['Prøv en gang til.', 300].concat(sporsmalstale()));
+        lyttForst(['Prøv en gang til.', 300].concat(sporsmalstale()));
       }
     }
 
@@ -846,13 +893,14 @@ var Moduser = (function () {
          * gjorde. */
         if (!alle[i].classList.contains('feil')) alle[i].classList.add('borte');
       }
-      riktigKnapp.classList.add('pekes');
-      Tale.stopp();
       /* Navnet sies for seg. Det er samme ytring som ellers i spillet, og
        * kan derfor gjenbruke det samme innspilte klippet – i tillegg til at
-       * det blir en pause rett foran det han skal høre etter. */
-      Tale.rekke(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
-                  300, 'Trykk på den.']);
+       * det blir en pause rett foran det han skal høre etter. Skiltet
+       * begynner å pulsere når det er sagt, ikke før. */
+      lyttForst(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
+                 300, 'Trykk på den.'], function () {
+        riktigKnapp.classList.add('pekes');
+      });
     }
 
     function riktig(knapp) {
@@ -872,7 +920,11 @@ var Moduser = (function () {
         spillOm(el('oppgave-mal').querySelector('.navnrute.na'), 'lander', 520);
       }
 
-      kjorTil(okt.verden, knapp);
+      /* Riktig på første forsøk: figuren kjører dit og blir glad. Etter
+       * hjelp: bare et rolig grønt skilt. Hjelpen skal aldri være morsommere
+       * enn å klare det selv, ellers lønner det seg å bomme med vilje. */
+      if (forsteForsok) kjorTil(okt.verden, knapp);
+      else knapp.classList.add('rolig');
 
       if (forsteForsok) {
         okt.riktigForste += 1;
@@ -960,10 +1012,12 @@ var Moduser = (function () {
         ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
         : '';
 
+      var pause = rundeFerdig();
       el('oppsum-flagg').textContent = VERDENER[okt.verden].flagg;
-      el('oppsum-tittel').textContent = okt.type === 'navn'
-        ? navnet + '!'
+      el('oppsum-tittel').textContent = pause ? 'Nå tar vi en pause'
+        : okt.type === 'navn' ? navnet + '!'
         : tilfeldig(VERDENER[okt.verden].ros) + '!';
+      el('oppsum-igjen').hidden = pause;
 
       /* En treåring kan ikke lese en resultatliste. Han kan telle stjerner
        * og kjenne igjen bokstavene sine, så det er det oppsummeringen viser.
@@ -1024,7 +1078,10 @@ var Moduser = (function () {
       el('oppsum-tekst').textContent = tekst;
 
       Lyd.ferdig();
-      uttrykk('glad');
+      /* Slutten av runden: figuren kjører helt bort, over målstreken. Den er
+       * glad – eller trøtt, når det er tid for en pause. */
+      kjorTil(okt.verden, 1);
+      uttrykk(pause ? 'trott' : 'glad');
       var hilsen = okt.type === 'navn'
         ? navnetTalt(okt.ko)
         : okt.nyeMestrede.length
@@ -1032,6 +1089,7 @@ var Moduser = (function () {
              280, 'Den kan du nå!']
           : [Tale.velg('Bra jobbet, ' + Lagring.navnFor(okt.verden) + '!',
                        'Bra jobbet!')];
+      if (pause) hilsen = hilsen.concat([400, 'Nå trenger vi en pause.']);
       /* Rosen og hoppet kommer litt etter, med vilje. Har han allerede gått
        * videre – en ny runde, eller tilbake – hører de ikke hjemme der han
        * er nå, og da blir de borte. */
@@ -1041,7 +1099,9 @@ var Moduser = (function () {
       }
       window.setTimeout(function () { if (fortsattHer()) Tale.rekke(hilsen); }, 700);
       /* Figuren hopper av glede – det er den delen han skjønner uten ord. */
-      window.setTimeout(function () { if (fortsattHer()) hopp(); }, 400);
+      window.setTimeout(function () {
+        if (fortsattHer() && !pause) { hopp(); uttrykk('glad'); }
+      }, 1000);
 
       Spill.settOppsummering(okt.type);
     }
@@ -1081,7 +1141,8 @@ var Moduser = (function () {
           forsokPaDenne: 0,
           riktigForste: 0,
           telling: {},
-          nyeMestrede: []
+          nyeMestrede: [],
+          spmNr: 0
         };
 
         Spill.visSkjerm('skjerm-oppgave');
@@ -1102,11 +1163,21 @@ var Moduser = (function () {
 
       gjentaSporsmal: function () {
         if (!okt) return;
-        Tale.stopp();
-        Tale.rekke(sporsmalstale());
+        if (okt.ferdigMedDenne) {
+          Tale.stopp();
+          Tale.rekke(sporsmalstale());
+          return;
+        }
+        lyttForst(sporsmalstale());
       },
 
-      stopp: function () { stoppNedtelling(); Spill.settTastLytter(null); Tale.stopp(); }
+      stopp: function () {
+        stoppNedtelling();
+        Spill.settTastLytter(null);
+        Tale.stopp();
+        if (okt) okt.spmNr += 1;
+        el('skjerm-oppgave').classList.remove('lytter');
+      }
     };
   })();
 

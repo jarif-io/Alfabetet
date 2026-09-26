@@ -53,6 +53,9 @@ var Tale = (function () {
 
     si: si,
 
+    /* Om spillet faktisk kan si noe nå – stemmen på og pakken lastet. */
+    kanSnakke: pa,
+
     /* Velger den første varianten vi har lydklipp for. Finnes ingen av dem,
      * velges den siste – som regel den enkleste, navneløse varianten – i
      * stedet for den rikeste: bedre stille enn å risikere en hel setning

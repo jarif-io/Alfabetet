@@ -107,7 +107,10 @@ module.exports = async function (t) {
   }
 
   /* Rask vei ut av oppsummeringen: rosen er forsinket med vilje, og skal
-   * ikke komme midt i det neste han gjør. */
+   * ikke komme midt i det neste han gjør. (Rundene over har gitt pause, og
+   * da er «en runde til» borte – telleren nullstilles, som etter en
+   * halvtime uten spill.) */
+  await side.evaluate(function () { sessionStorage.removeItem('oppdageroya.runder'); });
   await hjelp.tilVerden(side, 'Racerbanen');
   await hjelp.velgModus(side, 'Finn bokstaven');
   await hjelp.spillRunde(side);
@@ -118,6 +121,21 @@ module.exports = async function (t) {
   var nyRunde = await sagt();
   ok(!nyRunde.some(function (x) { return /^Bra jobbet|Den kan du nå/.test(x); }),
      'ingen ros fra forrige runde inn i den neste (' + nyRunde.join(' / ') + ')');
+
+  /* «Lytt først» med stemme: skiltene våkner når spørsmålet er ferdig lest,
+   * ikke før – selv når klippene tar tid. */
+  await hjelp.tilbake(side);
+  await side.evaluate(function () {
+    Lydbank.spill = function () { return new Promise(function (f) { setTimeout(f, 1500); }); };
+  });
+  await hjelp.velgModus(side, 'Finn bokstaven');
+  function lytter() {
+    return side.evaluate(function () { return document.getElementById('skjerm-oppgave').classList.contains('lytter'); });
+  }
+  await side.clock.runFor(2000);
+  ok(await lytter(), 'med stemme sover skiltene mens spørsmålet fortsatt leses');
+  await side.clock.runFor(2500);
+  ok(!(await lytter()), 'når spørsmålet er lest, våkner skiltene');
 
   var tause = await side.evaluate(function () { return window.__mangler; });
   var unike = tause.filter(function (x, i) { return tause.indexOf(x) === i; });

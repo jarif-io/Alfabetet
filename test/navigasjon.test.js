@@ -118,6 +118,7 @@ module.exports = async function (t) {
       };
     });
   }
+  await hjelp.vaken(s6);
   var h = await hentTilstand();
   ok(h.biler > h.n && h.biler <= Math.min(10, h.n + 3), 'Hent: flere biler enn han skal hente (' + h.biler + ' biler, hent ' + h.n + ')');
   var biler = s6.locator('#oppgave-mal .ting');
@@ -142,6 +143,7 @@ module.exports = async function (t) {
     return p[1] && p[1].classList.contains('na');
   });
   await s6.clock.runFor(300);
+  await hjelp.vaken(s6);
   h = await hentTilstand();
   await biler.nth(0).click();
   await s6.clock.runFor(60);
@@ -164,6 +166,7 @@ module.exports = async function (t) {
     return s4.evaluate(function () { return document.getElementById('figur').dataset.uttrykk || 'vanlig'; });
   }
   var fasit = await hjelp.fasit(s4);
+  await hjelp.vaken(s4);
   await s4.locator('#oppgave-valg .skilt:not([data-bokstav="' + fasit + '"])').first().click();
   await s4.clock.runFor(200);
   ok(await ansikt() === 'hmm', 'figuren ser «hmm» ut etter et bom (' + await ansikt() + ')');
@@ -172,9 +175,21 @@ module.exports = async function (t) {
   await hjelp.ventTil(s4, function (v) {
     var k = document.querySelector(v); return k && !k.disabled;
   }, '#oppgave-valg .skilt[data-bokstav="' + fasit + '"]');
+  var forHjelp = await s4.locator('#figur').evaluate(function (f) { return f.style.transform; });
   await s4.locator('#oppgave-valg .skilt[data-bokstav="' + fasit + '"]').click();
   await s4.clock.runFor(200);
-  ok(await ansikt() === 'glad', 'figuren blir glad ved riktig svar (' + await ansikt() + ')');
+  /* Riktig etter hjelp er bevisst roligere enn å klare det selv. */
+  ok(await ansikt() === 'vanlig', 'etter hjelp blir figuren ikke glad (' + await ansikt() + ')');
+  var etterHjelp = await s4.locator('#figur').evaluate(function (f) { return f.style.transform; });
+  ok(forHjelp === etterHjelp, 'etter hjelp kjører ikke figuren (' + forHjelp + ' → ' + etterHjelp + ')');
+  ok(await s4.locator('#oppgave-valg .skilt.riktig.rolig').count() === 1, 'etter hjelp spretter ikke skiltet');
+  await hjelp.ventTil(s4, function () {
+    var p = document.querySelectorAll('#oppgave-prikker .prikk');
+    return p[1] && p[1].classList.contains('na');
+  });
+  await hjelp.svarRiktig(s4);
+  await s4.clock.runFor(200);
+  ok(await ansikt() === 'glad', 'figuren blir glad ved riktig svar på første forsøk (' + await ansikt() + ')');
   await hjelp.tilbake(s4);
   ok(await ansikt() === 'vanlig', 'på menyen er ansiktet vanlig igjen (' + await ansikt() + ')');
 
@@ -192,6 +207,71 @@ module.exports = async function (t) {
   ok(tilbakeIgjen === '', 'etter litt ser pupillene rett fram igjen (' + tilbakeIgjen + ')');
   ok(s4.feil.length === 0, 'ingen feil i konsollen med ansikt og blikk' + (s4.feil.length ? ' – ' + s4.feil.join(' | ') : ''));
   await s4.context().close();
+
+  /* ---------- «lytt først» og «tell først» ----------
+   * Skiltene sover mens spørsmålet leses, og i Tell til alt er talt. Et
+   * trykk – også fra tastaturet – gjør ingenting da. */
+  var s7 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s7, 'Racerbanen');
+  await hjelp.velgModus(s7, 'Finn bokstaven');
+  var sover = await s7.evaluate(function () {
+    var skjerm = document.getElementById('skjerm-oppgave');
+    var skilt = document.querySelector('#oppgave-valg .skilt');
+    var r = skilt.getBoundingClientRect();
+    var under = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    skilt.click();
+    return { lytter: skjerm.classList.contains('lytter'), treff: under === skilt,
+             svart: skilt.classList.contains('feil') || skilt.classList.contains('riktig') };
+  });
+  ok(sover.lytter && !sover.treff && !sover.svart, 'mens spørsmålet leses, sover skiltene og et trykk gjør ingenting (' + JSON.stringify(sover) + ')');
+  var tast = await s7.locator('#oppgave-valg .skilt').first().getAttribute('data-bokstav');
+  await s7.keyboard.press(tast);
+  ok(await s7.locator('#oppgave-valg .skilt.feil, #oppgave-valg .skilt.riktig').count() === 0, 'tastaturet kan heller ikke svare mens spørsmålet leses');
+  await s7.clock.runFor(1400);
+  ok(await s7.evaluate(function () { return !document.getElementById('skjerm-oppgave').classList.contains('lytter'); }),
+     'uten stemme våkner skiltene etter litt over ett sekund');
+  /* «Hør igjen» er skjult når stemmen er av; spørsmålstegnet gjør det samme. */
+  await s7.locator('#oppgave-mal').click();
+  ok(await s7.evaluate(function () { return document.getElementById('skjerm-oppgave').classList.contains('lytter'); }),
+     'å høre spørsmålet igjen legger skiltene til å sove til det er lest');
+  await hjelp.tilbake(s7);
+  await hjelp.tilbake(s7);
+
+  await hjelp.tilVerden(s7, 'Dinodalen');
+  await hjelp.velgModus(s7, 'Tell');
+  await hjelp.vaken(s7);
+  ok(await s7.locator('#oppgave-valg.sover').count() === 1, 'i Tell sover tallskiltene før han har talt');
+  var ting = s7.locator('#oppgave-mal .ting');
+  var antallTing = await ting.count();
+  for (var k = 0; k < antallTing; k++) { await ting.nth(k).click(); await s7.clock.runFor(60); }
+  ok(await s7.locator('#oppgave-valg.sover').count() === 0, 'når alt er talt, våkner tallskiltene');
+  await ting.nth(0).click();
+  ok(await s7.locator('#oppgave-valg.sover').count() === 1, 'angrer han en, sover de igjen til alt er talt');
+  ok(s7.feil.length === 0, 'lytt først / tell først: ingen feil' + (s7.feil.length ? ' – ' + s7.feil.join(' | ') : ''));
+  await s7.context().close();
+
+  /* ---------- pausen ----------
+   * Etter fire runder er figuren trøtt, og «en runde til» er borte. */
+  var s8 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s8, 'Racerbanen');
+  await hjelp.velgModus(s8, 'Finn bokstaven');
+  for (var runde = 1; runde <= 4; runde++) {
+    await hjelp.spillRunde(s8);
+    await s8.clock.runFor(1500);
+    var oppsum = await s8.evaluate(function () {
+      return { igjen: !document.getElementById('oppsum-igjen').hidden,
+               ansikt: document.getElementById('figur').dataset.uttrykk || 'vanlig' };
+    });
+    if (runde < 4) {
+      ok(oppsum.igjen && oppsum.ansikt === 'glad', 'runde ' + runde + ': glad figur, og en runde til går an (' + JSON.stringify(oppsum) + ')');
+      await s8.locator('#oppsum-igjen').click();
+      await s8.clock.runFor(300);
+    } else {
+      ok(!oppsum.igjen && oppsum.ansikt === 'trott', 'runde 4: figuren er trøtt, og «en runde til» er borte (' + JSON.stringify(oppsum) + ')');
+    }
+  }
+  ok(s8.feil.length === 0, 'pausen: ingen feil' + (s8.feil.length ? ' – ' + s8.feil.join(' | ') : ''));
+  await s8.context().close();
 
   /* ---------- «Ro på skjermen» ----------
    * Med bevegelse av skal ingenting på forsiden gå i sløyfe. */

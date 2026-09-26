@@ -1368,12 +1368,26 @@ body[data-verden="oy"] .skilt::after {
 .skilt:active:not([disabled]) { transform: translateY(-1px) rotate(0deg) scale(.99); }
 .skilt[disabled] { cursor: default; }
 
+/* «Lytt først» og «Tell først»: skiltene sover til spørsmålet er lest, og i
+   Tell til alt er talt (se lyttForst i moduser.js). Når klassen tas bort,
+   starter inn-animasjonen igjen, og skiltene spretter opp. */
+#skjerm-oppgave.lytter .skilt:not([disabled]),
+.valg.sover .skilt {
+  pointer-events: none;
+  opacity: .45;
+  filter: saturate(.3);
+  animation: none;
+}
+#skjerm-oppgave.lytter .oppdrag-mal--tell .ting { pointer-events: none; }
+
 .skilt.riktig {
   background: var(--god-svak);
   color: var(--god-mork);
   box-shadow: inset 0 0 0 4px var(--god), 0 5px 0 var(--god-mork), var(--sk-3);
   animation: sprett 560ms cubic-bezier(.3, 1.5, .45, 1) forwards;
 }
+/* Riktig etter hjelp: grønt, men uten sprett. */
+.skilt.riktig.rolig { animation: none; }
 @keyframes sprett {
   0% { transform: rotate(0) scale(1); }
   35% { transform: rotate(0) scale(1.13); }
