@@ -129,9 +129,21 @@ var Lyd = (function () {
       tone(520, 0, 0.09, 'sine', 0.14);
     },
 
-    /* Tut. Bilen tuter, skipet svarer med skipsfløyte – begge deler er noe
-       en treåring trykker på figuren for å få til. */
-    tut: function () {
+    /* Figuren sier fra når han trykker på den – det er det første en
+       treåring prøver. Bilen tuter, skipet ringer i skipsklokka, dinosauren
+       brøler (vennlig). */
+    tut: function (figur) {
+      if (figur === 'skip') {
+        tone(880, 0, 0.9, 'sine', 0.2);
+        tone(1320, 0, 0.6, 'sine', 0.08);
+        tone(880, 0.32, 0.9, 'sine', 0.16);
+        return;
+      }
+      if (figur === 'dino') {
+        tone(190, 0, 0.45, 'sawtooth', 0.08, 120);
+        stoy(0, 0.4, 500, 0.08, 250);
+        return;
+      }
       tone(392, 0, 0.16, 'triangle', 0.26);
       tone(311, 0.13, 0.26, 'triangle', 0.24);
     },

@@ -117,7 +117,34 @@ var Spill = (function () {
     el('scene-landskap').innerHTML = Figurer.landskapFor(verdenId || 'bane');
     el('figur').innerHTML = '<div class="figur-vipp">' +
       Figurer.figurFor(verdenId || 'bane') + '</div>';
-    el('figur').style.transform = 'translateX(24px)';
+    Moduser.stillFigurTilStart();
+  }
+
+  /* Blikket: pupillene i alle figurene som synes, ser mot fingeren hans.
+   * Det skjer bare når han rører skjermen, og etter litt ser de rett fram
+   * igjen. Maks 1,6 enheter, så pupillen blir i øyet. */
+  var blikkTimer = null;
+  function blikk(e) {
+    var figurer = document.querySelectorAll('svg.fig');
+    for (var i = 0; i < figurer.length; i++) {
+      var f = figurer[i];
+      var r = f.getBoundingClientRect();
+      if (!r.width) continue;
+      var dx = e.clientX - (r.left + r.width / 2);
+      var dy = e.clientY - (r.top + r.height / 3);
+      var len = Math.sqrt(dx * dx + dy * dy) || 1;
+      /* En speilvendt figur ser andre veien – da må blikket også snus. */
+      var snu = f.closest('.speilet') ? -1 : 1;
+      f.style.setProperty('--se-x', (snu * dx / len * 1.6).toFixed(2) + 'px');
+      f.style.setProperty('--se-y', (dy / len * 1.6).toFixed(2) + 'px');
+    }
+    window.clearTimeout(blikkTimer);
+    blikkTimer = window.setTimeout(function () {
+      for (var j = 0; j < figurer.length; j++) {
+        figurer[j].style.removeProperty('--se-x');
+        figurer[j].style.removeProperty('--se-y');
+      }
+    }, 1500);
   }
 
   function settBevegelse() {
@@ -842,9 +869,10 @@ var Spill = (function () {
     });
 
     /* Figuren står på bakken – den må finne plassen sin på nytt ved omskalering. */
-    window.addEventListener('resize', function () {
-      el('figur').style.transform = 'translateX(24px)';
-    });
+    window.addEventListener('resize', Moduser.stillFigurTilStart);
+
+    document.addEventListener('pointerdown', blikk);
+    document.addEventListener('pointermove', blikk);
   }
 
   return {

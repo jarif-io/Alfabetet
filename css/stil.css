@@ -254,8 +254,19 @@ body.pa-havet.bevegelse .scene-skyer { animation: sjodriv 150s linear infinite; 
 .scene-landskap .lag {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  width: 100%;
+  /* Litt bredere enn skjermen, så det finnes landskap å gli inn fra når
+     lagene forskyves (under). */
+  width: calc(100% + 160px);
 }
+/* Dybde: når figuren kjører bortover, glir lagene forbi i ulik fart – det
+   fjerne sakte, det nære fortere. --kjort settes av Moduser når figuren
+   flytter seg, og ingenting rører seg ellers. */
+body.bevegelse .scene-landskap .lag {
+  transition: transform 980ms cubic-bezier(.42, .05, .18, 1);
+}
+body.bevegelse .scene-landskap .lag--fjern { transform: translateX(max(-160px, calc(var(--kjort, 0px) * -.03))); }
+body.bevegelse .scene-landskap .lag--bak { transform: translateX(max(-160px, calc(var(--kjort, 0px) * -.07))); }
+body.bevegelse .scene-landskap .lag--fram { transform: translateX(max(-160px, calc(var(--kjort, 0px) * -.13))); }
 .scene-landskap .lag--fjern { height: 184px; }
 .scene-landskap .lag--bak { height: 150px; opacity: .9; }
 .scene-landskap .lag--fram { height: 118px; }
@@ -1396,23 +1407,54 @@ body[data-verden="oy"] .skilt::after {
 /* Kjører den mot venstre, snur den seg. */
 .figur.speilet .figur-vipp { transform: scaleX(-1); }
 
-/* Et hopp – når barnet trykker på figuren, og når runden er i havn. */
-.figur.hopper svg { animation: hopp 620ms cubic-bezier(.3, 1.4, .5, 1); }
+/* Et hopp – når barnet trykker på figuren, og når runden er i havn. Den
+   trykker seg sammen før satsen og i landingen, og strekker seg i lufta. */
+.figur svg { transform-origin: 50% 92%; }
+.figur.hopper svg { animation: hopp 680ms cubic-bezier(.3, 1.2, .5, 1); }
 @keyframes hopp {
-  0%, 100% { transform: translateY(0); }
-  35% { transform: translateY(-26px) rotate(-3deg); }
-  60% { transform: translateY(0) rotate(1deg); }
-  78% { transform: translateY(-8px); }
+  0%, 100% { transform: none; }
+  14% { transform: scale(1.08, .9); }
+  38% { transform: translateY(-26px) rotate(-3deg) scale(.95, 1.06); }
+  62% { transform: scale(1.07, .92); }
+  80% { transform: translateY(-6px); }
 }
-.fig-skygge { fill: rgba(0, 0, 0, .22); }
+.fig-skygge { fill: rgba(0, 0, 0, .2); }
+
+/* Bilene krenger bakover når de setter fart, og nikker når de bremser. */
+.figur.kjorer .fig--bil { animation: krenge 1000ms ease-out; }
+@keyframes krenge {
+  0%, 100% { transform: none; }
+  16% { transform: rotate(-3deg); }
+  66% { transform: rotate(0); }
+  82% { transform: rotate(1.8deg); }
+}
+
+/* ---------- ansiktet ----------
+   Fire uttrykk ligger i tegningen, og ett vises om gangen: vanlig, eller det
+   data-uttrykk på #figur sier. Kartet og navnevalget viser alltid vanlig. */
+.fig .u-glad, .fig .u-hmm, .fig .u-trott { display: none; }
+#figur[data-uttrykk] .fig .u-vanlig { display: none; }
+#figur[data-uttrykk="glad"] .fig .u-glad,
+#figur[data-uttrykk="hmm"] .fig .u-hmm,
+#figur[data-uttrykk="trott"] .fig .u-trott { display: inline; }
+
+/* Pupillene ser mot fingeren hans (se Spill: blikket). Bare når han selv
+   rører skjermen – de flytter seg aldri av seg selv. */
+.pupill {
+  transform: translate(var(--se-x, 0px), var(--se-y, 0px));
+  transition: transform 180ms ease-out;
+}
 
 /* Hjulene ruller mens bilen kjører. */
 .hjul { transform-box: fill-box; transform-origin: center; }
 .figur.kjorer .hjul { animation: rull 620ms linear infinite; }
 @keyframes rull { to { transform: rotate(360deg); } }
 
-/* Skipet vugger i bølgene når det seiler. */
+/* Skipet vugger i bølgene når det seiler, og flagget blafrer. */
 .figur.kjorer .fig--skip { animation: vugg-skip 1500ms ease-in-out infinite; }
+.flagg { transform-box: fill-box; transform-origin: 0 50%; }
+.figur.kjorer .flagg { animation: blafre 420ms ease-in-out infinite alternate; }
+@keyframes blafre { to { transform: scaleX(.86) skewY(4deg); } }
 @keyframes vugg-skip {
   0%, 100% { transform: rotate(-1.6deg); }
   50% { transform: rotate(1.6deg); }
@@ -2274,4 +2316,5 @@ body[data-verden="oy"] .skilt::after {
     animation-iteration-count: 1 !important;
     transition-duration: 60ms !important;
   }
+  body.bevegelse .scene-landskap .lag { transform: none; }
 }

@@ -127,7 +127,11 @@ module.exports = async function (t) {
       /* Inn-animasjonene må ha lagt seg, ellers måles posisjoner som ikke
        * finnes et halvsekund senere. */
       await side.clock.runFor(900);
-      await side.waitForTimeout(700);
+      await side.evaluate(function () {
+        return Promise.all(document.getAnimations().filter(function (a) {
+          return a.effect.getComputedTiming().iterations !== Infinity;
+        }).map(function (a) { return a.finished.catch(function () {}); }));
+      });
       var problemer = await side.evaluate(sjekk);
       ok(problemer.length === 0, sk.navn + ' ' + hva + ': ' + (problemer.join('; ') || 'ok'));
     }

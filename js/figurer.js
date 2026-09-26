@@ -13,24 +13,120 @@ var Figurer = (function () {
   var teller = 0;
   function unik(navn) { return navn + '-' + (++teller); }
 
+  /* ---------- ansiktene ----------
+   *
+   * Hver figur har fire uttrykk tegnet oppå hverandre, og CSS viser ett av
+   * dem ut fra data-uttrykk på #figur: vanlig, glad (riktig svar), hmm (bom)
+   * og trøtt (pause). Ingenting blunker eller rører seg av seg selv – ansiktet
+   * forandrer seg bare når noe har skjedd.
+   *
+   * stil 'stor': hvite øyne med pupill, som biler med øyne i frontruta.
+   * stil 'prikk': mørke prikkøyne med et lysglimt, for dyr og folk.
+   * oyne: [[x, y, r], …]. munn: path-data for hvert uttrykk; den glade er
+   * lukket (z) og fylles, som en åpen munn. */
+  function ansikt(stil, oyne, munn) {
+    var stor = stil === 'stor';
+    var sw = stor ? 2.2 : 1.7;
+    function n(v) { return +v.toFixed(1); }
+
+    function apne(dx, dy) {
+      return oyne.map(function (o) {
+        var x = o[0], y = o[1], r = o[2];
+        return stor
+          ? '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + n(r * 1.15) +
+              '" fill="#fff" stroke="#23262d" stroke-width="1.5"/>' +
+            '<circle class="pupill" cx="' + n(x + r * dx) + '" cy="' + n(y + r * dy) +
+              '" r="' + n(r * 0.5) + '" fill="#23262d"/>'
+          : '<g class="pupill"><circle cx="' + n(x + r * dx * 0.3) + '" cy="' + n(y + r * dy * 0.3) +
+              '" r="' + r + '" fill="#243528"/>' +
+            '<circle cx="' + n(x + r * 0.35) + '" cy="' + n(y - r * 0.4) + '" r="' + n(r * 0.36) +
+              '" fill="#fff"/></g>';
+      }).join('');
+    }
+    /* Lukkede øyne: ^ når figuren smiler med hele ansiktet, u når den sover. */
+    function buer(opp) {
+      return oyne.map(function (o) {
+        var x = o[0], y = o[1], r = o[2];
+        return '<path d="M' + n(x - r) + ' ' + n(y + (opp ? r * 0.3 : 0)) +
+          'Q' + x + ' ' + n(opp ? y - r * 1.1 : y + r * 0.9) + ' ' + n(x + r) + ' ' +
+          n(y + (opp ? r * 0.3 : 0)) + '" fill="none" stroke="#23262d" stroke-width="' + sw +
+          '" stroke-linecap="round"/>';
+      }).join('');
+    }
+    /* Et lite bryn over første øye – «hmm, var det den?». */
+    function bryn() {
+      var o = oyne[oyne.length - 1];
+      return '<path d="M' + n(o[0] - o[2]) + ' ' + n(o[1] - o[2] * 1.5) + 'l' + n(o[2] * 2) +
+        ' ' + n(-o[2] * 0.45) + '" stroke="#23262d" stroke-width="' + sw +
+        '" stroke-linecap="round" fill="none"/>';
+    }
+    function strek(d) {
+      return '<path d="' + d + '" fill="none" stroke="#23262d" stroke-width="' + sw +
+        '" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+
+    return '<g class="ansikt">' +
+      '<g class="u-vanlig">' + apne(0.25, 0.1) + strek(munn.vanlig) + '</g>' +
+      '<g class="u-glad">' + buer(true) +
+        '<path d="' + munn.glad + '" fill="#7a2a22" stroke="#23262d" stroke-width="' + sw +
+        '" stroke-linejoin="round"/></g>' +
+      '<g class="u-hmm">' + apne(-0.15, 0.35) + bryn() + strek(munn.hmm) + '</g>' +
+      '<g class="u-trott">' + buer(false) + strek(munn.trott) + '</g>' +
+    '</g>';
+  }
+
+  /* Myk skygge der figuren møter bakken, litt mørkere rett under hjulene. */
+  function bakkeskygge(cx, cy, rx, punkter) {
+    return '<ellipse class="fig-skygge" cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="7"/>' +
+      punkter.map(function (x) {
+        return '<ellipse cx="' + x + '" cy="' + (cy + 1) + '" rx="17" ry="3" fill="rgba(0,0,0,.22)"/>';
+      }).join('');
+  }
+
+  function hjul(cx, cy, r, klasse) {
+    return '<g class="hjul ' + klasse + '">' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#23262d"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 3) + '" fill="none" stroke="#3a3f47" stroke-width="2"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + Math.round(r * 0.52) + '" fill="#d8dce2"/>' +
+      '<g class="eiker" stroke="#9aa1ab" stroke-width="3" stroke-linecap="round">' +
+        '<path d="M' + cx + ' ' + (cy - 9) + 'v18"/>' +
+        '<path d="M' + (cx - 7.8) + ' ' + (cy - 5) + 'l15.6 10"/>' +
+        '<path d="M' + (cx - 7.8) + ' ' + (cy + 5) + 'l15.6-10"/>' +
+      '</g>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="#6d747e"/>' +
+      '<path d="M' + (cx - r * 0.6) + ' ' + (cy - r * 0.55) + 'a' + (r * 0.8) + ' ' + (r * 0.8) +
+        ' 0 0 1 ' + (r * 0.9) + '-' + (r * 0.25) + '" stroke="rgba(255,255,255,.18)" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+    '</g>';
+  }
+
   /* ---------- racerbilen ---------- */
 
+  /* Vår egen racerbil: rød, med lynmerke og øyne i frontruta. I samme ånd
+   * som bilfilmene, men ingen andres figur – barnet gir den navn selv. */
   function bil() {
-    var gLakk = unik('lakk'), gGlass = unik('glass');
+    var gLakk = unik('lakk'), gGlass = unik('glass'), gGlans = unik('glans');
     return '' +
     '<svg class="fig fig--bil" viewBox="0 0 200 104" role="img" aria-label="Racerbil">' +
       '<defs>' +
+        /* Himmelen speiler seg i ruta: lys øverst, et mørkere bånd der
+           horisonten ville ligget, og lysere igjen nederst. */
         '<linearGradient id="' + gGlass + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#dff2fb"/><stop offset="1" stop-color="#9cc9e4"/>' +
+          '<stop offset="0" stop-color="#eef9fe"/><stop offset=".55" stop-color="#a9d3ea"/>' +
+          '<stop offset=".62" stop-color="#7fb2cf"/><stop offset="1" stop-color="#b9dcef"/>' +
         '</linearGradient>' +
         '<linearGradient id="' + gLakk + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#f4574a"/>' +
-          '<stop offset="0.55" stop-color="#dc3327"/>' +
-          '<stop offset="1" stop-color="#a4200f"/>' +
+          '<stop offset="0" stop-color="#ff6a5a"/>' +
+          '<stop offset="0.45" stop-color="#e0362a"/>' +
+          '<stop offset="1" stop-color="#9c1d0e"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="' + gGlans + '" x1="0" y1="0" x2="1" y2="0">' +
+          '<stop offset="0" stop-color="#fff" stop-opacity="0"/>' +
+          '<stop offset=".5" stop-color="#fff" stop-opacity=".55"/>' +
+          '<stop offset="1" stop-color="#fff" stop-opacity="0"/>' +
         '</linearGradient>' +
       '</defs>' +
 
-      '<ellipse class="fig-skygge" cx="100" cy="95" rx="76" ry="7"/>' +
+      bakkeskygge(100, 96, 80, [56, 150]) +
 
       /* karosseri */
       '<path d="M14 78c-6-2-8-9-6-16l9-13c4-6 10-9 18-9h21c9-14 22-21 39-21h20c15 0 26 6 34 18l25 6c10 2 15 9 15 19 0 8-5 12-13 12z"' +
@@ -42,49 +138,49 @@ var Figurer = (function () {
       '<path d="M45 44h7v12h-7z" fill="#8d1a0c"/>' +
       '<path d="M18 38h40a4 4 0 0 1 0 8H18a4 4 0 0 1 0-8z" fill="#a4200f"/>' +
 
-      /* skulderlinje */
-      '<path d="M20 58h158" stroke="rgba(255,255,255,.28)" stroke-width="3" stroke-linecap="round" fill="none"/>' +
+      /* blank lakk: en lang glansstripe og lys langs taket og panseret */
+      '<path d="M20 57h158" stroke="url(#' + gGlans + ')" stroke-width="4" stroke-linecap="round" fill="none"/>' +
+      '<path d="M86 21c10-2 20-2 30 0" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" stroke-linecap="round" fill="none"/>' +
+      '<path d="M152 46l24 6" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round" fill="none"/>' +
 
-      /* kupé */
+      /* frontruta, der øynene sitter */
       '<path d="M63 40c8-12 19-18 33-18h19c11 0 20 5 27 14l4 6z" fill="url(#' + gGlass + ')"/>' +
-      '<path d="M96 22h6l-9 20h-7z" fill="rgba(255,255,255,.45)"/>' +
+      '<path d="M90 22h6l-9 20h-7z" fill="rgba(255,255,255,.45)"/>' +
 
       /* lynmerke på døra – vårt eget, ikke noen andres */
       '<path class="fig-merke" d="M92 52l14-1-6 9 12-1-20 20 5-13-10 1z" fill="#fff" opacity=".92"/>' +
 
+      /* Støtfangeren foran er der munnen sitter – karosseriet er for tynt
+         der framme til å ha et ansikt uten. */
+      '<path d="M168 64h20c4 0 7 3 6 7l-1.5 5c-1 3-3.5 5-6.5 5h-18z" fill="#b8271a"/>' +
       /* lykt og eksos */
-      '<path d="M182 62h9a5 5 0 0 1 0 10h-9z" fill="#ffe9a0"/>' +
+      '<path d="M182 53h7a4.5 4.5 0 0 1 0 9h-7z" fill="#ffe9a0"/>' +
       '<rect x="8" y="66" width="10" height="7" rx="3.5" fill="#8e939c"/>' +
 
-      /* hjul */
-      '<g class="hjul hjul--bak">' +
-        '<circle cx="56" cy="78" r="21" fill="#23262d"/>' +
-        '<circle cx="56" cy="78" r="11" fill="#d8dce2"/>' +
-        '<g class="eiker" stroke="#9aa1ab" stroke-width="3" stroke-linecap="round">' +
-          '<path d="M56 69v18"/><path d="M47.2 73l17.6 10"/><path d="M47.2 83l17.6-10"/>' +
-        '</g>' +
-        '<circle cx="56" cy="78" r="4" fill="#6d747e"/>' +
-      '</g>' +
-      '<g class="hjul hjul--front">' +
-        '<circle cx="150" cy="78" r="21" fill="#23262d"/>' +
-        '<circle cx="150" cy="78" r="11" fill="#d8dce2"/>' +
-        '<g class="eiker" stroke="#9aa1ab" stroke-width="3" stroke-linecap="round">' +
-          '<path d="M150 69v18"/><path d="M141.2 73l17.6 10"/><path d="M141.2 83l17.6-10"/>' +
-        '</g>' +
-        '<circle cx="150" cy="78" r="4" fill="#6d747e"/>' +
-      '</g>' +
+      hjul(56, 78, 21, 'hjul--bak') +
+      hjul(150, 78, 21, 'hjul--front') +
+
+      ansikt('stor', [[110, 32, 7], [127, 33, 7]], {
+        vanlig: 'M174 70q8 6 16 0',
+        glad: 'M173 68q9 11 18 0z',
+        hmm: 'M176 73q6-2 12 1',
+        trott: 'M178 71q5 3 10 0'
+      }) +
     '</svg>';
   }
 
   /* ---------- sjørøverskipet ---------- */
 
+  /* Skipet med kapteinen på dekk: trekantet hatt med hodeskalle, stort rødt
+   * skjegg – han heter jo Kaptein Rødskjegg fra start – og en papegøye på
+   * skulderen. Vår egen sjørøver, i samme ånd som dem i barnebøkene. */
   function skip() {
     var gSkrog = unik('skrog'), gSeil = unik('seil');
     return '' +
     '<svg class="fig fig--skip" viewBox="0 0 200 140" role="img" aria-label="Sjørøverskip">' +
       '<defs>' +
         '<linearGradient id="' + gSkrog + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#a9713f"/><stop offset="1" stop-color="#6b4322"/>' +
+          '<stop offset="0" stop-color="#b37a45"/><stop offset="1" stop-color="#633d1f"/>' +
         '</linearGradient>' +
         '<linearGradient id="' + gSeil + '" x1="0" y1="0" x2="1" y2="1">' +
           '<stop offset="0" stop-color="#fffdf5"/><stop offset="1" stop-color="#e4d9c0"/>' +
@@ -95,6 +191,7 @@ var Figurer = (function () {
 
       /* mast */
       '<rect x="96" y="14" width="7" height="82" rx="3.5" fill="#7d5330"/>' +
+      '<path d="M98 16v78" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>' +
 
       /* flagg */
       '<g class="flagg">' +
@@ -111,11 +208,40 @@ var Figurer = (function () {
         '<path d="M112 68h30M112 80h34" stroke="rgba(140,120,84,.5)" stroke-width="2.5" stroke-linecap="round"/>' +
       '</g>' +
 
-      /* skrog */
+      /* kapteinen: frakk, hode, skjegg og hatt */
+      '<g class="kaptein">' +
+        '<path d="M145 92c0-15 6-24 15-24s15 9 15 24z" fill="#c8352c"/>' +
+        '<path d="M160 70v20" stroke="#f2c33d" stroke-width="2" stroke-dasharray="2 4"/>' +
+        '<circle cx="160" cy="56" r="11" fill="#f3c9a0"/>' +
+        '<path d="M148 55c0 13 5 21 12 21s12-8 12-21c-3 5-7 8-12 8s-9-3-12-8z" fill="#d9532b"/>' +
+        '<circle cx="162" cy="58.5" r="2.2" fill="#e8a882"/>' +
+        '<path d="M143 48c6-3 11-11 17-11s11 8 17 11c-5 3-11 4-17 4s-12-1-17-4z" fill="#23262d"/>' +
+        '<circle cx="160" cy="44.5" r="2.6" fill="#fff"/>' +
+        ansikt('prikk', [[156.5, 53.5, 1.9], [164, 53.5, 1.9]], {
+          vanlig: 'M156 63q4 3 8 0',
+          glad: 'M155 61.5q5 7 10 0z',
+          hmm: 'M157 64h6',
+          trott: 'M158 63q3 2 6 0'
+        }) +
+      '</g>' +
+
+      /* papegøyen på skulderen */
+      '<g class="papegoye">' +
+        '<path d="M174 70l-3 9 6-5z" fill="#d8392b"/>' +
+        '<ellipse cx="177" cy="66" rx="5" ry="7" fill="#2f9e4f"/>' +
+        '<circle cx="178.5" cy="58" r="4.6" fill="#35ad57"/>' +
+        '<path d="M182.5 56.5l4 2.2-4 2z" fill="#f2c33d"/>' +
+        '<circle cx="179.6" cy="57.2" r="1.1" fill="#23262d"/>' +
+      '</g>' +
+
+      /* skrog med planker */
       '<path d="M22 94h156l-14 28c-3 6-9 10-16 10H52c-7 0-13-4-16-10z" fill="url(#' + gSkrog + ')"/>' +
       '<path d="M18 88h164a5 5 0 0 1 0 10H18a5 5 0 0 1 0-10z" fill="#c8492f"/>' +
-      '<path d="M34 108h132" stroke="rgba(0,0,0,.16)" stroke-width="3" stroke-linecap="round"/>' +
-      '<g fill="#ffe9a0">' +
+      '<g stroke="rgba(0,0,0,.14)" stroke-width="2" stroke-linecap="round" fill="none">' +
+        '<path d="M30 104h140"/><path d="M38 116h124"/><path d="M48 126h104"/>' +
+      '</g>' +
+      '<path d="M26 99h148" stroke="rgba(255,255,255,.2)" stroke-width="2" stroke-linecap="round"/>' +
+      '<g fill="#ffe9a0" stroke="#7d5330" stroke-width="1.5">' +
         '<circle cx="66" cy="110" r="5"/><circle cx="100" cy="110" r="5"/><circle cx="134" cy="110" r="5"/>' +
       '</g>' +
     '</svg>';
@@ -132,7 +258,7 @@ var Figurer = (function () {
     '<svg class="fig fig--dino" viewBox="0 0 200 130" role="img" aria-label="Dinosaur">' +
       '<defs>' +
         '<linearGradient id="' + gHud + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#7cc48a"/>' +
+          '<stop offset="0" stop-color="#86cf93"/>' +
           '<stop offset="0.6" stop-color="#4f9e63"/>' +
           '<stop offset="1" stop-color="#357a49"/>' +
         '</linearGradient>' +
@@ -141,7 +267,7 @@ var Figurer = (function () {
         '</linearGradient>' +
       '</defs>' +
 
-      '<ellipse class="fig-skygge" cx="100" cy="122" rx="74" ry="7"/>' +
+      bakkeskygge(100, 122, 74, [72, 122]) +
 
       /* Hale – bakerst, altså til venstre, siden dinoen ser mot høyre.
          Tykk der den møter kroppen, spiss ytterst. */
@@ -154,6 +280,11 @@ var Figurer = (function () {
 
       /* Kropp – én rund form, så silhuetten er lett å kjenne igjen. */
       '<ellipse cx="94" cy="76" rx="52" ry="34" fill="url(#' + gHud + ')"/>' +
+      /* Lys på ryggen, og noen flekker i huden. */
+      '<path d="M58 60c14-14 44-20 70-8" stroke="#fff" stroke-opacity=".28" stroke-width="4" stroke-linecap="round" fill="none"/>' +
+      '<g fill="#3f8b53" opacity=".45">' +
+        '<circle cx="78" cy="70" r="4"/><circle cx="92" cy="64" r="3"/><circle cx="110" cy="70" r="3.5"/>' +
+      '</g>' +
 
       /* Buk. Holdes godt innenfor kroppen, ellers leses den som en bjelke. */
       '<ellipse cx="96" cy="88" rx="34" ry="16" fill="#b6e2bd" opacity=".55"/>' +
@@ -174,13 +305,16 @@ var Figurer = (function () {
       '<path d="M132 62c0-18 10-30 26-32 6-1 10 2 10 8v26z" fill="url(#' + gHud + ')"/>' +
       '<ellipse cx="168" cy="42" rx="24" ry="19" fill="url(#' + gHud + ')"/>' +
       '<path d="M186 44h10a5 5 0 0 1 0 10h-8z" fill="#4f9e63"/>' +
-      '<circle cx="172" cy="36" r="5.5" fill="#243528"/>' +
-      '<circle cx="174" cy="34" r="2" fill="#fff" opacity=".95"/>' +
-      '<path d="M172 52c6 3 12 2 16-2" fill="none" stroke="#243528"' +
-            ' stroke-width="2.6" stroke-linecap="round"/>' +
       /* nesebor */
       '<circle cx="188" cy="40" r="1.7" fill="#2e6b40"/>' +
+      '<ellipse cx="178" cy="47" rx="4" ry="2.5" fill="#f08a8a" opacity=".5"/>' +
 
+      ansikt('prikk', [[172, 36, 5.5]], {
+        vanlig: 'M172 52c6 3 12 2 16-2',
+        glad: 'M171 50q9 9 18-1z',
+        hmm: 'M174 53q6-1 12 1',
+        trott: 'M175 52q5 2 10 0'
+      }) +
     '</svg>';
   }
 

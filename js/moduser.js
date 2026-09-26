@@ -136,6 +136,24 @@ var Moduser = (function () {
   /* ================= figuren på bakken ================= */
 
   var kjoreTimer = null;
+  var uttrykkTimer = null;
+
+  /* Ansiktet på figuren: 'glad', 'hmm', 'trott' eller null (vanlig). Med ms
+   * går det tilbake til vanlig av seg selv – ett uttrykk varer bare så lenge
+   * det hører til noe som skjedde. */
+  function uttrykk(navn, ms) {
+    var figur = el('figur');
+    window.clearTimeout(uttrykkTimer);
+    if (navn) figur.dataset.uttrykk = navn; else delete figur.dataset.uttrykk;
+    if (ms) uttrykkTimer = window.setTimeout(function () { uttrykk(null); }, ms);
+  }
+
+  /* Hvor langt figuren har kjørt. Landskapet bak glir etter i dybden, se
+   * .scene-landskap i stil.css. */
+  function settPosisjon(figur, x) {
+    figur.style.transform = 'translateX(' + x + 'px)';
+    document.body.style.setProperty('--kjort', (x - 24) + 'px');
+  }
 
   function naVaerendeX(figur) {
     var m = /translateX\((-?[\d.]+)px\)/.exec(figur.style.transform || '');
@@ -178,7 +196,8 @@ var Moduser = (function () {
     figur.classList.toggle('speilet', x < fra - 4);
     figur.classList.add('kjorer');
     stovSky(fra, x);
-    figur.style.transform = 'translateX(' + x + 'px)';
+    settPosisjon(figur, x);
+    uttrykk('glad', 1100);
 
     if (VERDENER[verdenId].figur === 'skip') Lyd.bolge(); else Lyd.motor();
 
@@ -191,7 +210,8 @@ var Moduser = (function () {
   function stillFigurTilStart() {
     var figur = el('figur');
     figur.classList.remove('speilet', 'kjorer');
-    figur.style.transform = 'translateX(24px)';
+    settPosisjon(figur, 24);
+    uttrykk(null);
   }
 
   /* Et lite hopp. Treåringer trykker på figuren fordi den er der, og da
@@ -199,8 +219,10 @@ var Moduser = (function () {
   function hopp() {
     var figur = el('figur');
     if (!figur || el('figurbane').hidden) return;
-    spillOm(figur, 'hopper', 620);
-    Lyd.tut();
+    spillOm(figur, 'hopper', 680);
+    uttrykk('glad', 900);
+    var v = document.body.getAttribute('data-verden');
+    Lyd.tut(v ? VERDENER[v].figur : 'bil');
   }
 
   /* ================= belønninger ================= */
@@ -692,6 +714,7 @@ var Moduser = (function () {
       spillOm(knapp, 'vugg', 500);
       knapp.disabled = true;
       Lyd.proveIgjen();
+      uttrykk('hmm', 1400);
 
       if (okt.forsokPaDenne >= okt.oppsett.bomForHjelp) {
         hjelp();
@@ -891,6 +914,7 @@ var Moduser = (function () {
       el('oppsum-tekst').textContent = tekst;
 
       Lyd.ferdig();
+      uttrykk('glad');
       var hilsen = okt.type === 'navn'
         ? navnetTalt(okt.ko)
         : okt.nyeMestrede.length
@@ -1107,6 +1131,7 @@ var Moduser = (function () {
     Oppgave: Oppgave,
     Loype: Loype,
     hopp: hopp,
+    stillFigurTilStart: stillFigurTilStart,
     /* Alle veier ut av en modus går gjennom dette – se Spill.visSkjerm.
      * Uten det tikket nedtellingen videre i bakgrunnen når man gikk ut via
      * foreldremenyen, og hoppet over en oppgave i neste runde. */
@@ -1114,6 +1139,7 @@ var Moduser = (function () {
       Utforsk.stopp();
       Oppgave.stopp();
       Loype.stopp();
+      uttrykk(null);
     }
   };
 })();
