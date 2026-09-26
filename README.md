@@ -31,7 +31,16 @@ som krever et trykk før den vil spille noe.
 
 Forsiden er et øykart. De fire verdenene ligger som steder på kartet —
 **Racerbanen** på sletta, **Verkstedet** i nord, **Dinodalen** ved vulkanen og
-**Sjørøverøya** ute på sjøen — og han trykker rett på det stedet han vil til. Kartet er det eneste
+**Sjørøverøya** ute på sjøen — og han trykker rett på det stedet han vil til.
+Kartet er et lite diorama: øya er vippet litt bakover, og figurene står oppreist
+på den.
+
+Kartet er også et sted å oppdage. Trykker han på vulkanen, puster den en
+røykring; måka på steinen letter, en skattekiste spretter opp ved krysset, en
+kokosnøtt faller fra palmen, en fisk hopper i havet, og kompassnåla snurrer.
+Hver varer rundt ett sekund, og så er det stille. Ingenting går av seg selv,
+ingenting gir poeng – og overraskelsene finnes bare på kartet, aldri under
+oppgavene. Kartet er det eneste
 stedet verden velges, og tilbakeknappen fører alltid helt hjem dit.
 
 Så gir han figuren sin et navn. Navnet brukes gjennom hele spillet.

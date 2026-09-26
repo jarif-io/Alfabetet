@@ -239,7 +239,10 @@ module.exports = async function (t) {
   });
   ok(sover.lytter && !sover.treff && !sover.svart, 'mens spørsmålet leses, sover skiltene og et trykk gjør ingenting (' + JSON.stringify(sover) + ')');
   var tast = await s7.locator('#oppgave-valg .skilt').first().getAttribute('data-bokstav');
-  await s7.keyboard.press(tast);
+  /* Sendt direkte: Playwright kjenner ikke Æ, Ø og Å som taster. */
+  await s7.evaluate(function (k) {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+  }, tast);
   ok(await s7.locator('#oppgave-valg .skilt.feil, #oppgave-valg .skilt.riktig').count() === 0, 'tastaturet kan heller ikke svare mens spørsmålet leses');
   await s7.clock.runFor(1400);
   ok(await s7.evaluate(function () { return !document.getElementById('skjerm-oppgave').classList.contains('lytter'); }),
@@ -292,6 +295,60 @@ module.exports = async function (t) {
   }
   ok(s8.feil.length === 0, 'pausen: ingen feil' + (s8.feil.length ? ' – ' + s8.feil.join(' | ') : ''));
   await s8.context().close();
+
+  /* ---------- overraskelsene på kartet ----------
+   * Et trykk spiller et øyeblikk og stopper; et trykk til mens den spiller,
+   * gjør ingenting; og ingenting går av seg selv. */
+  var s9 = await t.nySide({ lagret: lagret });
+  var hvaListe = await s9.evaluate(function () {
+    return Array.prototype.map.call(document.querySelectorAll('.overraskelse'), function (o) {
+      return o.getAttribute('data-hva');
+    });
+  });
+  ok(hvaListe.length === 6, 'kartet har seks overraskelser (' + hvaListe.join(', ') + ')');
+
+  /* Figurene er tegnet på nytt i 2,5D. Det som får dem til å leve, må
+   * fortsatt være der – og ingen id i dokumentet kan finnes to ganger, ellers
+   * blir en gradient borte. */
+  var figurFeil = await s9.evaluate(function () {
+    var ut = [], ider = {};
+    document.querySelectorAll('[id]').forEach(function (e) {
+      if (ider[e.id]) ut.push('dobbel id ' + e.id);
+      ider[e.id] = true;
+    });
+    ['bane', 'oy', 'dino', 'taue'].forEach(function (v) {
+      var svg = document.querySelector('.kartsted--' + v + ' svg.fig');
+      ['u-vanlig', 'u-glad', 'u-hmm', 'u-trott'].forEach(function (u) {
+        if (!svg.querySelector('.' + u)) ut.push(v + ' mangler ' + u);
+      });
+      if (!svg.querySelector('.pupill')) ut.push(v + ' mangler pupiller');
+    });
+    ['bane', 'taue'].forEach(function (v) {
+      if (document.querySelectorAll('.kartsted--' + v + ' svg.fig .hjul').length < 2) ut.push(v + ' mangler hjul');
+    });
+    return ut;
+  });
+  ok(figurFeil.length === 0, 'figurene har uttrykk, pupiller og hjul, og ingen id er dobbel (' + figurFeil.join('; ') + ')');
+  for (var o = 0; o < hvaListe.length; o++) {
+    var hva = hvaListe[o];
+    var sentrum = await s9.evaluate(function (h) {
+      var r = document.querySelector('.overraskelse[data-hva="' + h + '"] .treff').getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }, hva);
+    await s9.mouse.click(sentrum.x, sentrum.y);
+    var spiller = await s9.evaluate(function (h) {
+      return document.querySelector('.overraskelse[data-hva="' + h + '"]').classList.contains('spiller');
+    }, hva);
+    ok(spiller, 'overraskelsen ' + hva + ' spiller når han trykker');
+    await s9.clock.runFor(1500);
+    var ferdig = await s9.evaluate(function (h) {
+      return !document.querySelector('.overraskelse[data-hva="' + h + '"]').classList.contains('spiller');
+    }, hva);
+    ok(ferdig, 'overraskelsen ' + hva + ' er ferdig etter et øyeblikk');
+  }
+  ok(await hjelp.skjerm(s9) === 'skjerm-start', 'overraskelsene tar ham ikke bort fra kartet');
+  ok(s9.feil.length === 0, 'overraskelsene: ingen feil' + (s9.feil.length ? ' – ' + s9.feil.join(' | ') : ''));
+  await s9.context().close();
 
   /* ---------- «Ro på skjermen» ----------
    * Med bevegelse av skal ingenting på forsiden gå i sløyfe. */

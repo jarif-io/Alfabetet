@@ -148,6 +148,25 @@ var Lyd = (function () {
       tone(311, 0.13, 0.26, 'triangle', 0.24);
     },
 
+    /* Overraskelsene på kartet – korte og myke, som alt annet. */
+    overraskelse: function (hva) {
+      if (hva === 'vulkan') stoy(0, 1.0, 180, 0.2, 90);
+      else if (hva === 'maake') {
+        tone(1250, 0, 0.12, 'sine', 0.16, 1050);
+        tone(1350, 0.16, 0.14, 'sine', 0.14, 1100);
+      } else if (hva === 'skatt') {
+        tone(660, 0, 0.18, 'sine', 0.22);
+        tone(880, 0.14, 0.2, 'sine', 0.2);
+        tone(1320, 0.3, 0.35, 'sine', 0.14);
+      } else if (hva === 'palme') tone(200, 0.5, 0.18, 'sine', 0.3, 110);
+      else if (hva === 'fisk') stoy(0.55, 0.45, 2400, 0.16, 500);
+      else if (hva === 'kompass') {
+        tone(700, 0, 0.05, 'sine', 0.12);
+        tone(760, 0.12, 0.05, 'sine', 0.12);
+        tone(820, 0.24, 0.05, 'sine', 0.12);
+      }
+    },
+
     /* Runden er ferdig: tre rolige toner. */
     ferdig: function () {
       tone(523, 0.00, 0.28, 'sine', 0.22);
