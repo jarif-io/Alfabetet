@@ -35,8 +35,10 @@ var Figurer = (function () {
         return stor
           ? '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + n(r * 1.15) +
               '" fill="#fff" stroke="#23262d" stroke-width="1.5"/>' +
-            '<circle class="pupill" cx="' + n(x + r * dx) + '" cy="' + n(y + r * dy) +
-              '" r="' + n(r * 0.5) + '" fill="#23262d"/>'
+            '<g class="pupill"><circle cx="' + n(x + r * dx) + '" cy="' + n(y + r * dy) +
+              '" r="' + n(r * 0.55) + '" fill="#23262d"/>' +
+            '<circle cx="' + n(x + r * dx + r * 0.2) + '" cy="' + n(y + r * dy - r * 0.25) +
+              '" r="' + n(r * 0.2) + '" fill="#fff"/></g>'
           : '<g class="pupill"><circle cx="' + n(x + r * dx * 0.3) + '" cy="' + n(y + r * dy * 0.3) +
               '" r="' + r + '" fill="#243528"/>' +
             '<circle cx="' + n(x + r * 0.35) + '" cy="' + n(y - r * 0.4) + '" r="' + n(r * 0.36) +
@@ -654,7 +656,9 @@ var Figurer = (function () {
     return '' +
     '<svg class="fig fig--dino" viewBox="0 0 200 130" role="img" aria-label="Dinosaur">' +
       '<defs>' +
-        '<linearGradient id="' + gHud + '" x1="0" y1="0" x2="0" y2="1">' +
+        /* Én gradient for hele dyret, regnet i figurens høyde: da blir det
+           ingen skjøt der halsen går inn i kroppen. */
+        '<linearGradient id="' + gHud + '" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="0" y2="118">' +
           '<stop offset="0" stop-color="#86cf93"/>' +
           '<stop offset="0.6" stop-color="#4f9e63"/>' +
           '<stop offset="1" stop-color="#357a49"/>' +
@@ -675,6 +679,11 @@ var Figurer = (function () {
       '<path d="M56 88C36 92 18 88 4 74c16 2 26-2 32-10 6-8 14-12 24-10z"' +
             ' fill="url(#' + gHud + ')"/>' +
 
+      /* Hals og hode i ett strøk, med en rund snute – ingen klosser som
+         stikker ut. Tegnes før kroppen, så halsen kommer opp av den. */
+      '<path d="M128 70C128 46 138 27 156 20C170 14 186 18 193 30C198 38 199 48 194 54' +
+        'C188 61 174 62 162 60C156 65 150 73 141 80H128z" fill="url(#' + gHud + ')"/>' +
+      '<ellipse cx="172" cy="25" rx="14" ry="6" fill="url(#' + gLys + ')"/>' +
       /* Bakbein bak kroppen, så dyret får dybde. */
       '<rect class="dino-bein dino-bein--bak" x="62" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
       '<rect class="dino-bein dino-bein--bak" x="104" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
@@ -703,20 +712,15 @@ var Figurer = (function () {
         '<path d="M120 50l9-12 6 14z"/>' +
       '</g>' +
 
-      /* Hals og hode. */
-      '<path d="M132 62c0-18 10-30 26-32 6-1 10 2 10 8v26z" fill="url(#' + gHud + ')"/>' +
-      '<ellipse cx="168" cy="42" rx="24" ry="19" fill="url(#' + gHud + ')"/>' +
-      '<ellipse cx="174" cy="32" rx="12" ry="6" fill="url(#' + gLys + ')"/>' +
-      '<path d="M186 44h10a5 5 0 0 1 0 10h-8z" fill="#4f9e63"/>' +
-      /* nesebor */
-      '<circle cx="188" cy="40" r="1.7" fill="#2e6b40"/>' +
-      '<ellipse cx="178" cy="47" rx="4" ry="2.5" fill="#f08a8a" opacity=".5"/>' +
+      /* nesebor og rosa kinn */
+      '<path d="M189 35.5q2.5-1.5 4 .5" stroke="#2e6b40" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="179" cy="47" rx="5.5" ry="3.2" fill="#ff9aa8" opacity=".8"/>' +
 
-      ansikt('prikk', [[172, 36, 5.5]], {
-        vanlig: 'M172 52c6 3 12 2 16-2',
-        glad: 'M171 50q9 9 18-1z',
-        hmm: 'M174 53q6-1 12 1',
-        trott: 'M175 52q5 2 10 0'
+      ansikt('stor', [[170, 33, 7]], {
+        vanlig: 'M193 48C187 56 175 57 167 50q-1.5-1.5-.5-3.5',
+        glad: 'M194 46C189 61 172 61 165 48C175 53 186 51 194 46z',
+        hmm: 'M190 51q-7 3-15 0',
+        trott: 'M188 51q-6 3-12 0'
       }) +
     '</svg>';
   }
