@@ -416,54 +416,56 @@ var Figurer = (function () {
    * ingen startnummer eller logoer, og barnet gir den navn selv. */
   function bil() {
     var RODT = '#e3281c';
+    /* Kort, høyt panser som holder full bredde helt fram, og en butt front
+     * med plass til et bredt smil – ikke en lang snute som smalner. */
     var st = [
-      [-104, 16, 30, 20, 1, 13], [-100, 12, 37, 27, 1.5, 19], [-90, 10, 40, 30, 2, 22],
-      [-70, 10, 41, 32, 2, 23], [-52, 10, 42, 31, 2.5, 23], [-38, 10, 42, 30, 11, 23],
-      [-24, 10, 42, 29.5, 21, 22.5], [-4, 10, 42, 29.5, 23.5, 22.5], [12, 10, 42, 30, 22.5, 23],
-      [30, 10, 41, 30.5, 12, 24], [46, 10, 39.5, 31, 2.5, 24.5], [62, 10, 37, 32, 2.5, 25],
-      [80, 10, 34, 31, 2.5, 24], [94, 10, 31, 29, 2, 22], [100, 11, 29.5, 28, 1.5, 20],
-      [104, 12, 28, 26, 1, 18]
+      [-100, 16, 31, 21, 1, 14], [-96, 12, 38, 28, 1.5, 20], [-86, 10, 41, 31, 2, 23],
+      [-68, 10, 42, 32.5, 2, 24], [-50, 10, 43, 31.5, 2.5, 24], [-36, 10, 43, 30.5, 11, 24],
+      [-22, 10, 43, 30, 22, 23.5], [-2, 10, 43, 30, 24.5, 23.5], [16, 10, 43, 30.5, 23.5, 24],
+      [32, 10, 42, 31, 12.5, 25], [48, 10, 41, 31.5, 2.5, 25.5], [60, 10, 40, 32.5, 2.5, 26],
+      [74, 10, 38.5, 32.5, 2.5, 26], [84, 10, 36.5, 32, 2, 25.5], [90, 10.5, 33.5, 31, 1.5, 24.5],
+      [93, 11.5, 30, 29.5, 1, 23]
     ];
-    var flater = karosseri(st, [[-60, 17, 21], [62, 17, 21]], function (x, j) {
-      if (j === 5 && x > -34 && x < 22) return ['#26303b', 0.9];
+    var flater = karosseri(st, [[-58, 17, 21], [58, 17, 21]], function (x, j) {
+      if (j === 5 && x > -32 && x < 28) return ['#26303b', 0.9];
       if (j >= 6 && x > -36 && x < -16) return ['#26303b', 0.9];
       return [RODT, 0.6];
     }).concat(
-      karosseri([[-96, 9, 32, 16, 0, 14], [96, 9, 30, 16, 0, 14]], [], function () { return ['#1b1c20', 0]; }),
-      bjelke([-95, 40, 14], [-95, 51, 14], 1.6, 1.6, '#9c1c12', 0.3),
-      bjelke([-95, 40, -14], [-95, 51, -14], 1.6, 1.6, '#9c1c12', 0.3),
-      bjelke([-96, 52, -28], [-96, 52, 28], 1.8, 9, RODT, 0.5),
-      hjul3d(-60, 17, 26, 17, 13, 1, '#d8261c', 'hjul--bak'), hjul3d(62, 17, 26, 17, 13, 1, '#d8261c', 'hjul--front'),
-      hjul3d(-60, 17, -26, 17, 13, -1, '#d8261c', 'hjul--bak'), hjul3d(62, 17, -26, 17, 13, -1, '#d8261c', 'hjul--front')
+      karosseri([[-90, 9, 32, 16, 0, 14], [82, 9, 30, 16, 0, 14]], [], function () { return ['#1b1c20', 0]; }),
+      bjelke([-91, 41, 14], [-91, 52, 14], 1.6, 1.6, '#9c1c12', 0.3),
+      bjelke([-91, 41, -14], [-91, 52, -14], 1.6, 1.6, '#9c1c12', 0.3),
+      bjelke([-92, 53, -28], [-92, 53, 28], 1.8, 9, RODT, 0.5),
+      hjul3d(-58, 17, 26, 17, 13, 1, '#d8261c', 'hjul--bak'), hjul3d(58, 17, 26, 17, 13, 1, '#d8261c', 'hjul--front'),
+      hjul3d(-58, 17, -26, 17, 13, -1, '#d8261c', 'hjul--bak'), hjul3d(58, 17, -26, 17, 13, -1, '#d8261c', 'hjul--front')
     );
-    /* frontruta fra underkanten (x 45) til toppen (x 13), midt på bilen */
-    var ned = [45, glatt(st, 2, 45) + glatt(st, 4, 45), 0], opp = [13, glatt(st, 2, 13) + glatt(st, 4, 13), 0];
+    /* frontruta fra underkanten (x 47) til toppen (x 17), midt på bilen */
+    var ned = [47, glatt(st, 2, 47) + glatt(st, 4, 47), 0], opp = [17, glatt(st, 2, 17) + glatt(st, 4, 17), 0];
     var h = Math.sqrt(prikk(minus(opp, ned), minus(opp, ned)));
     var rute = iPlan(ned, [0, 0, -1], enhet(minus(opp, ned)));
-    var front = iPlan([104.3, 20, 0], [0, 0, -1], [0, 1, 0]);
-    var side = iPlan([-6, 27, 29.8], [1, 0, 0], [0, 1, 0]);
+    var front = iPlan([93.3, 21, 0], [0, 0, -1], [0, 1, 0]);
+    var side = iPlan([-6, 27, 30.3], [1, 0, 0], [0, 1, 0]);
     var MUNN = '#4a120d';
     function smil(dybde, tenner) {
       return function (kam) {
-        var over = kurve(-17, 17, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2); });
-        var under = kurve(17, -17, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2) - dybde * (1 - Math.pow(u / 17, 2)); });
+        var over = kurve(-19, 19, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2); });
+        var under = kurve(19, -19, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2) - dybde * (1 - Math.pow(u / 19, 2)); });
         return flekk(kam, front, over.concat(under), 'fill="' + MUNN + '"') +
-          (tenner ? flekk(kam, front, kurve(-13, 13, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2) - 0.2; })
-              .concat(kurve(13, -13, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2) - 2.6; })), 'fill="#fff"') : '');
+          (tenner ? flekk(kam, front, kurve(-15, 15, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2) - 0.2; })
+              .concat(kurve(15, -15, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2) - 2.8; })), 'fill="#fff"') : '');
       };
     }
     return bil3d({
       flater: flater,
-      skygge: [0, 112, 40],
+      skygge: [-3, 103, 40],
       pynt: function (kam) {
         return flekk(kam, side, [[-9, 9], [4, 9.5], [-1, 3], [8, 3.5], [-11, -10], [-4, -0.5], [-12, 0]].map(function (p) {
             return [p[0] * 0.75, p[1] * 0.75]; }), 'fill="#fff" opacity=".94"') +
           [-1, 1].map(function (s) {
-            return flekk(kam, front, ring(s * 18.5, 6.5, 4.2, 2.3), 'fill="#fff4cf" stroke="#7a150d" stroke-width=".6"');
+            return flekk(kam, front, ring(s * 19.5, 6.8, 4.4, 2.4), 'fill="#fff4cf" stroke="#7a150d" stroke-width=".6"');
           }).join('') +
           bilansikt(kam, rute, h, 22, '#2f9bd6', {
-            vanlig: smil(6, true)(kam),
-            glad: smil(9.5, true)(kam),
+            vanlig: smil(7.5, true)(kam),
+            glad: smil(11, true)(kam),
             hmm: strek(kam, front, kurve(-11, 11, function (u) { return 1 + Math.sin(u / 3.5) * 0.8; }), MUNN, 2),
             trott: strek(kam, front, kurve(-7, 7, function (u) { return 1.5 - 1.8 * (1 - Math.pow(u / 7, 2)); }), MUNN, 2)
           });
