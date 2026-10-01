@@ -18,9 +18,15 @@
   --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
   --font-ui: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
 
+  /* Radiene: strammere på små ting inni, mykere på store flater ytterst. */
+  --r-xs: 8px;
+  --r-sm: 12px;
   --r-md: 18px;
   --r-lg: 26px;
   --r-xl: 34px;
+
+  /* Skyggene har samme varme brunfarge som lyset i scenen, ikke ren svart. */
+  --sk-rgb: 40, 30, 15;
 
   --grunn-h: 170px;
   --rute: 96px;      /* bokstavrutene i Garasjen/Skattekartet */
@@ -392,7 +398,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   background: rgba(255, 253, 248, .74);
   backdrop-filter: blur(6px);
   padding: 6px 20px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   box-shadow: var(--sk-1);
   display: inline-block;
   max-width: 100%;
@@ -419,7 +425,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   min-height: 44px;
   padding: 9px 18px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: rgba(255, 253, 248, .86);
   color: var(--blekk);
   box-shadow: var(--sk-1);
@@ -464,7 +470,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   gap: 6px;
   min-height: 44px;
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: rgba(255, 253, 248, .86);
   box-shadow: var(--sk-1);
   font-family: var(--font-display);
@@ -497,23 +503,23 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   font-size: 1.1rem;
   padding: 15px 30px 12px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: linear-gradient(to bottom, var(--aksent) 0%, var(--aksent-mork) 100%);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, .22), var(--sk-2);
+  box-shadow: 0 4px 0 rgba(var(--sk-rgb), .22), var(--sk-2);
   transition: transform 200ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 160ms ease, filter var(--mykt);
   position: relative;
 }
 .knapp > span {
   display: block;
   line-height: 1.2;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, .22);
+  text-shadow: 0 1px 1px rgba(var(--sk-rgb), .22);
 }
 .knapp:hover { filter: brightness(1.06); transform: scale(1.03); }
 .knapp:active {
   transform: translateY(4px) scale(.97);
-  box-shadow: 0 0 0 rgba(0, 0, 0, .22), var(--sk-1);
+  box-shadow: 0 0 0 rgba(var(--sk-rgb), .22), var(--sk-1);
   transition: transform 60ms ease, box-shadow 60ms ease;
 }
 
@@ -528,7 +534,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 }
 .knapp--pil .knapp-ikon { display: block; }
 .knapp--pil .knapp-ikon svg { width: 38px; height: 38px; display: block; }
-.knapp--pil .knapp-tekst { display: block; line-height: 1.2; text-shadow: 0 1px 1px rgba(0, 0, 0, .22); }
+.knapp--pil .knapp-tekst { display: block; line-height: 1.2; text-shadow: 0 1px 1px rgba(var(--sk-rgb), .22); }
 
 /* Nedtellingen som erstattet «Videre»-knappen: en ring som tømmes og et
    tall i midten, ikke en knapp – den skal ikke se ut som noe å trykke på,
@@ -537,7 +543,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
 .nedtelling {
   width: 60px;
   height: 60px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: var(--flate);
   color: var(--aksent-mork);
   display: flex;
@@ -611,7 +617,7 @@ body.bevegelse[data-verden="oy"] .scene-grunn::after {
   gap: 8px;
   padding: 9px 20px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: rgba(255, 253, 248, .92);
   color: var(--blekk-svak);
   box-shadow: var(--sk-1);
@@ -683,6 +689,10 @@ body.pa-havet #app { padding-left: 0; padding-right: 0; }
   text-shadow: 0 3px 0 var(--aksent-mork), 0 8px 22px rgba(40, 30, 15, .3);
   letter-spacing: .01em;
 }
+
+/* Ingen ord alene på siste linje i overskrifter og voksentekst. */
+.skjermtittel, .ingress, .panel h2, .panel h3 { text-wrap: balance; }
+.panel p { text-wrap: pretty; }
 
 .skjermtittel {
   font-family: var(--font-display);
@@ -794,7 +804,7 @@ body.pa-havet .ingress {
   line-height: 1.15;
   white-space: nowrap;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   color: var(--blekk);
   background: rgba(255, 253, 244, .93);
   box-shadow: var(--sk-1);
@@ -889,11 +899,11 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   width: 46px; height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: var(--r-sm);
   color: #fff;
   background: linear-gradient(to bottom, #dc3327, #a4200f);
   box-shadow: var(--sk-1);
-  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+  text-shadow: 0 2px 0 rgba(var(--sk-rgb), .2);
   animation: trinn-inn 420ms cubic-bezier(.2, .8, .3, 1) backwards;
 }
 .startbrikke--tall { background: linear-gradient(to bottom, #4f9e63, #1d6437); }
@@ -989,7 +999,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
 .flis-bilde {
   width: 100%;
   display: block;
-  border-radius: 16px;
+  border-radius: var(--r-md);
   background: var(--flate-2);
   box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .06);
   padding: 6px;
@@ -1075,10 +1085,10 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   height: 118px;
   display: grid;
   place-items: center;
-  border-radius: 24px;
+  border-radius: var(--r-lg);
   color: #fff;
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
-  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+  text-shadow: 0 3px 0 rgba(var(--sk-rgb), .2);
   box-shadow: var(--sk-1);
 }
 .ordkort-bokstav.bytter { animation: kort-bytt 420ms cubic-bezier(.3, 1.4, .5, 1); }
@@ -1110,7 +1120,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   width: 92px; height: 92px;
   display: grid;
   place-items: center;
-  border-radius: 22px;
+  border-radius: var(--r-lg);
   background: var(--flate-2);
   box-shadow: inset 0 0 0 2px rgba(40, 30, 15, .05);
 }
@@ -1142,7 +1152,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   font-weight: 700;
   cursor: pointer;
   border: none;
-  border-radius: 18px;
+  border-radius: var(--r-md);
   flex: 0 0 auto;
   width: var(--rute);
   height: var(--rute);
@@ -1165,7 +1175,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
 .bokstav.aktiv {
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
   color: #fff;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, .18);
+  text-shadow: 0 2px 0 rgba(var(--sk-rgb), .18);
 }
 .bokstav.mestret::after {
   content: "★";
@@ -1229,7 +1239,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   color: var(--blekk-svak);
   background: rgba(255, 253, 248, .88);
   padding: 7px 22px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   box-shadow: var(--sk-1);
 }
 
@@ -1257,11 +1267,11 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   width: 150px; height: 150px;
   display: grid;
   place-items: center;
-  border-radius: 28px;
+  border-radius: var(--r-lg);
   font-size: 5.4rem;
   color: #fff;
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
-  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+  text-shadow: 0 3px 0 rgba(var(--sk-rgb), .2);
   box-shadow: var(--sk-2);
   transition: transform 140ms ease, box-shadow 140ms ease;
 }
@@ -1283,7 +1293,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   font-size: 3.1rem;
   width: 104px; height: 104px;
   margin: 0 auto 6px;
-  border-radius: 24px;
+  border-radius: var(--r-lg);
   background: rgba(255, 253, 248, .96);
   box-shadow: var(--sk-2);
 }
@@ -1308,7 +1318,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   width: 84px; height: 96px;
   display: grid;
   place-items: center;
-  border-radius: 18px;
+  border-radius: var(--r-md);
   font-size: 2.9rem;
   line-height: 1;
   color: var(--aksent);
@@ -1320,7 +1330,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   color: #fff;
   background: linear-gradient(to bottom, var(--aksent), var(--aksent-mork));
   box-shadow: var(--sk-1);
-  text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+  text-shadow: 0 3px 0 rgba(var(--sk-rgb), .2);
 }
 .navnrute.na {
   background: rgba(255, 253, 248, .96);
@@ -1351,7 +1361,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   width: 142px;
   height: 142px;
   border: none;
-  border-radius: 24px;
+  border-radius: var(--r-lg);
   color: var(--blekk);
   background: var(--flate);
   box-shadow: inset 0 0 0 4px var(--aksent), 0 5px 0 rgba(40, 30, 15, .2), var(--sk-2);
@@ -1382,7 +1392,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 30px 30px 18px 18px;
+  border-radius: var(--r-xl) var(--r-xl) var(--r-md) var(--r-md);
   transform: none;
 }
 .skilt--garasje::after { display: none; }
@@ -1408,7 +1418,7 @@ body.bevegelse .kartsted--oy .kartsted-figur {
 .garasje-plass {
   width: 32px;
   height: 32px;
-  border-radius: 9px;
+  border-radius: var(--r-xs);
   border: 2px dashed rgba(35, 38, 45, .3);
   display: grid;
   place-items: center;
@@ -1547,7 +1557,7 @@ body[data-verden="oy"] .skilt::after {
   width: 208px;
   transform: translateX(24px);
   transition: transform 980ms cubic-bezier(.42, .05, .18, 1);
-  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .3));
+  filter: drop-shadow(0 10px 14px rgba(var(--sk-rgb), .3));
 }
 .figur { pointer-events: auto; cursor: pointer; }
 .figur-vipp { width: 100%; transition: transform 200ms ease; }
@@ -1566,7 +1576,8 @@ body[data-verden="oy"] .skilt::after {
   62% { transform: scale(1.07, .92); }
   80% { transform: translateY(-6px); }
 }
-.fig-skygge { fill: rgba(0, 0, 0, .2); }
+/* Skyggen under skipet; de andre figurene har sin egen myke gradient. */
+.fig-skygge:not([fill]) { fill: rgba(var(--sk-rgb), .2); }
 
 /* Bilene står på skrå og ser på barnet, og snur seg rett bortover veien
    mens de kjører (to tegninger av samme 3D-modell, se Figurer). */
@@ -1680,7 +1691,7 @@ body[data-verden="oy"] .skilt::after {
   gap: 1px;
   min-width: 58px;
   padding: 7px 10px 6px;
-  border-radius: 14px;
+  border-radius: var(--r-sm);
   background: var(--flate-2);
   animation: trinn-inn 380ms cubic-bezier(.2, .8, .3, 1) backwards;
 }
@@ -1704,7 +1715,7 @@ body[data-verden="oy"] .skilt::after {
 .oppsum-brikker--navn .oppsum-brikke b {
   font-size: 2rem;
   color: #fff;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+  text-shadow: 0 2px 0 rgba(var(--sk-rgb), .2);
 }
 
 .oppsum-ny {
@@ -1712,7 +1723,7 @@ body[data-verden="oy"] .skilt::after {
   align-items: center;
   gap: 10px;
   padding: 10px 22px 10px 14px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: var(--god-svak);
   box-shadow: inset 0 0 0 3px var(--god);
   animation: sprett 620ms cubic-bezier(.3, 1.5, .45, 1) 700ms backwards;
@@ -1725,7 +1736,7 @@ body[data-verden="oy"] .skilt::after {
   line-height: 1;
   color: #fff;
   background: var(--god);
-  border-radius: 12px;
+  border-radius: var(--r-sm);
   padding: 6px 13px;
 }
 .ny-tekst { font-weight: 700; color: var(--god-mork); font-size: 1.05rem; }
@@ -1878,7 +1889,7 @@ body[data-verden="oy"] .skilt::after {
   align-self: center;
   width: min(520px, 90%);
   height: 14px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: rgba(255, 253, 248, .7);
   box-shadow: inset 0 1px 3px rgba(40, 30, 15, .2);
   overflow: hidden;
@@ -1887,7 +1898,7 @@ body[data-verden="oy"] .skilt::after {
   display: block;
   height: 100%;
   width: 0;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: linear-gradient(to right, var(--god), #4aa87a);
   transition: width 900ms cubic-bezier(.2, .8, .3, 1);
 }
@@ -1914,7 +1925,7 @@ body[data-verden="oy"] .skilt::after {
 .samling-rute {
   flex: 0 0 auto;
   width: 116px;
-  border-radius: 18px;
+  border-radius: var(--r-md);
   padding: 12px 6px 9px;
   text-align: center;
   background: rgba(255, 253, 248, .55);
@@ -2048,7 +2059,7 @@ body[data-verden="oy"] .skilt::after {
 .bryter-spor {
   flex: 0 0 auto;
   width: 50px; height: 29px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: var(--flate-2);
   box-shadow: inset 0 0 0 2px var(--kant);
   position: relative;
@@ -2084,7 +2095,7 @@ body[data-verden="oy"] .skilt::after {
   font-size: 1.05rem;
   padding: 9px 0;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--r-xs);
   background: var(--flate-2);
   color: var(--blekk-svak);
   cursor: pointer;
@@ -2099,7 +2110,7 @@ body[data-verden="oy"] .skilt::after {
   font-weight: 700;
   font-size: .95rem;
   padding: 5px 9px;
-  border-radius: 8px;
+  border-radius: var(--r-xs);
   background: var(--flate-2);
   color: rgba(35, 38, 45, .35);
 }
@@ -2116,7 +2127,7 @@ body[data-verden="oy"] .skilt::after {
   font-size: 1rem;
   padding: 10px 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--r-sm);
   background: var(--flate-2);
   color: var(--blekk);
 }
@@ -2135,7 +2146,7 @@ body[data-verden="oy"] .skilt::after {
   font-size: 1.3rem;
   padding: 15px 30px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
   background: var(--flate);
   color: var(--blekk);
   cursor: pointer;
@@ -2169,7 +2180,7 @@ body[data-verden="oy"] .skilt::after {
   font: inherit;
   cursor: pointer;
   border: none;
-  border-radius: 16px;
+  border-radius: var(--r-md);
   padding: 14px 16px;
   background: var(--flate-2);
   color: var(--blekk-svak);
@@ -2201,7 +2212,7 @@ body[data-verden="oy"] .skilt::after {
   align-items: center;
   gap: 10px;
   padding: 8px 8px 8px 16px;
-  border-radius: 14px;
+  border-radius: var(--r-sm);
   background: var(--blekk);
   color: #fff;
   font-size: .9rem;
@@ -2220,7 +2231,7 @@ body[data-verden="oy"] .skilt::after {
   background: var(--blekk);
   transform: rotate(45deg);
 }
-.voksenboble .knapp { box-shadow: 0 3px 0 rgba(0, 0, 0, .3); }
+.voksenboble .knapp { box-shadow: 0 3px 0 rgba(var(--sk-rgb), .3); }
 
 .ibruk {
   font-size: .85rem;
@@ -2228,13 +2239,13 @@ body[data-verden="oy"] .skilt::after {
   color: var(--god-mork);
   background: var(--god-svak);
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--r-xl);
 }
 .ibruk--advarsel { color: #9a5116; background: #fdf0e2; }
 
 .hjelpetekst {
   margin-top: 10px;
-  border-radius: 12px;
+  border-radius: var(--r-sm);
   background: var(--flate-2);
   padding: 10px 14px;
 }
@@ -2261,12 +2272,12 @@ body[data-verden="oy"] .skilt::after {
   body { font-size: 16px; }
   #app { padding: 8px 14px calc(var(--grunn-h) + 2px); }
   .ordkort { gap: 14px; padding: 10px 14px; }
-  .ordkort-bokstav { font-size: 3rem; width: 72px; height: 72px; border-radius: 18px; }
-  .ordkort-ikon { font-size: 2.1rem; width: 62px; height: 62px; border-radius: 16px; }
+  .ordkort-bokstav { font-size: 3rem; width: 72px; height: 72px; border-radius: var(--r-md); }
+  .ordkort-ikon { font-size: 2.1rem; width: 62px; height: 62px; border-radius: var(--r-md); }
   .ordkort-innhold { gap: 12px; }
   .ordkort-ord { font-size: 1.5rem; }
   .skilt { width: 116px; height: 116px; font-size: 3.2rem; }
-  .oppdrag-mal--bokstav { width: 124px; height: 124px; font-size: 4.4rem; border-radius: 24px; }
+  .oppdrag-mal--bokstav { width: 124px; height: 124px; font-size: 4.4rem; border-radius: var(--r-lg); }
   .oppdrag-mal--tell { --ting: 72px; --ting-gap: 9px; padding: 12px 14px; }
   .figur { width: 158px; bottom: 30px; }
   .ikonknapp-tekst { display: none; }
@@ -2283,9 +2294,9 @@ body[data-verden="oy"] .skilt::after {
   #app { padding: 6px 8px calc(var(--grunn-h) + 2px); }
   .skjerm { gap: 10px; }
 
-  .ordkort { gap: 10px; padding: 8px 10px; border-radius: 22px; }
-  .ordkort-bokstav { font-size: 2.2rem; width: 52px; height: 52px; border-radius: 14px; }
-  .ordkort-ikon { font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; }
+  .ordkort { gap: 10px; padding: 8px 10px; border-radius: var(--r-lg); }
+  .ordkort-bokstav { font-size: 2.2rem; width: 52px; height: 52px; border-radius: var(--r-sm); }
+  .ordkort-ikon { font-size: 1.6rem; width: 44px; height: 44px; border-radius: var(--r-sm); }
   .ordkort-innhold { gap: 10px; }
   .ordkort-ord { font-size: 1.15rem; }
   /* I løypa er kortet alene på skjermen. Der skal bokstaven og bildet være
@@ -2293,30 +2304,30 @@ body[data-verden="oy"] .skilt::after {
      Garasjen, der 29 ruter trenger plassen. */
   .loype-kort { flex-direction: column; padding: 18px 14px 14px; gap: 12px; }
   .loype-kort .ordkort-innhold { flex-direction: column; gap: 10px; }
-  .loype-kort .ordkort-bokstav { font-size: 4.4rem; width: 108px; height: 108px; border-radius: 26px; }
-  .loype-kort .ordkort-ikon:not(.mengde) { font-size: 3.6rem; width: 104px; height: 104px; border-radius: 24px; }
+  .loype-kort .ordkort-bokstav { font-size: 4.4rem; width: 108px; height: 108px; border-radius: var(--r-lg); }
+  .loype-kort .ordkort-ikon:not(.mengde) { font-size: 3.6rem; width: 104px; height: 104px; border-radius: var(--r-lg); }
   .loype-kort .ordkort-ikon.mengde { --ting: 34px; }
   .loype-kort .ordkort-ord { font-size: 1.8rem; }
   .lytt-tekst { display: none; }
   .lyttknapp { padding: 9px 11px; }
 
   /* Navnet skal helst stå på én linje, ellers leses det ikke som et navn. */
-  .navnrute { width: 48px; height: 58px; font-size: 2rem; border-radius: 13px; }
+  .navnrute { width: 48px; height: 58px; font-size: 2rem; border-radius: var(--r-sm); }
   .oppdrag-mal--navn { gap: 6px; }
 
   .bokstavrutenett { gap: 7px; padding: 4px 0; }
-  .bokstav { border-radius: 13px; padding: 4px 2px 3px; }
+  .bokstav { border-radius: var(--r-sm); padding: 4px 2px 3px; }
   .bokstav-tegn { font-size: 1.45rem; }
   .bokstav-bilde { font-size: .95rem; }
   .bokstav.mestret::after { right: 3px; top: 2px; font-size: .6rem; }
 
-  .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: 20px; }
+  .skilt { width: 104px; height: 104px; font-size: 2.9rem; border-radius: var(--r-md); }
   .skilt::after { height: 22px; width: 12px; }
-  .oppdrag-mal--bokstav { width: 110px; height: 110px; font-size: 4rem; border-radius: 22px; }
+  .oppdrag-mal--bokstav { width: 110px; height: 110px; font-size: 4rem; border-radius: var(--r-lg); }
   .oppdrag-mal--tell { --ting: 58px; --ting-gap: 7px; padding: 10px 12px; }
   .oppdrag-mal--tell .ting.talt::after { width: 21px; height: 21px; font-size: .82rem; right: -4px; top: -4px; }
   .ordkort-ikon.mengde { --ting: 24px; min-width: 62px; min-height: 62px; padding: 6px; }
-  .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: 18px; }
+  .oppdrag-mal .mal-ikon { width: 76px; height: 76px; font-size: 2.2rem; border-radius: var(--r-md); }
   .oppdrag-mal .mal-ord { font-size: 1.5rem; }
   .oppdrag-tekst { font-size: 1.1rem; }
   /* På en telefon er det ikke bredde nok til at «Videre» kan stå i hjørnet
@@ -2340,9 +2351,9 @@ body[data-verden="oy"] .skilt::after {
      også her – bare mindre. Kortene ligger i to kolonner, som er nok til at
      alle modusene er synlige uten å rulle. */
   .menyrad { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; padding: 10px 12px 24px; }
-  .flis { padding: 9px 8px 10px; gap: 6px; border-radius: 20px; }
+  .flis { padding: 9px 8px 10px; gap: 6px; border-radius: var(--r-md); }
   .flis-navn { font-size: .98rem; }
-  .flis-bilde { padding: 4px; border-radius: 13px; }
+  .flis-bilde { padding: 4px; border-radius: var(--r-sm); }
   /* Panelet går helt ut i kantene på telefon, og da må overlegget slippe
      lufta si: med 24 px padding rundt ble et 100dvh-høyt panel 48 px høyere
      enn skjermen, og nederste halvdel av «Lukk» havnet utenfor. Målt på
@@ -2398,8 +2409,8 @@ body[data-verden="oy"] .skilt::after {
   .bokstav-tegn { font-size: 1.2rem; }
   .bokstav-bilde { font-size: .8rem; }
   .ordkort { padding: 5px 10px; gap: 8px; }
-  .ordkort-bokstav { width: 42px; height: 42px; font-size: 1.8rem; border-radius: 12px; }
-  .ordkort-ikon { width: 38px; height: 38px; font-size: 1.3rem; border-radius: 11px; }
+  .ordkort-bokstav { width: 42px; height: 42px; font-size: 1.8rem; border-radius: var(--r-sm); }
+  .ordkort-ikon { width: 38px; height: 38px; font-size: 1.3rem; border-radius: var(--r-xs); }
   .ordkort-ord { font-size: 1.05rem; }
   .figur { width: 96px; bottom: 10px; }
 
@@ -2419,11 +2430,11 @@ body[data-verden="oy"] .skilt::after {
   /* På en skjerm som bare er 360 piksler høy er det ikke plass til både et
      stort merke og en rad skilt. Merket er fortsatt større enn skiltene –
      hierarkiet står – men begge krymper så de ikke møtes. */
-  .oppdrag-mal--bokstav { width: 70px; height: 70px; font-size: 2.7rem; border-radius: 17px; }
+  .oppdrag-mal--bokstav { width: 70px; height: 70px; font-size: 2.7rem; border-radius: var(--r-md); }
   .oppdrag-mal--tell { --ting: 44px; --ting-gap: 5px; padding: 6px 9px; }
   .oppdrag-mal--tell .ting.talt::after { width: 18px; height: 18px; font-size: .72rem; right: -3px; top: -3px; }
   .ordkort-ikon.mengde { --ting: 20px; min-width: 46px; min-height: 46px; padding: 4px; }
-  .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: 15px; }
+  .oppdrag-mal .mal-ikon { width: 58px; height: 58px; font-size: 1.7rem; margin-bottom: 2px; border-radius: var(--r-md); }
   .oppdrag-mal .mal-ord { font-size: 1.1rem; }
   .lytt-tekst { display: none; }
   .lyttknapp { padding: 7px 10px; }
@@ -2433,17 +2444,17 @@ body[data-verden="oy"] .skilt::after {
   /* På tvers er høyden det knappe. Kortene blir smalere, så alle står på
      én rad, og bildet krymper med dem. */
   .menyrad { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
-  .flis { padding: 7px 6px 8px; gap: 4px; border-radius: 18px; }
+  .flis { padding: 7px 6px 8px; gap: 4px; border-radius: var(--r-md); }
   .flis-navn { font-size: .82rem; }
-  .flis-bilde { padding: 3px; border-radius: 11px; }
+  .flis-bilde { padding: 3px; border-radius: var(--r-xs); }
 
   /* Navnet må få plass på én linje – brekker det i to, leses det ikke
      lenger som navnet hans. */
-  .navnrute { width: 46px; height: 54px; font-size: 1.9rem; border-radius: 12px; }
+  .navnrute { width: 46px; height: 54px; font-size: 1.9rem; border-radius: var(--r-sm); }
   .oppdrag-mal--navn { gap: 6px; }
   .loype-teller { font-size: .85rem; }
 
-  .skilt { width: 66px; height: 66px; font-size: 2rem; border-radius: 15px; }
+  .skilt { width: 66px; height: 66px; font-size: 2rem; border-radius: var(--r-md); }
   .skilt::after { height: 18px; width: 10px; }
   .valg { gap: 14px; }
   .knapp--stor { font-size: 1.05rem; padding: 12px 24px 10px; }
@@ -2469,7 +2480,7 @@ body[data-verden="oy"] .skilt::after {
   :root { --grunn-h: 128px; }
   .oppdrag-mal { font-size: 3.2rem; }
   .skilt { width: 118px; height: 118px; font-size: 3.2rem; }
-  .oppdrag-mal--bokstav { width: 126px; height: 126px; font-size: 4.4rem; border-radius: 24px; }
+  .oppdrag-mal--bokstav { width: 126px; height: 126px; font-size: 4.4rem; border-radius: var(--r-lg); }
   .figur { width: 160px; bottom: 28px; }
 }
 

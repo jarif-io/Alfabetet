@@ -80,8 +80,8 @@ var Figurer = (function () {
   function bakkeskygge(cx, cy, rx, punkter) {
     var g = unik('skygge');
     return '<defs><radialGradient id="' + g + '" cx=".5" cy=".5" r=".5">' +
-        '<stop offset="0" stop-color="#000" stop-opacity=".36"/>' +
-        '<stop offset="1" stop-color="#000" stop-opacity="0"/>' +
+        '<stop offset="0" stop-color="#281e0f" stop-opacity=".36"/>' +
+        '<stop offset="1" stop-color="#281e0f" stop-opacity="0"/>' +
       '</radialGradient></defs>' +
       '<ellipse class="fig-skygge" cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="9" fill="url(#' + g + ')"/>' +
       punkter.map(function (x) {
@@ -387,8 +387,8 @@ var Figurer = (function () {
     skygge.forEach(ramme);
     return {
       boks: [min[0], min[1], max[0], max[1]],
-      svg: '<defs><radialGradient id="' + g + '"><stop offset="0" stop-color="#000" stop-opacity=".4"/>' +
-          '<stop offset=".65" stop-color="#000" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity="0"/>' +
+      svg: '<defs><radialGradient id="' + g + '"><stop offset="0" stop-color="#281e0f" stop-opacity=".4"/>' +
+          '<stop offset=".65" stop-color="#281e0f" stop-opacity=".18"/><stop offset="1" stop-color="#281e0f" stop-opacity="0"/>' +
         '</radialGradient></defs>' +
         '<path class="fig-skygge" d="' + sti(kam, skygge) + '" fill="url(#' + g + ')"/>' +
         ting.map(function (t) { return t.svg; }).join('') + modell.pynt(kam)
@@ -660,7 +660,7 @@ var Figurer = (function () {
         '<linearGradient id="' + gPlate + '" x1="0" y1="0" x2="0" y2="1">' +
           '<stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#e0a127"/>' +
         '</linearGradient>' +
-        /* Lyset fra oven til venstre: en myk lysflekk på ryggen og hodet. */
+        /* Lyset fra oven til høyre, der sola står: en myk lysflekk på ryggen og hodet. */
         '<radialGradient id="' + gLys + '" cx=".5" cy=".5" r=".5">' +
           '<stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>' +
         '</radialGradient>' +
@@ -680,7 +680,7 @@ var Figurer = (function () {
       /* Kropp – én rund form, så silhuetten er lett å kjenne igjen. */
       '<ellipse cx="94" cy="76" rx="52" ry="34" fill="url(#' + gHud + ')"/>' +
       /* Lys på ryggen, skygge under magen, og noen flekker i huden. */
-      '<ellipse cx="84" cy="60" rx="34" ry="14" fill="url(#' + gLys + ')"/>' +
+      '<ellipse cx="104" cy="60" rx="34" ry="14" fill="url(#' + gLys + ')"/>' +
       '<path d="M48 90c20 18 70 20 96 2-8 16-30 20-50 20s-40-8-46-22z" fill="rgba(0,0,0,.14)"/>' +
       '<g fill="#3f8b53" opacity=".45">' +
         '<circle cx="78" cy="70" r="4"/><circle cx="92" cy="64" r="3"/><circle cx="110" cy="70" r="3.5"/>' +
@@ -704,7 +704,7 @@ var Figurer = (function () {
       /* Hals og hode. */
       '<path d="M132 62c0-18 10-30 26-32 6-1 10 2 10 8v26z" fill="url(#' + gHud + ')"/>' +
       '<ellipse cx="168" cy="42" rx="24" ry="19" fill="url(#' + gHud + ')"/>' +
-      '<ellipse cx="162" cy="33" rx="12" ry="6" fill="url(#' + gLys + ')"/>' +
+      '<ellipse cx="174" cy="32" rx="12" ry="6" fill="url(#' + gLys + ')"/>' +
       '<path d="M186 44h10a5 5 0 0 1 0 10h-8z" fill="#4f9e63"/>' +
       /* nesebor */
       '<circle cx="188" cy="40" r="1.7" fill="#2e6b40"/>' +

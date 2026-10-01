@@ -343,6 +343,15 @@ stanset gjeldende setning, men resten av den lenkede sekvensen fortsatte oppå
 neste oppgave. Bruk en generasjonsteller som gjør alle ventende
 fortsettelser til no-ops.
 
+**Designregler for voksne sider passer bare delvis.** Taste-skill (anti-«AI-design»)
+er laget for landingssider og sier selv at barneprodukter går foran estetikken. Det som
+holdt her: ikon til Hjem-skjermen, lyset fra samme kant som sola, skygger i scenens
+varme farge i stedet for svart, og en radius-skala (strammere inni, mykere ytterst).
+Det som ikke passer en treåring: asymmetri, mye bevegelse, korn og glass,
+scroll-effekter og «én aksentfarge» (rød for bokstaver og grønn for tall er en kode).
+Og sjekk at en CSS-regel ikke overstyrer `fill="url(#…)"`: `.fig-skygge { fill }`
+gjorde de myke skyggene flate i flere versjoner.
+
 **Unike id-er i SVG-gradienter.** To figurer med samme `<linearGradient id>`
 gjør at den ene blir usynlig. Generer id per instans. CSS-variabler virker
 heller ikke i `stop-color` – bruk literale farger.

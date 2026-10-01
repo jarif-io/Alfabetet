@@ -427,7 +427,7 @@ kjører. Skipet og dinosauren er tegnet rett fra siden.
 index.html        hele skjermen: scenen, de ni skjermbildene og foreldremenyen
 css/stil.css      designsystem, scene, farger og animasjoner
 css/fonter.css    de to skriftene, lagt inn som base64 så de virker uten nett
-js/data.js        bokstavene, tallene, ordene og de tre verdenene  ← denne kan dere endre
+js/data.js        bokstavene, tallene, ordene og de fire verdenene  ← denne kan dere endre
 js/figurer.js     bilene, skipet, dinosauren, landskap og forsidekartet, tegnet som SVG
 js/lagring.js     framgang og innstillinger (localStorage), med migreringer
 js/tale.js        spiller spillets egen stemme via Lydbank
@@ -439,6 +439,7 @@ js/spill.js       navigasjon, scene, tastatur og foreldremeny
 lag-lydpakke.py   leser inn alle replikkene med en norsk nevral stemme
 lyd/              språkpakken: ett lydklipp per replikk, og manifest.js
 bygg-enfil.js     limer alt sammen til én fil du kan flytte rundt
+ikon.png          ikonet på Hjem-skjermen og i fanen; lag-ikon.js lager det av racerbilen
 test/             testene: spillet i en ekte nettleser, rett fra file://
 ```
 
