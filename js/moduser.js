@@ -440,19 +440,212 @@ var Moduser = (function () {
     }
   }
 
-  var MODUSTITTEL = {
-    finn: 'Finn bokstaven',
-    forstelyd: 'Første lyd',
-    navn: 'Navnet mitt',
-    tell: 'Tell',
-    hent: 'Hent'
-  };
-
   var Oppgave = (function () {
     var okt = null;
     var nedtellingAv = null;
     function stoppNedtelling() {
       if (nedtellingAv) { nedtellingAv(); nedtellingAv = null; }
+    }
+
+    /* ---------- modusene ----------
+     *
+     * Alle oppgavemodusene deler samme motor: kø, «lytt først», skilt, hjelp,
+     * ros, nedtelling og oppsummering. Det som skiller dem, står her – hver
+     * type overstyrer bare det som er annerledes enn STANDARD. En ny modus er
+     * en ny oppføring i TYPER (og en flis i Spill), ikke nye forgreininger i
+     * motoren. okt.typ er standarden med typens egne felter lagt over. */
+    var STANDARD = {
+      tittel: 'Finn bokstaven',
+      mal: 'bokstav',               /* klassen på merket: oppdrag-mal--… */
+      /* Køen og oppsettet for runden. */
+      forbered: function (opps) { return { ko: byggKo(okt.verden, opps.antall), oppsett: opps }; },
+      /* Det som kan stå på skiltene. */
+      utvalg: function () { return Lagring.aktiveTegn(okt.verden); },
+      /* Teksten over og merket i midten. */
+      tegn: function () {},
+      kanVise: false,               /* kan merket avsløres med et trykk */
+      sover: false,                 /* skiltene sover til noe er gjort */
+      /* Skiltene: tegner valgene og gir antallet som faktisk sto der. */
+      valg: skilt,
+      skiltInnhold: function (verdi, knapp) { knapp.textContent = verdi; },
+      navnPa: function (verdi) { return navnPaTegn(okt.verden, verdi); },
+      sporsmal: function () { return []; },
+      vedRiktig: function () {},
+      ros: function (ros) { return ros; },
+      opprykk: true,                /* flere skilt når det går godt */
+      mestring: true,               /* svarene teller mot framgangen */
+      runde: true,                  /* runden teller mot vanskegraden */
+      /* Oppsummeringen. */
+      brikker: function () {
+        return Object.keys(okt.telling).sort(function (a, b) {
+          /* Tegnsettets egen rekkefølge: 2 før 10, og Æ Ø Å til slutt. */
+          return tegnFor(okt.verden).indexOf(a) - tegnFor(okt.verden).indexOf(b);
+        });
+      },
+      brikke: function (b) { return '<b>' + b + '</b><i>' + ordFor(okt.verden, b).ikon + '</i>'; },
+      oppsumTittel: null,
+      oppsumTekst: function (tekst) { return tekst; },
+      hilsen: null
+    };
+
+    var TYPER = {
+      finn: {
+        /* «Finn bokstaven» heter «Finn tallet» i tallverdenene. */
+        tittel: function () { return domeneFor(okt.verden) === 'tall' ? 'Finn tallet' : 'Finn bokstaven'; },
+        tegn: function () {
+          el('oppgave-tekst').textContent = VERDENER[okt.verden].oppdrag;
+          /* Bokstaven er skjult, ellers er oppgaven bare å finne to like.
+           * Trykker han på merket, kommer den fram – hjelp når han trenger den. */
+          okt.malVist = !!Lagring.innstilling('visMal');
+          tegnMal();
+        },
+        kanVise: true,
+        sporsmal: function () {
+          return [VERDENER[okt.verden].oppdrag + '…', 280, navnPaTegn(okt.verden, okt.fasit) + '.'];
+        }
+      },
+
+      /* «Navnet mitt»: køen er bokstavene i navnet hans, så runden er
+       * nøyaktig så lang som navnet og har en slutt barnet skjønner. */
+      navn: {
+        tittel: 'Navnet mitt',
+        mal: 'navn',
+        forbered: function (opps, navnkoe) {
+          var ko = (navnkoe || []).slice();
+          return {
+            ko: ko,
+            oppsett: { antall: ko.length, maksValg: opps.maksValg,
+                       bomForHjelp: opps.bomForHjelp, opprykk: opps.opprykk }
+          };
+        },
+        /* Navnets egne bokstaver må alltid være med: har foreldrene snevret
+         * inn til fire bokstaver, ville runden ellers vært uspillbar. */
+        utvalg: function () {
+          var ut = Lagring.aktiveTegn(okt.verden).slice();
+          okt.ko.forEach(function (b) { if (ut.indexOf(b) === -1) ut.push(b); });
+          return ut;
+        },
+        tegn: function () {
+          el('oppgave-tekst').textContent = 'Navnet ditt';
+          okt.malVist = !!Lagring.innstilling('visMal');
+          tegnMal();
+        },
+        kanVise: true,
+        sporsmal: function () {
+          /* Første rute knytter oppgaven til navnet hans; resten holder
+           * tempoet nede uten å gjenta hele setningen hver gang. */
+          return okt.indeks === 0
+            ? ['Navnet ditt begynner med…', 320, bokstavnavnFor(okt.fasit) + '.']
+            : ['Så kommer…', 300, bokstavnavnFor(okt.fasit) + '.'];
+        },
+        /* Bokstaven faller på plass i navnet med én gang – det er hele
+         * poenget med runden. */
+        vedRiktig: function () {
+          okt.malVist = true;
+          tegnMal();
+          spillOm(el('oppgave-mal').querySelector('.navnrute.na'), 'lander', 520);
+        },
+        /* Runden er like lang som navnet og sier ingenting om hvor
+         * vanskelig bokstavene er. */
+        runde: false,
+        /* Navnet står som et navn, i sin egen rekkefølge – «SOFIA» ville
+         * sett ut som et rop, «Sofia» leses som navnet hans. */
+        brikker: function () { return okt.ko.slice(); },
+        brikke: function (b) { return '<b>' + b + '</b>'; },
+        brikkerKlasse: 'oppsum-brikker--navn',
+        oppsumTittel: function () { return navnetSomNavn() + '!'; },
+        oppsumTekst: function (tekst) { return 'Bygde ' + navnetSomNavn() + '. ' + tekst; },
+        hilsen: function () { return navnetTalt(okt.ko); }
+      },
+
+      tell: {
+        tittel: 'Tell',
+        mal: 'tell',
+        tegn: function () {
+          el('oppgave-tekst').textContent = 'Hvor mange?';
+          tegnTelleting();
+        },
+        /* «Tell først»: tallskiltene våkner når alt er talt. Da er svaret
+         * det siste tallordet han sa – telling er veien til svaret, ikke en
+         * omvei rundt det. */
+        sover: true,
+        sporsmal: function () {
+          return ['Hvor mange ' + okt.telleting.ord + '?', 400, 'Trykk på hver enkelt og tell.'];
+        }
+      },
+
+      /* «Hent»: tallet står på garasjen, og han henter akkurat så mange. */
+      hent: {
+        tittel: 'Hent',
+        mal: 'tell',
+        forbered: function (opps) {
+          return { ko: byggKo(okt.verden, opps.antall, opps.hentTall), oppsett: opps };
+        },
+        tegn: function () {
+          el('oppgave-tekst').textContent = 'Hent';
+          tegnTelleting();
+        },
+        /* Ingen skilt å velge mellom – bare garasjen han leverer bilene i.
+         * Alle bilene han kunne tatt, var valget – og det er alltid minst tre. */
+        valg: function (valgfelt) {
+          var garasje = document.createElement('button');
+          garasje.type = 'button';
+          garasje.className = 'skilt skilt--garasje';
+          garasje.setAttribute('aria-label', 'Garasjen – trykk når du har hentet nok');
+          garasje.addEventListener('click', function () { lever(garasje); });
+          valgfelt.appendChild(garasje);
+          tegnGarasje();
+          return el('oppgave-mal').querySelectorAll('.ting').length;
+        },
+        sporsmal: function () {
+          return okt.indeks === 0
+            ? [hentSetning(okt.verden, okt.fasit), 400, 'Trykk på garasjen når du er ferdig.']
+            : [hentSetning(okt.verden, okt.fasit)];
+        },
+        /* Det siste tallordet er svaret: «tre biler» – så rosen. */
+        ros: function (ros) { return [hentSvar(okt.verden, okt.fasit), 300].concat(ros); },
+        /* Ingen skilt, og derfor ikke noe opprykk; tallene er valgt for
+         * alderen, ikke etter hvor godt det går. */
+        opprykk: false,
+        runde: false,
+        brikke: function (b) { return '<b>' + b + '</b><i>' + VERDENER[okt.verden].hent.ikon + '</i>'; }
+      },
+
+      forstelyd: {
+        tittel: 'Første lyd',
+        mal: 'ord',
+        tegn: function () {
+          var oppslag = ordFor(okt.verden, okt.fasit);
+          el('oppgave-tekst').textContent = 'Hvilken bokstav begynner ordet på?';
+          el('oppgave-mal').innerHTML = '<span class="mal-ikon">' + oppslag.ikon + '</span>' +
+                                        '<span class="mal-ord">' + oppslag.ord + '</span>';
+        },
+        sporsmal: function () {
+          var oppslag = ordFor(okt.verden, okt.fasit);
+          return [oppslag.ord + '.', 420, 'Hvilken bokstav begynner ' + tilTale(oppslag.ord) + ' på?'];
+        }
+      }
+    };
+
+    function navnetSomNavn() {
+      return okt.ko[0] + okt.ko.slice(1).join('').toLowerCase();
+    }
+
+    /* Standardvalgene: fasiten og noen andre fra utvalget, på hvert sitt
+     * skilt. Har foreldrene valgt bare to bokstaver, finnes det ikke tre. */
+    function skilt(valgfelt) {
+      var antallValg = Math.min(okt.antallValg, okt.typ.utvalg().length);
+      var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
+      alternativer.forEach(function (verdi) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'skilt';
+        okt.typ.skiltInnhold(verdi, b);
+        b.dataset.bokstav = verdi;
+        b.addEventListener('click', function () { svar(verdi, b); });
+        valgfelt.appendChild(b);
+      });
+      return alternativer.length;
     }
 
     /* Bygger køen: bokstavene han kan minst kommer først i utvalget, men
@@ -537,52 +730,14 @@ var Moduser = (function () {
       }
     }
 
-    /* Bokstavene det er lov å velge mellom. I «Navnet mitt» må navnets egne
-     * bokstaver alltid være med: har foreldrene snevret inn til fire
-     * bokstaver, ville runden ellers vært uspillbar. */
-    function utvalg() {
-      var aktive = Lagring.aktiveTegn(okt.verden);
-      if (okt.type !== 'navn') return aktive;
-      var ut = aktive.slice();
-      okt.ko.forEach(function (b) { if (ut.indexOf(b) === -1) ut.push(b); });
-      return ut;
-    }
-
     function distraktorer(fasit, antall) {
-      var andre = utvalg().filter(function (b) { return b !== fasit; });
+      var andre = okt.typ.utvalg().filter(function (b) { return b !== fasit; });
       return bland(andre).slice(0, antall);
     }
 
-    function sporsmalstale() {
-      var v = VERDENER[okt.verden];
-      if (okt.type === 'finn') {
-        return [v.oppdrag + '…', 280, navnPaTegn(okt.verden, okt.fasit) + '.'];
-      }
-      if (okt.type === 'navn') {
-        /* Første rute knytter oppgaven til navnet hans; resten holder tempoet
-         * nede uten å gjenta hele setningen hver gang. */
-        return okt.indeks === 0
-          ? ['Navnet ditt begynner med…', 320, bokstavnavnFor(okt.fasit) + '.']
-          : ['Så kommer…', 300, bokstavnavnFor(okt.fasit) + '.'];
-      }
-      if (okt.type === 'tell') {
-        return ['Hvor mange ' + okt.telleting.ord + '?', 400,
-                'Trykk på hver enkelt og tell.'];
-      }
-      if (okt.type === 'hent') {
-        return okt.indeks === 0
-          ? [hentSetning(okt.verden, okt.fasit), 400, 'Trykk på garasjen når du er ferdig.']
-          : [hentSetning(okt.verden, okt.fasit)];
-      }
-      var oppslag = ordFor(okt.verden, okt.fasit);
-      return [
-        oppslag.ord + '.', 420,
-        'Hvilken bokstav begynner ' + tilTale(oppslag.ord) + ' på?'
-      ];
-    }
+    function sporsmalstale() { return okt.typ.sporsmal(); }
 
     function visOppgave() {
-      var v = VERDENER[okt.verden];
       okt.fasit = okt.ko[okt.indeks];
       okt.forsokPaDenne = 0;
       okt.ferdigMedDenne = false;
@@ -591,62 +746,16 @@ var Moduser = (function () {
       tegnPrikker();
 
       var mal = el('oppgave-mal');
-      mal.className = 'oppdrag-mal oppdrag-mal--' +
-        (okt.type === 'finn' ? 'bokstav' : okt.type === 'navn' ? 'navn'
-          : okt.type === 'tell' || okt.type === 'hent' ? 'tell' : 'ord');
-      if (okt.type === 'tell' || okt.type === 'hent') {
-        el('oppgave-tekst').textContent = okt.type === 'tell' ? 'Hvor mange?' : 'Hent';
-        tegnTelleting();
-      } else if (okt.type === 'finn' || okt.type === 'navn') {
-        el('oppgave-tekst').textContent =
-          okt.type === 'navn' ? 'Navnet ditt' : v.oppdrag;
-        /* Bokstaven er skjult, ellers er oppgaven bare å finne to like.
-         * Trykker han på merket, kommer den fram – hjelp når han trenger den. */
-        okt.malVist = !!Lagring.innstilling('visMal');
-        tegnMal();
-      } else {
-        var oppslag = ordFor(okt.verden, okt.fasit);
-        el('oppgave-tekst').textContent = 'Hvilken bokstav begynner ordet på?';
-        mal.innerHTML = '<span class="mal-ikon">' + oppslag.ikon + '</span>' +
-                        '<span class="mal-ord">' + oppslag.ord + '</span>';
-      }
+      mal.className = 'oppdrag-mal oppdrag-mal--' + okt.typ.mal;
+      okt.typ.tegn();
       spillOm(mal, 'bytter', 460);
 
       var valgfelt = el('oppgave-valg');
       valgfelt.innerHTML = '';
-      if (okt.type === 'hent') {
-        /* Ingen skilt å velge mellom – bare garasjen han leverer bilene i. */
-        var garasje = document.createElement('button');
-        garasje.type = 'button';
-        garasje.className = 'skilt skilt--garasje';
-        garasje.setAttribute('aria-label', 'Garasjen – trykk når du har hentet nok');
-        garasje.addEventListener('click', function () { lever(garasje); });
-        valgfelt.appendChild(garasje);
-        /* Alle bilene han kunne tatt, var valget – og det er alltid minst tre. */
-        okt.visteValg = el('oppgave-mal').querySelectorAll('.ting').length;
-        tegnGarasje();
-      } else {
-        /* Har foreldrene valgt bare to bokstaver, finnes det ikke tre skilt. */
-        var antallValg = Math.min(okt.antallValg, utvalg().length);
-        var alternativer = bland([okt.fasit].concat(distraktorer(okt.fasit, antallValg - 1)));
-        okt.visteValg = alternativer.length;
-        alternativer.forEach(function (bokstav) {
-          var b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'skilt';
-          b.textContent = bokstav;
-          b.dataset.bokstav = bokstav;
-          b.addEventListener('click', function () { svar(bokstav, b); });
-          valgfelt.appendChild(b);
-        });
-      }
+      okt.visteValg = okt.typ.valg(valgfelt);
 
       el('oppgave-videre').hidden = true;
-
-      /* «Tell først»: tallskiltene våkner når alt er talt. Da er svaret
-       * det siste tallordet han sa – telling er veien til svaret, ikke en
-       * omvei rundt det. */
-      valgfelt.classList.toggle('sover', okt.type === 'tell');
+      valgfelt.classList.toggle('sover', !!okt.typ.sover);
 
       lyttForst(sporsmalstale());
     }
@@ -837,7 +946,7 @@ var Moduser = (function () {
     }
 
     function visMal() {
-      if (!okt || okt.type === 'forstelyd' || okt.type === 'tell' || okt.type === 'hent') return false;
+      if (!okt || !okt.typ.kanVise) return false;
       if (okt.malVist) return false;
       okt.malVist = true;
       tegnMal();
@@ -865,7 +974,7 @@ var Moduser = (function () {
       /* Feil: skiltet vugger, tonen er lav og vennlig, og han prøver igjen. */
       okt.forsokPaDenne += 1;
       okt.paRad = 0;
-      Lagring.registrerFeil(okt.fasit);
+      if (okt.typ.mestring) Lagring.registrerFeil(okt.fasit);
       knapp.classList.add('feil');
       spillOm(knapp, 'vugg', 500);
       knapp.disabled = true;
@@ -904,7 +1013,7 @@ var Moduser = (function () {
        * sover mens det sies, og pulsen starter når det våkner – også om
        * han ber om å høre det igjen underveis. */
       riktigKnapp.classList.add('pekes');
-      lyttForst(['Her er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.',
+      lyttForst(['Her er…', 260, okt.typ.navnPa(okt.fasit) + '.',
                  300, 'Trykk på den.']);
     }
 
@@ -917,13 +1026,7 @@ var Moduser = (function () {
       knapp.classList.remove('pekes');
       knapp.classList.add('riktig');
 
-      /* I «Navnet mitt» skal bokstaven falle på plass i navnet med én gang –
-       * det er hele poenget med runden. */
-      if (okt.type === 'navn') {
-        okt.malVist = true;
-        tegnMal();
-        spillOm(el('oppgave-mal').querySelector('.navnrute.na'), 'lander', 520);
-      }
+      okt.typ.vedRiktig(knapp);
 
       /* Riktig på første forsøk: figuren kjører dit og blir glad. Etter
        * hjelp: bare et rolig grønt skilt. Hjelpen skal aldri være morsommere
@@ -938,8 +1041,8 @@ var Moduser = (function () {
         var forMestret = Lagring.erMestret(okt.fasit);
         /* Antall skilt som faktisk sto på skjermen avgjør om treffet teller
          * mot mestring – med to er halvparten flaks. */
-        Lagring.registrerRiktig(okt.fasit, okt.visteValg);
-        var bleMestret = !forMestret && Lagring.erMestret(okt.fasit);
+        if (okt.typ.mestring) Lagring.registrerRiktig(okt.fasit, okt.visteValg);
+        var bleMestret = okt.typ.mestring && !forMestret && Lagring.erMestret(okt.fasit);
         if (bleMestret) okt.nyeMestrede.push(okt.fasit);
         okt.telling[okt.fasit] = (okt.telling[okt.fasit] || 0) + 1;
 
@@ -952,8 +1055,7 @@ var Moduser = (function () {
       /* Ikke lov noe vanskeligere på siste oppgave – runden slutter ved neste
        * trykk, og løftet ville aldri blitt innfridd. */
       var siste = okt.indeks + 1 >= okt.oppsett.antall;
-      /* «Hent» har ingen skilt å velge mellom, og derfor ikke noe opprykk. */
-      var opp = !siste && okt.type !== 'hent' && okt.paRad >= okt.oppsett.opprykk &&
+      var opp = !siste && okt.typ.opprykk && okt.paRad >= okt.oppsett.opprykk &&
                 okt.antallValg < okt.oppsett.maksValg;
       if (opp) {
         okt.antallValg += 1;
@@ -968,11 +1070,8 @@ var Moduser = (function () {
       var ros = forsteForsok
         ? [Tale.velg(rosord + ', ' + Lagring.navnFor(okt.verden) + '!',
                      rosord + '!')]
-        : ['Der ja! Det er…', 260, navnPaTegn(okt.verden, okt.fasit) + '.'];
-      /* Det siste tallordet er svaret: «tre biler» – så rosen. */
-      if (forsteForsok && okt.type === 'hent') {
-        ros = [hentSvar(okt.verden, okt.fasit), 300].concat(ros);
-      }
+        : ['Der ja! Det er…', 260, okt.typ.navnPa(okt.fasit) + '.'];
+      if (forsteForsok) ros = okt.typ.ros(ros);
 
       Tale.stopp();
       Tale.rekke(opp ? ros.concat([350, 'Nå prøver vi en vanskeligere en.']) : ros);
@@ -1004,23 +1103,16 @@ var Moduser = (function () {
       Spill.visSkjerm('skjerm-oppsummering');
       Spill.settTopp('Ferdig', true);
 
-      /* Gikk det tungt to runder på rad, går vi ned et hakk igjen. «Navnet
-       * mitt» holdes utenfor: den runden er like lang som navnet og sier
-       * ingenting om hvor vanskelig bokstavene er. */
-      if (okt.type !== 'navn' && okt.type !== 'hent') {
+      /* Gikk det tungt to runder på rad, går vi ned et hakk igjen – for de
+       * modusene der runden sier noe om vanskegraden. */
+      if (okt.typ.runde) {
         Lagring.registrerRunde(okt.verden, okt.riktigForste, okt.oppsett.antall);
       }
-
-      /* Navnet vises som et navn på skjermen: «SOFIA» ville sett ut som et
-       * rop, «Sofia» leses som navnet hans. */
-      var navnet = okt.type === 'navn'
-        ? okt.ko[0] + okt.ko.slice(1).join('').toLowerCase()
-        : '';
 
       var pause = rundeFerdig();
       el('oppsum-flagg').textContent = VERDENER[okt.verden].flagg;
       el('oppsum-tittel').textContent = pause ? 'Nå tar vi en pause'
-        : okt.type === 'navn' ? navnet + '!'
+        : okt.typ.oppsumTittel ? okt.typ.oppsumTittel()
         : tilfeldig(VERDENER[okt.verden].ros) + '!';
       el('oppsum-igjen').hidden = pause;
 
@@ -1039,23 +1131,13 @@ var Moduser = (function () {
 
       var brikker = el('oppsum-brikker');
       brikker.innerHTML = '';
-      /* I «Navnet mitt» er rekkefølgen hele poenget – der skal navnet stå
-       * som et navn, ikke sortert alfabetisk slik de andre rundene gjør. */
-      brikker.classList.toggle('oppsum-brikker--navn', okt.type === 'navn');
-      var funnet = okt.type === 'navn'
-        ? okt.ko.slice()
-        : Object.keys(okt.telling).sort(function (a, b) {
-            /* Tegnsettets egen rekkefølge: 2 før 10, og Æ Ø Å til slutt. */
-            return tegnFor(okt.verden).indexOf(a) - tegnFor(okt.verden).indexOf(b);
-          });
+      brikker.className = 'oppsum-brikker' + (okt.typ.brikkerKlasse ? ' ' + okt.typ.brikkerKlasse : '');
+      var funnet = okt.typ.brikker();
       funnet.forEach(function (b, n) {
         var brikke = document.createElement('span');
         brikke.className = 'oppsum-brikke';
         brikke.style.animationDelay = (okt.oppsett.antall * 130 + 160 + n * 90) + 'ms';
-        brikke.innerHTML = okt.type === 'navn'
-          ? '<b>' + b + '</b>'
-          : '<b>' + b + '</b><i>' + (okt.type === 'hent'
-              ? VERDENER[okt.verden].hent.ikon : ordFor(okt.verden, b).ikon) + '</i>';
+        brikke.innerHTML = okt.typ.brikke(b);
         brikker.appendChild(brikke);
       });
 
@@ -1075,11 +1157,10 @@ var Moduser = (function () {
 
       var tekst = 'Klarte ' + okt.riktigForste + ' av ' + okt.oppsett.antall +
                   ' med én gang.';
-      if (okt.type === 'navn') {
-        tekst = 'Bygde ' + navnet + '. ' + tekst;
-      } else if (funnet.length) {
+      if (!okt.typ.brikkerKlasse && funnet.length) {
         tekst += ' Fant ' + listetekst(funnet) + ' selv.';
       }
+      tekst = okt.typ.oppsumTekst(tekst);
       if (okt.nyeMestrede.length) {
         tekst += ' ' + listetekst(okt.nyeMestrede) + ' er nå truffet tre ulike dager.';
       }
@@ -1090,8 +1171,8 @@ var Moduser = (function () {
        * glad – eller trøtt, når det er tid for en pause. */
       kjorTil(okt.verden, 1);
       uttrykk(pause ? 'trott' : 'glad');
-      var hilsen = okt.type === 'navn'
-        ? navnetTalt(okt.ko)
+      var hilsen = okt.typ.hilsen
+        ? okt.typ.hilsen()
         : okt.nyeMestrede.length
           ? ['Se her!', 280, navnPaTegn(okt.verden, okt.nyeMestrede[0]) + '.',
              280, 'Den kan du nå!']
@@ -1118,31 +1199,15 @@ var Moduser = (function () {
       /* «Navnet mitt» sender med bokstavene i navnet som kø; runden er da
        * nøyaktig så lang som navnet, og har en slutt barnet skjønner. */
       start: function (type, verdenId, navnkoe) {
-        var opps = oppsett();
-        var ko;
-        if (type === 'navn') {
-          ko = (navnkoe || []).slice();
-          if (!ko.length) return false;
-          opps = {
-            antall: ko.length,
-            maksValg: opps.maksValg,
-            bomForHjelp: opps.bomForHjelp,
-            opprykk: opps.opprykk
-          };
-        } else {
-          ko = byggKo(verdenId, opps.antall, type === 'hent' ? opps.hentTall : null);
-        }
-
         okt = {
           type: type,
+          typ: Object.assign({}, STANDARD, TYPER[type]),
           verden: verdenId,
-          oppsett: opps,
-          ko: ko,
           indeks: 0,
           /* Der han slapp forrige runde, klippet mot taket på dagens nivå –
            * settes nivået ned i foreldremenyen, skal ikke et gammelt opprykk
            * overstyre det. */
-          antallValg: Math.min(Lagring.antallValgFor(verdenId), opps.maksValg),
+          antallValg: 2,
           visteValg: 2,
           paRad: 0,
           bomPaRad: 0,
@@ -1152,11 +1217,14 @@ var Moduser = (function () {
           nyeMestrede: [],
           spmNr: 0
         };
+        var runde = okt.typ.forbered(oppsett(), navnkoe);
+        if (!runde.ko.length) { okt = null; return false; }
+        okt.ko = runde.ko;
+        okt.oppsett = runde.oppsett;
+        okt.antallValg = Math.min(Lagring.antallValgFor(verdenId), runde.oppsett.maksValg);
 
         Spill.visSkjerm('skjerm-oppgave');
-        /* «Finn bokstaven» heter «Finn tallet» i Dinodalen. */
-        var tittel = MODUSTITTEL[type] || 'Finn bokstaven';
-        if (type === 'finn' && domeneFor(verdenId) === 'tall') tittel = 'Finn tallet';
+        var tittel = typeof okt.typ.tittel === 'function' ? okt.typ.tittel() : okt.typ.tittel;
         /* Er runden låst, er pila tilbake borte helt til «Se hvordan det
          * gikk» – se innstillingen «Fullfør runden» og startOppgave() i
          * spill.js, som også lar tilbakeHandling stå tom mens den er der. */
