@@ -151,6 +151,17 @@ var Replikker = (function () {
       }
     });
 
+    /* --- «Se raskt» og «Hvem har flest?» (spørsmålet «Hvor mange egg?»
+     * finnes allerede fra «Tell») --- */
+    legg('setning', 'Se godt etter.');
+    legg('setning', 'den med flest.');
+    Object.keys(VERDENER).forEach(function (id) {
+      if (!VERDENER[id].tallsans) return;
+      tellingFor(id).forEach(function (t) {
+        legg('telling', 'Hvem har flest ' + t.ord + '?', 'Hvem har flest ' + uttaleFor(t.ord) + '?');
+      });
+    });
+
     /* --- fargene i «Mal bilen» --- */
     FARGER.forEach(function (f) {
       legg('farge', malSetning(f.id));

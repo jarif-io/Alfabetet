@@ -40,7 +40,12 @@ module.exports = async function (t) {
         var ventet = await side.locator('#utforsk-rutenett .bokstav').nth(1).getAttribute('data-bokstav');
         ok(vist === ventet, sted + '/' + modus + ': kortet viser tegnet som ble trykket (' + vist + ')');
       } else if (skjerm === 'skjerm-loype') {
-        await side.clock.runFor(3600);
+        /* Nedtellingen tar fire sekunder (3, 2, 1, 0). Vi spoler i små steg
+         * til telleren har gått videre, i stedet for ett fast hopp med liten
+         * margin – det feilet av og til når hele testnettet kjørte. */
+        await hjelp.ventTil(side, function () {
+          return /^2 av/.test(document.getElementById('loype-teller').textContent);
+        }, null, 6000);
         var teller = await side.locator('#loype-teller').textContent();
         ok(/^2 av/.test(teller), sted + '/' + modus + ': nedtellingen går videre av seg selv (' + teller + ')');
       } else if (skjerm === 'skjerm-oppgave') {
@@ -133,6 +138,39 @@ module.exports = async function (t) {
   ok(await s7.locator('#oppgave-mal').innerHTML() !== grunnet, 'Mal bilen: riktig bøtte maler bilen');
   ok(s7.feil.length === 0, 'Mal bilen: ingen feil i konsollen' + (s7.feil.length ? ' – ' + s7.feil.join(' | ') : ''));
   await s7.context().close();
+
+  /* ---------- «Se raskt»: teppet kommer, og et trykk løfter det ----------
+   * ---------- «Hvem har flest?»: feil reir gir hjelp ---------- */
+  var s8 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s8, 'Dinodalen');
+  await hjelp.velgModus(s8, 'Se raskt');
+  function dekket() {
+    return s8.evaluate(function () { return document.getElementById('oppgave-mal').classList.contains('dekket'); });
+  }
+  ok(!(await dekket()), 'Se raskt: tingene vises først');
+  await s8.clock.runFor(2600);
+  ok(await dekket(), 'Se raskt: så kommer teppet over');
+  await hjelp.vaken(s8);
+  await s8.locator('#oppgave-mal').click();
+  await s8.clock.runFor(200);
+  ok(!(await dekket()), 'Se raskt: trykk på teppet, og tingene titter fram igjen');
+  await hjelp.tilbake(s8);
+  await hjelp.velgModus(s8, 'Hvem har flest');
+  await hjelp.vaken(s8);
+  var flest = await s8.evaluate(function () {
+    var r = document.querySelectorAll('#oppgave-valg .skilt--reir');
+    return { reir: r.length, a: r[0].children.length, b: r[1].children.length };
+  });
+  ok(flest.reir === 2 && flest.a !== flest.b && Math.max(flest.a, flest.b) >= 2 * Math.min(flest.a, flest.b),
+     'Hvem har flest?: to reir, det ene minst dobbelt så stort på «Liten» (' + flest.a + ' mot ' + flest.b + ')');
+  var feilSide = flest.a > flest.b ? 'høyre' : 'venstre', rettSide = feilSide === 'høyre' ? 'venstre' : 'høyre';
+  await s8.locator('#oppgave-valg .skilt[data-bokstav="' + feilSide + '"]').click();
+  await s8.clock.runFor(300);
+  ok(await s8.locator('#oppgave-valg .skilt[data-bokstav="' + rettSide + '"]').evaluate(function (k) {
+    return k.classList.contains('pekes');
+  }), 'Hvem har flest?: etter feil reir peker hjelpen på det med flest');
+  ok(s8.feil.length === 0, 'Se raskt og Hvem har flest: ingen feil i konsollen' + (s8.feil.length ? ' – ' + s8.feil.join(' | ') : ''));
+  await s8.context().close();
 
   /* ---------- «Hent»: for mange, for få, og hjelpen som sørger for at
    * runden alltid ender med at han klarte det ---------- */

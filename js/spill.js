@@ -394,6 +394,25 @@ var Spill = (function () {
         start: function () { Lyd.klikk(); startOppgave('hent'); }
       },
       {
+        id: 'seraskt',
+        bilde: 'seraskt',
+        tegn: function () { return []; },
+        navn: 'Se raskt',
+        /* Å se tre uten å telle kommer før tallsymbolene. */
+        mulig: function () { return !!v.tallsans; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('seraskt'); }
+      },
+      {
+        id: 'flest',
+        bilde: 'flest',
+        tegn: function () { return []; },
+        navn: 'Hvem har flest?',
+        mulig: function () { return !!v.tallsans; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('flest'); }
+      },
+      {
         id: 'maling',
         bilde: 'maling',
         tegn: function () { return []; },

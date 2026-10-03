@@ -854,6 +854,26 @@ var Figurer = (function () {
                   (k + 1) + '</text>';
       }
 
+    } else if (art === 'seraskt') {
+      /* En terning med tre øyne – å se tallet uten å telle. */
+      inni = '<rect x="30" y="10" width="40" height="40" rx="9" style="fill: var(--flate); stroke: var(--aksent); stroke-width: 3"/>' +
+        [[39, 19], [50, 30], [61, 41]].map(function (p) {
+          return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.6" style="fill: var(--aksent)"/>';
+        }).join('');
+
+    } else if (art === 'flest') {
+      /* To reir: to egg mot fem, og det største er merket. */
+      function reir(x, n, merket) {
+        var ut = '<rect x="' + x + '" y="16" width="40" height="34" rx="8" style="fill: var(--flate); stroke: ' +
+          (merket ? 'var(--aksent)' : 'rgba(0,0,0,.15)') + '; stroke-width: 3"/>';
+        for (var e = 0; e < n; e++) {
+          ut += '<circle cx="' + (x + 9 + (e % 3) * 11) + '" cy="' + (27 + Math.floor(e / 3) * 12) +
+                '" r="4.2" style="fill: var(--aksent)"/>';
+        }
+        return ut;
+      }
+      inni = reir(6, 2, false) + reir(54, 5, true);
+
     } else if (art === 'maling') {
       /* Tre malingsbøtter i fargene han skal lære. */
       inni = ['#e3281c', '#2f7fe0', '#f5c518'].map(function (f, i) {

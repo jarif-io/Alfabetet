@@ -414,13 +414,18 @@ var Moduser = (function () {
    * med én gang i stedet for å bomme to ganger på rad. */
   function oppsett() {
     var liten = Lagring.innstilling('niva') !== 'storre';
-    /* hentTall: hvor mange biler «Hent» kan be om. Små mengder først –
+    /* seMaks: største mengde i «Se raskt» – en treåring ser opp til tre,
+     * fire uten å telle. flestLett: i «Hvem har flest?» er den ene mengden
+     * minst dobbelt så stor; ellers holder det at de skiller seg med to.
+     * hentTall: hvor mange biler «Hent» kan be om. Små mengder først –
      * to, tre og fire er det en treåring faktisk kan hente riktig.
      * farger: hvor mange av FARGER «Mal bilen» bruker – de fire første er
      * de en treåring lærer først. */
     return liten
-      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4), farger: 4 }
-      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7), farger: FARGER.length };
+      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4), farger: 4,
+          seMaks: 4, flestLett: true }
+      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7), farger: FARGER.length,
+          seMaks: 5, flestLett: false };
   }
 
   /* Etter noen runder på rad foreslår figuren en pause: den er trøtt på
@@ -473,6 +478,14 @@ var Moduser = (function () {
       navnPa: function (verdi) { return navnPaTegn(okt.verden, verdi); },
       sporsmal: function () { return []; },
       vedRiktig: function () {},
+      vedHjelp: function () {},
+      /* Trykk på merket: vis det som er skjult. Sant om noe ble vist. */
+      avslor: function () {
+        if (okt.malVist) return false;
+        okt.malVist = true;
+        tegnMal();
+        return true;
+      },
       ros: function (ros) { return ros; },
       opprykk: true,                /* flere skilt når det går godt */
       mestring: true,               /* svarene teller mot framgangen */
@@ -660,6 +673,98 @@ var Moduser = (function () {
         }
       },
 
+      /* «Se raskt»: én til fire ting i terningmønster, så kommer teppet
+       * over. Han svarer uten å telle – å *se* tre er noe annet enn å telle
+       * til tre, og kommer før. Skiltene har tallet og like mange prikker,
+       * en bro fra mengden til tegnet. Trykk på teppet: titt-tei igjen. */
+      seraskt: {
+        tittel: 'Se raskt',
+        mal: 'se',
+        forbered: function (opps) {
+          var tall = TALL.slice(0, opps.seMaks), ko = [];
+          while (ko.length < opps.antall) {
+            var t = tilfeldig(tall);
+            if (t !== ko[ko.length - 1]) ko.push(t);
+          }
+          return { ko: ko, oppsett: opps, antallValg: opps.maksValg };
+        },
+        utvalg: function () { return TALL.slice(0, okt.oppsett.seMaks); },
+        tegn: function () {
+          okt.telleting = tilfeldig(tellingFor(okt.verden));
+          el('oppgave-tekst').textContent = 'Hvor mange?';
+          tegnTerning(el('oppgave-mal'), okt.telleting.ikon, antallFor(okt.verden, okt.fasit));
+          dekkTerning(2200);
+        },
+        kanVise: true,
+        avslor: function () {
+          if (okt.ferdigMedDenne) return false;
+          dekkTerning(2200);
+          return true;
+        },
+        skiltInnhold: function (tall, knapp) {
+          var prikker = '';
+          for (var i = 0; i < parseInt(tall, 10); i++) prikker += '<i></i>';
+          knapp.classList.add('skilt--prikker');
+          knapp.innerHTML = '<span>' + tall + '</span><span class="skilt-prikker">' + prikker + '</span>';
+        },
+        sporsmal: function () {
+          return ['Se godt etter.', 400, 'Hvor mange ' + okt.telleting.ord + '?'];
+        },
+        /* Svaret står der når han har funnet det, eller fått hjelp. */
+        vedRiktig: function () { avdekk(); },
+        vedHjelp: function () { avdekk(); },
+        opprykk: false,
+        mestring: false,
+        runde: false
+      },
+
+      /* «Hvem har flest?»: to reir, og han trykker på det med flest. Ingen
+       * tall og ingen telling – bare øyet. Det er grunnlaget for å skjønne
+       * at fem er mer enn tre. Reirene er selve skiltene. */
+      flest: {
+        tittel: 'Hvem har flest?',
+        mal: 'ord',
+        forbered: function (opps) {
+          var ko = [];
+          okt.par = [];
+          for (var i = 0; i < opps.antall; i++) {
+            var p = lagPar(opps.flestLett);
+            okt.par.push(p);
+            ko.push(p[0] > p[1] ? 'venstre' : 'høyre');
+          }
+          return { ko: ko, oppsett: opps };
+        },
+        tegn: function () {
+          okt.telleting = tilfeldig(tellingFor(okt.verden));
+          el('oppgave-tekst').textContent = 'Hvem har flest?';
+          el('oppgave-mal').innerHTML = '<span class="mal-ikon">' + okt.telleting.ikon + '</span>';
+        },
+        valg: function (valgfelt) {
+          var p = okt.par[okt.indeks];
+          ['venstre', 'høyre'].forEach(function (side, i) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'skilt skilt--reir';
+            b.dataset.bokstav = side;
+            b.setAttribute('aria-label', p[i] + ' ' + okt.telleting.ord);
+            for (var n = 0; n < p[i]; n++) {
+              var t = document.createElement('span');
+              t.textContent = okt.telleting.ikon;
+              b.appendChild(t);
+            }
+            b.addEventListener('click', function () { svar(side, b); });
+            valgfelt.appendChild(b);
+          });
+          return 2;
+        },
+        navnPa: function () { return 'den med flest'; },
+        sporsmal: function () { return ['Hvem har flest ' + okt.telleting.ord + '?']; },
+        opprykk: false,
+        mestring: false,
+        runde: false,
+        brikker: function () { return []; }
+      },
+
       forstelyd: {
         tittel: 'Første lyd',
         mal: 'ord',
@@ -675,6 +780,46 @@ var Moduser = (function () {
         }
       }
     };
+
+    /* Terningmønsteret i «Se raskt»: tingene på faste plasser i et 3 × 3-
+     * rutenett, slik han kjenner dem fra terningen. */
+    var TERNING = {
+      1: [[2, 2]],
+      2: [[1, 1], [3, 3]],
+      3: [[1, 1], [2, 2], [3, 3]],
+      4: [[1, 1], [1, 3], [3, 1], [3, 3]],
+      5: [[1, 1], [1, 3], [2, 2], [3, 1], [3, 3]]
+    };
+    function tegnTerning(vertEl, ikon, antall) {
+      vertEl.innerHTML = TERNING[antall].map(function (p) {
+        return '<span class="ting" style="grid-area: ' + p[0] + ' / ' + p[1] + '">' + ikon + '</span>';
+      }).join('');
+    }
+    /* Teppet kommer over etter litt. Bare for denne oppgaven – har han gått
+     * videre, skal ikke en gammel tidtaker dekke den neste. */
+    function dekkTerning(ms) {
+      var mal = el('oppgave-mal'), denne = okt, nr = okt.indeks;
+      mal.classList.remove('dekket');
+      window.clearTimeout(okt.dekkTimer);
+      okt.dekkTimer = window.setTimeout(function () {
+        if (okt === denne && okt.indeks === nr && !okt.ferdigMedDenne) mal.classList.add('dekket');
+      }, ms);
+    }
+    function avdekk() {
+      window.clearTimeout(okt.dekkTimer);
+      el('oppgave-mal').classList.remove('dekket');
+    }
+
+    /* To mengder til «Hvem har flest?». Lett: den ene minst dobbelt så
+     * stor (2 mot 4). Ellers: minst to i forskjell, opp til åtte. */
+    function lagPar(lett) {
+      var maks = lett ? 6 : 8;
+      for (;;) {
+        var a = 1 + Math.floor(Math.random() * maks), b = 1 + Math.floor(Math.random() * maks);
+        var lav = Math.min(a, b), hoy = Math.max(a, b);
+        if (lett ? hoy >= 2 * lav : hoy - lav >= 2) return [a, b];
+      }
+    }
 
     function navnetSomNavn() {
       return okt.ko[0] + okt.ko.slice(1).join('').toLowerCase();
@@ -996,9 +1141,7 @@ var Moduser = (function () {
 
     function visMal() {
       if (!okt || !okt.typ.kanVise) return false;
-      if (okt.malVist) return false;
-      okt.malVist = true;
-      tegnMal();
+      if (!okt.typ.avslor()) return false;
       spillOm(el('oppgave-mal'), 'bytter', 460);
       Lyd.klikk();
       return true;
@@ -1062,6 +1205,7 @@ var Moduser = (function () {
        * sover mens det sies, og pulsen starter når det våkner – også om
        * han ber om å høre det igjen underveis. */
       riktigKnapp.classList.add('pekes');
+      okt.typ.vedHjelp();
       lyttForst(['Her er…', 260, okt.typ.navnPa(okt.fasit) + '.',
                  300, 'Trykk på den.']);
     }

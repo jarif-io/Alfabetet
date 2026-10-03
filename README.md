@@ -84,6 +84,8 @@ ikke stedet.
 | **Reiret** | Trykk på et tall og hør det. Ved siden av tallet står like mange ting som tallet sier — trykker han på 4, ser han fire biler. Hvert tall har sin egen ting, så det er variasjon å se på. Ingen oppgaver, ingen feil. |
 | **Tallrekka** | Fra 1 til 10, ett trykk om gangen, med mengden ved siden av. Samme rolige tur som Alfabetløypa. |
 | **Tell** | Et antall ting vises. Han **trykker på hver enkelt**, og spillet teller høyt: «én … to … tre». Så velger han tallet. |
+| **Se raskt** (Dinodalen) | Én til fire ting i terningmønster, så kommer et grønt teppe over. Hvor mange var det? Han svarer uten å telle — å *se* tre kommer før å telle til tre. Skiltene har tallet og like mange prikker, en bro fra mengde til tegn. Trykk på teppet, så titter tingene fram igjen. |
+| **Hvem har flest?** (Dinodalen) | To reir med ting, og han trykker på reiret med flest. Ingen tall og ingen telling — bare øyet. På «Liten» er det ene reiret minst dobbelt så fullt. |
 | **Finn tallet** | Hør tallet, og velg riktig skilt. Kommer når tre tall sitter — å kjenne igjen tallsymbolet er vanskeligere enn å telle ting. |
 | **Hent** (Verkstedet) | «Hent tre biler!» Han trykker på én bil om gangen, tauebilen henter den, og spillet teller høyt. Så trykker han på garasjen. |
 | **Mal bilen** (Verkstedet) | Fargene. Racerbilen står grunnet, stemmen sier «Mal bilen rød», og han velger riktig malingsbøtte — da blir bilen rød. Fire farger på «Liten» (rød, blå, gul, grønn), åtte på «Større». Fargene teller ikke mot bokstav- og tallsamlingen. |

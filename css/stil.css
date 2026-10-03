@@ -709,6 +709,63 @@ body.pa-havet #app { padding-left: 0; padding-right: 0; }
   box-shadow: inset 0 -2px 0 rgba(var(--sk-rgb), .25);
 }
 
+/* «Se raskt»: tingene i terningmønster på et kort; teppet (grønt, med et
+   spørsmålstegn) kommer over etter litt. Trykk på det, så titter de fram. */
+.oppdrag-mal--se {
+  --celle: min(64px, 9vh);
+  display: grid;
+  grid-template: repeat(3, var(--celle)) / repeat(3, var(--celle));
+  place-items: center;
+  padding: 10px;
+  font-size: calc(var(--celle) * .74);
+  background: rgba(255, 253, 248, .92);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sk-2);
+  position: relative;
+  cursor: pointer;
+}
+.oppdrag-mal--se .ting { transition: opacity 260ms ease, transform 260ms ease; }
+.oppdrag-mal--se::after {
+  content: '?';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: calc(var(--celle) * 1.6);
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(var(--sk-rgb), .25);
+  border-radius: inherit;
+  background: radial-gradient(circle at 35% 30%, #a9dfa0, #5fae62);
+  opacity: 0;
+  transform: translateY(-14px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: none;
+}
+.oppdrag-mal--se.dekket::after { opacity: 1; transform: none; }
+.oppdrag-mal--se.dekket .ting { opacity: 0; transform: scale(.6); }
+/* Skiltene i «Se raskt»: tallet, og like mange prikker under. */
+.skilt.skilt--prikker { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.skilt-prikker { display: flex; gap: 3px; margin-top: .12em; }
+.skilt-prikker i { width: .16em; height: .16em; border-radius: 50%; background: var(--aksent); }
+/* «Hvem har flest?»: reirene er skiltene, med tingene inni. Dobbel klasse,
+   så de vinner over .skilt (også i mediespørringene for små skjermer). */
+.skilt.skilt--reir {
+  width: min(200px, 42vw);
+  height: auto;
+  min-height: min(142px, 22vh);
+  padding: 10px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: min(2.1rem, 5.4vh);
+  line-height: 1.15;
+}
+.skilt.skilt--reir span { flex: 0 0 31%; text-align: center; }
+
 /* Ingen ord alene på siste linje i overskrifter og voksentekst. */
 .skjermtittel, .ingress, .panel h2, .panel h3 { text-wrap: balance; }
 .panel p { text-wrap: pretty; }

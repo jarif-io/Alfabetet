@@ -290,6 +290,8 @@ var VERDENER = {
     samling: 'Eggsamlingen',
     oppdrag: 'Tramp til',
     ros: ['Kjempebra', 'Bra trampet', 'Så flink du er', 'Det klarte du'],
+    /* Tallforståelse uten å telle: «Se raskt» og «Hvem har flest?». */
+    tallsans: true,
     ord: {
       '1':  { ord: 'dinosaur',  ikon: '🦕' },
       '2':  { ord: 'egg',       ikon: '🥚' },

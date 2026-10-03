@@ -126,6 +126,8 @@ var hjelp = {
       var mal = document.getElementById('oppgave-mal');
       if (mal.classList.contains('oppdrag-mal--hent')) return 'hent';
       if (mal.classList.contains('oppdrag-mal--maling')) return 'maling';
+      if (mal.classList.contains('oppdrag-mal--se')) return 'se';
+      if (document.querySelector('#oppgave-valg .skilt--reir')) return 'flest';
       if (mal.classList.contains('oppdrag-mal--tell')) return 'tell';
       if (mal.classList.contains('oppdrag-mal--ord')) return 'ord';
       if (mal.classList.contains('oppdrag-mal--navn')) return 'navn';
@@ -139,6 +141,17 @@ var hjelp = {
         await side.clock.runFor(60);
       }
       return 'hent';
+    }
+    /* «Se raskt»: tingene i terningen er svaret. «Hvem har flest?»: reiret
+     * med flest ting. */
+    if (art === 'se') {
+      return String(await side.locator('#oppgave-mal .ting').count());
+    }
+    if (art === 'flest') {
+      return await side.evaluate(function () {
+        var r = document.querySelectorAll('#oppgave-valg .skilt--reir');
+        return r[0].children.length > r[1].children.length ? 'venstre' : 'høyre';
+      });
     }
     /* «Mal bilen»: fargen han skal velge, sier stemmen – her leser vi den. */
     if (art === 'maling') {
