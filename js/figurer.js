@@ -35,8 +35,10 @@ var Figurer = (function () {
         return stor
           ? '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + n(r * 1.15) +
               '" fill="#fff" stroke="#23262d" stroke-width="1.5"/>' +
-            '<circle class="pupill" cx="' + n(x + r * dx) + '" cy="' + n(y + r * dy) +
-              '" r="' + n(r * 0.5) + '" fill="#23262d"/>'
+            '<g class="pupill"><circle cx="' + n(x + r * dx) + '" cy="' + n(y + r * dy) +
+              '" r="' + n(r * 0.55) + '" fill="#23262d"/>' +
+            '<circle cx="' + n(x + r * dx + r * 0.2) + '" cy="' + n(y + r * dy - r * 0.25) +
+              '" r="' + n(r * 0.2) + '" fill="#fff"/></g>'
           : '<g class="pupill"><circle cx="' + n(x + r * dx * 0.3) + '" cy="' + n(y + r * dy * 0.3) +
               '" r="' + r + '" fill="#243528"/>' +
             '<circle cx="' + n(x + r * 0.35) + '" cy="' + n(y - r * 0.4) + '" r="' + n(r * 0.36) +
@@ -80,8 +82,8 @@ var Figurer = (function () {
   function bakkeskygge(cx, cy, rx, punkter) {
     var g = unik('skygge');
     return '<defs><radialGradient id="' + g + '" cx=".5" cy=".5" r=".5">' +
-        '<stop offset="0" stop-color="#000" stop-opacity=".36"/>' +
-        '<stop offset="1" stop-color="#000" stop-opacity="0"/>' +
+        '<stop offset="0" stop-color="#281e0f" stop-opacity=".36"/>' +
+        '<stop offset="1" stop-color="#281e0f" stop-opacity="0"/>' +
       '</radialGradient></defs>' +
       '<ellipse class="fig-skygge" cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="9" fill="url(#' + g + ')"/>' +
       punkter.map(function (x) {
@@ -387,8 +389,8 @@ var Figurer = (function () {
     skygge.forEach(ramme);
     return {
       boks: [min[0], min[1], max[0], max[1]],
-      svg: '<defs><radialGradient id="' + g + '"><stop offset="0" stop-color="#000" stop-opacity=".4"/>' +
-          '<stop offset=".65" stop-color="#000" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity="0"/>' +
+      svg: '<defs><radialGradient id="' + g + '"><stop offset="0" stop-color="#281e0f" stop-opacity=".4"/>' +
+          '<stop offset=".65" stop-color="#281e0f" stop-opacity=".18"/><stop offset="1" stop-color="#281e0f" stop-opacity="0"/>' +
         '</radialGradient></defs>' +
         '<path class="fig-skygge" d="' + sti(kam, skygge) + '" fill="url(#' + g + ')"/>' +
         ting.map(function (t) { return t.svg; }).join('') + modell.pynt(kam)
@@ -416,54 +418,56 @@ var Figurer = (function () {
    * ingen startnummer eller logoer, og barnet gir den navn selv. */
   function bil() {
     var RODT = '#e3281c';
+    /* Kort, høyt panser som holder full bredde helt fram, og en butt front
+     * med plass til et bredt smil – ikke en lang snute som smalner. */
     var st = [
-      [-104, 16, 30, 20, 1, 13], [-100, 12, 37, 27, 1.5, 19], [-90, 10, 40, 30, 2, 22],
-      [-70, 10, 41, 32, 2, 23], [-52, 10, 42, 31, 2.5, 23], [-38, 10, 42, 30, 11, 23],
-      [-24, 10, 42, 29.5, 21, 22.5], [-4, 10, 42, 29.5, 23.5, 22.5], [12, 10, 42, 30, 22.5, 23],
-      [30, 10, 41, 30.5, 12, 24], [46, 10, 39.5, 31, 2.5, 24.5], [62, 10, 37, 32, 2.5, 25],
-      [80, 10, 34, 31, 2.5, 24], [94, 10, 31, 29, 2, 22], [100, 11, 29.5, 28, 1.5, 20],
-      [104, 12, 28, 26, 1, 18]
+      [-100, 16, 31, 21, 1, 14], [-96, 12, 38, 28, 1.5, 20], [-86, 10, 41, 31, 2, 23],
+      [-68, 10, 42, 32.5, 2, 24], [-50, 10, 43, 31.5, 2.5, 24], [-36, 10, 43, 30.5, 11, 24],
+      [-22, 10, 43, 30, 22, 23.5], [-2, 10, 43, 30, 24.5, 23.5], [16, 10, 43, 30.5, 23.5, 24],
+      [32, 10, 42, 31, 12.5, 25], [48, 10, 41, 31.5, 2.5, 25.5], [60, 10, 40, 32.5, 2.5, 26],
+      [74, 10, 38.5, 32.5, 2.5, 26], [84, 10, 36.5, 32, 2, 25.5], [90, 10.5, 33.5, 31, 1.5, 24.5],
+      [93, 11.5, 30, 29.5, 1, 23]
     ];
-    var flater = karosseri(st, [[-60, 17, 21], [62, 17, 21]], function (x, j) {
-      if (j === 5 && x > -34 && x < 22) return ['#26303b', 0.9];
+    var flater = karosseri(st, [[-58, 17, 21], [58, 17, 21]], function (x, j) {
+      if (j === 5 && x > -32 && x < 28) return ['#26303b', 0.9];
       if (j >= 6 && x > -36 && x < -16) return ['#26303b', 0.9];
       return [RODT, 0.6];
     }).concat(
-      karosseri([[-96, 9, 32, 16, 0, 14], [96, 9, 30, 16, 0, 14]], [], function () { return ['#1b1c20', 0]; }),
-      bjelke([-95, 40, 14], [-95, 51, 14], 1.6, 1.6, '#9c1c12', 0.3),
-      bjelke([-95, 40, -14], [-95, 51, -14], 1.6, 1.6, '#9c1c12', 0.3),
-      bjelke([-96, 52, -28], [-96, 52, 28], 1.8, 9, RODT, 0.5),
-      hjul3d(-60, 17, 26, 17, 13, 1, '#d8261c', 'hjul--bak'), hjul3d(62, 17, 26, 17, 13, 1, '#d8261c', 'hjul--front'),
-      hjul3d(-60, 17, -26, 17, 13, -1, '#d8261c', 'hjul--bak'), hjul3d(62, 17, -26, 17, 13, -1, '#d8261c', 'hjul--front')
+      karosseri([[-90, 9, 32, 16, 0, 14], [82, 9, 30, 16, 0, 14]], [], function () { return ['#1b1c20', 0]; }),
+      bjelke([-91, 41, 14], [-91, 52, 14], 1.6, 1.6, '#9c1c12', 0.3),
+      bjelke([-91, 41, -14], [-91, 52, -14], 1.6, 1.6, '#9c1c12', 0.3),
+      bjelke([-92, 53, -28], [-92, 53, 28], 1.8, 9, RODT, 0.5),
+      hjul3d(-58, 17, 26, 17, 13, 1, '#d8261c', 'hjul--bak'), hjul3d(58, 17, 26, 17, 13, 1, '#d8261c', 'hjul--front'),
+      hjul3d(-58, 17, -26, 17, 13, -1, '#d8261c', 'hjul--bak'), hjul3d(58, 17, -26, 17, 13, -1, '#d8261c', 'hjul--front')
     );
-    /* frontruta fra underkanten (x 45) til toppen (x 13), midt på bilen */
-    var ned = [45, glatt(st, 2, 45) + glatt(st, 4, 45), 0], opp = [13, glatt(st, 2, 13) + glatt(st, 4, 13), 0];
+    /* frontruta fra underkanten (x 47) til toppen (x 17), midt på bilen */
+    var ned = [47, glatt(st, 2, 47) + glatt(st, 4, 47), 0], opp = [17, glatt(st, 2, 17) + glatt(st, 4, 17), 0];
     var h = Math.sqrt(prikk(minus(opp, ned), minus(opp, ned)));
     var rute = iPlan(ned, [0, 0, -1], enhet(minus(opp, ned)));
-    var front = iPlan([104.3, 20, 0], [0, 0, -1], [0, 1, 0]);
-    var side = iPlan([-6, 27, 29.8], [1, 0, 0], [0, 1, 0]);
+    var front = iPlan([93.3, 21, 0], [0, 0, -1], [0, 1, 0]);
+    var side = iPlan([-6, 27, 30.3], [1, 0, 0], [0, 1, 0]);
     var MUNN = '#4a120d';
     function smil(dybde, tenner) {
       return function (kam) {
-        var over = kurve(-17, 17, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2); });
-        var under = kurve(17, -17, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2) - dybde * (1 - Math.pow(u / 17, 2)); });
+        var over = kurve(-19, 19, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2); });
+        var under = kurve(19, -19, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2) - dybde * (1 - Math.pow(u / 19, 2)); });
         return flekk(kam, front, over.concat(under), 'fill="' + MUNN + '"') +
-          (tenner ? flekk(kam, front, kurve(-13, 13, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2) - 0.2; })
-              .concat(kurve(13, -13, function (u) { return 2 + 2.2 * Math.pow(u / 17, 2) - 2.6; })), 'fill="#fff"') : '');
+          (tenner ? flekk(kam, front, kurve(-15, 15, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2) - 0.2; })
+              .concat(kurve(15, -15, function (u) { return 2 + 2.6 * Math.pow(u / 19, 2) - 2.8; })), 'fill="#fff"') : '');
       };
     }
     return bil3d({
       flater: flater,
-      skygge: [0, 112, 40],
+      skygge: [-3, 103, 40],
       pynt: function (kam) {
         return flekk(kam, side, [[-9, 9], [4, 9.5], [-1, 3], [8, 3.5], [-11, -10], [-4, -0.5], [-12, 0]].map(function (p) {
             return [p[0] * 0.75, p[1] * 0.75]; }), 'fill="#fff" opacity=".94"') +
           [-1, 1].map(function (s) {
-            return flekk(kam, front, ring(s * 18.5, 6.5, 4.2, 2.3), 'fill="#fff4cf" stroke="#7a150d" stroke-width=".6"');
+            return flekk(kam, front, ring(s * 19.5, 6.8, 4.4, 2.4), 'fill="#fff4cf" stroke="#7a150d" stroke-width=".6"');
           }).join('') +
           bilansikt(kam, rute, h, 22, '#2f9bd6', {
-            vanlig: smil(6, true)(kam),
-            glad: smil(9.5, true)(kam),
+            vanlig: smil(7.5, true)(kam),
+            glad: smil(11, true)(kam),
             hmm: strek(kam, front, kurve(-11, 11, function (u) { return 1 + Math.sin(u / 3.5) * 0.8; }), MUNN, 2),
             trott: strek(kam, front, kurve(-7, 7, function (u) { return 1.5 - 1.8 * (1 - Math.pow(u / 7, 2)); }), MUNN, 2)
           });
@@ -652,7 +656,9 @@ var Figurer = (function () {
     return '' +
     '<svg class="fig fig--dino" viewBox="0 0 200 130" role="img" aria-label="Dinosaur">' +
       '<defs>' +
-        '<linearGradient id="' + gHud + '" x1="0" y1="0" x2="0" y2="1">' +
+        /* Én gradient for hele dyret, regnet i figurens høyde: da blir det
+           ingen skjøt der halsen går inn i kroppen. */
+        '<linearGradient id="' + gHud + '" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="0" y2="118">' +
           '<stop offset="0" stop-color="#86cf93"/>' +
           '<stop offset="0.6" stop-color="#4f9e63"/>' +
           '<stop offset="1" stop-color="#357a49"/>' +
@@ -660,7 +666,7 @@ var Figurer = (function () {
         '<linearGradient id="' + gPlate + '" x1="0" y1="0" x2="0" y2="1">' +
           '<stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#e0a127"/>' +
         '</linearGradient>' +
-        /* Lyset fra oven til venstre: en myk lysflekk på ryggen og hodet. */
+        /* Lyset fra oven til høyre, der sola står: en myk lysflekk på ryggen og hodet. */
         '<radialGradient id="' + gLys + '" cx=".5" cy=".5" r=".5">' +
           '<stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>' +
         '</radialGradient>' +
@@ -673,6 +679,11 @@ var Figurer = (function () {
       '<path d="M56 88C36 92 18 88 4 74c16 2 26-2 32-10 6-8 14-12 24-10z"' +
             ' fill="url(#' + gHud + ')"/>' +
 
+      /* Hals og hode i ett strøk, med en rund snute – ingen klosser som
+         stikker ut. Tegnes før kroppen, så halsen kommer opp av den. */
+      '<path d="M128 70C128 46 138 27 156 20C170 14 186 18 193 30C198 38 199 48 194 54' +
+        'C188 61 174 62 162 60C156 65 150 73 141 80H128z" fill="url(#' + gHud + ')"/>' +
+      '<ellipse cx="172" cy="25" rx="14" ry="6" fill="url(#' + gLys + ')"/>' +
       /* Bakbein bak kroppen, så dyret får dybde. */
       '<rect class="dino-bein dino-bein--bak" x="62" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
       '<rect class="dino-bein dino-bein--bak" x="104" y="86" width="20" height="32" rx="10" fill="#2e6b40"/>' +
@@ -680,7 +691,7 @@ var Figurer = (function () {
       /* Kropp – én rund form, så silhuetten er lett å kjenne igjen. */
       '<ellipse cx="94" cy="76" rx="52" ry="34" fill="url(#' + gHud + ')"/>' +
       /* Lys på ryggen, skygge under magen, og noen flekker i huden. */
-      '<ellipse cx="84" cy="60" rx="34" ry="14" fill="url(#' + gLys + ')"/>' +
+      '<ellipse cx="104" cy="60" rx="34" ry="14" fill="url(#' + gLys + ')"/>' +
       '<path d="M48 90c20 18 70 20 96 2-8 16-30 20-50 20s-40-8-46-22z" fill="rgba(0,0,0,.14)"/>' +
       '<g fill="#3f8b53" opacity=".45">' +
         '<circle cx="78" cy="70" r="4"/><circle cx="92" cy="64" r="3"/><circle cx="110" cy="70" r="3.5"/>' +
@@ -701,20 +712,15 @@ var Figurer = (function () {
         '<path d="M120 50l9-12 6 14z"/>' +
       '</g>' +
 
-      /* Hals og hode. */
-      '<path d="M132 62c0-18 10-30 26-32 6-1 10 2 10 8v26z" fill="url(#' + gHud + ')"/>' +
-      '<ellipse cx="168" cy="42" rx="24" ry="19" fill="url(#' + gHud + ')"/>' +
-      '<ellipse cx="162" cy="33" rx="12" ry="6" fill="url(#' + gLys + ')"/>' +
-      '<path d="M186 44h10a5 5 0 0 1 0 10h-8z" fill="#4f9e63"/>' +
-      /* nesebor */
-      '<circle cx="188" cy="40" r="1.7" fill="#2e6b40"/>' +
-      '<ellipse cx="178" cy="47" rx="4" ry="2.5" fill="#f08a8a" opacity=".5"/>' +
+      /* nesebor og rosa kinn */
+      '<path d="M189 35.5q2.5-1.5 4 .5" stroke="#2e6b40" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="179" cy="47" rx="5.5" ry="3.2" fill="#ff9aa8" opacity=".8"/>' +
 
-      ansikt('prikk', [[172, 36, 5.5]], {
-        vanlig: 'M172 52c6 3 12 2 16-2',
-        glad: 'M171 50q9 9 18-1z',
-        hmm: 'M174 53q6-1 12 1',
-        trott: 'M175 52q5 2 10 0'
+      ansikt('stor', [[170, 33, 7]], {
+        vanlig: 'M193 48C187 56 175 57 167 50q-1.5-1.5-.5-3.5',
+        glad: 'M194 46C189 61 172 61 165 48C175 53 186 51 194 46z',
+        hmm: 'M190 51q-7 3-15 0',
+        trott: 'M188 51q-6 3-12 0'
       }) +
     '</svg>';
   }

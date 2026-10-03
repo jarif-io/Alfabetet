@@ -73,6 +73,10 @@ html = html.replace(/[ \t]*<script src="([^"]+)"><\/script>\n?/g, function (_, f
   return '<script>\n/* ' + fil + ' */\n' + trygg(les(fil)) + '\n</script>\n';
 });
 
+/* Ikonet legges inn som data-URL, så det følger med fila. */
+html = html.replace(/href="ikon\.png"/g, 'href="data:image/png;base64,' +
+  fs.readFileSync(sti.join(rot, 'ikon.png')).toString('base64') + '"');
+
 fs.writeFileSync(sti.join(rot, 'oppdageroya.html'), html);
 
 /* Artefaktversjonen: bare innholdet, uten ytterskallet. Stilene ligger i
