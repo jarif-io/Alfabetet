@@ -125,6 +125,7 @@ var hjelp = {
     var art = await side.evaluate(function () {
       var mal = document.getElementById('oppgave-mal');
       if (mal.classList.contains('oppdrag-mal--hent')) return 'hent';
+      if (mal.classList.contains('oppdrag-mal--maling')) return 'maling';
       if (mal.classList.contains('oppdrag-mal--tell')) return 'tell';
       if (mal.classList.contains('oppdrag-mal--ord')) return 'ord';
       if (mal.classList.contains('oppdrag-mal--navn')) return 'navn';
@@ -138,6 +139,10 @@ var hjelp = {
         await side.clock.runFor(60);
       }
       return 'hent';
+    }
+    /* «Mal bilen»: fargen han skal velge, sier stemmen – her leser vi den. */
+    if (art === 'maling') {
+      return await side.locator('#oppgave-mal').getAttribute('data-farge');
     }
     if (art === 'tell') {
       var ting = side.locator('#oppgave-mal .ting');

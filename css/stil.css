@@ -690,6 +690,25 @@ body.pa-havet #app { padding-left: 0; padding-right: 0; }
   letter-spacing: .01em;
 }
 
+/* «Mal bilen»: bilen står grunnet på et lyst kort, og skiltene er
+   malingsbøtter. */
+.oppdrag-mal--maling {
+  width: min(300px, 74vw, 46vh);
+  padding: 4px 14px 0;
+  background: rgba(255, 253, 248, .92);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sk-2);
+}
+.oppdrag-mal--maling svg { display: block; width: 100%; height: auto; }
+.skilt--botte .botte { width: 74%; height: auto; display: block; margin: auto; }
+.fargeklatt {
+  display: inline-block;
+  width: .9em; height: .9em;
+  border-radius: 50%;
+  background: var(--farge);
+  box-shadow: inset 0 -2px 0 rgba(var(--sk-rgb), .25);
+}
+
 /* Ingen ord alene på siste linje i overskrifter og voksentekst. */
 .skjermtittel, .ingress, .panel h2, .panel h3 { text-wrap: balance; }
 .panel p { text-wrap: pretty; }

@@ -341,6 +341,8 @@ var VERDENER = {
     ],
     /* Det «Hent» ber om: «Hent tre biler.» */
     hent: { entall: 'bil', flertall: 'biler', ikon: '🚗' },
+    /* Verkstedet maler biler – her ligger «Mal bilen» (fargene). */
+    maling: true,
     ord: {
       '1':  { ord: 'bil',          ikon: '🚗' },
       '2':  { ord: 'nøkler',       ikon: '🔑' },
@@ -391,6 +393,24 @@ function hentTing(verdenId, tall) {
   var h = VERDENER[verdenId].hent;
   return tallnavnFor(tall) + ' ' + (tall === '1' ? h.entall : h.flertall);
 }
+/* Fargene i «Mal bilen». De fire første er de en treåring lærer først, og
+ * de eneste på nivået «Liten»; resten kommer på «Større». */
+var FARGER = [
+  { id: 'rød',     hex: '#e3281c' },
+  { id: 'blå',     hex: '#2f7fe0' },
+  { id: 'gul',     hex: '#f5c518' },
+  { id: 'grønn',   hex: '#2fa84f' },
+  { id: 'oransje', hex: '#f07f1e' },
+  { id: 'lilla',   hex: '#8e4fd0' },
+  { id: 'rosa',    hex: '#f06aa8' },
+  { id: 'brun',    hex: '#8a5a2e' }
+];
+function fargeFor(id) {
+  for (var i = 0; i < FARGER.length; i++) if (FARGER[i].id === id) return FARGER[i];
+  return null;
+}
+function malSetning(farge) { return 'Mal bilen ' + farge + '.'; }
+
 function hentSetning(verdenId, tall) { return 'Hent ' + hentTing(verdenId, tall) + '.'; }
 function hentSvar(verdenId, tall) { return hentTing(verdenId, tall) + '.'; }
 

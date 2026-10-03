@@ -86,6 +86,7 @@ ikke stedet.
 | **Tell** | Et antall ting vises. Han **trykker på hver enkelt**, og spillet teller høyt: «én … to … tre». Så velger han tallet. |
 | **Finn tallet** | Hør tallet, og velg riktig skilt. Kommer når tre tall sitter — å kjenne igjen tallsymbolet er vanskeligere enn å telle ting. |
 | **Hent** (Verkstedet) | «Hent tre biler!» Han trykker på én bil om gangen, tauebilen henter den, og spillet teller høyt. Så trykker han på garasjen. |
+| **Mal bilen** (Verkstedet) | Fargene. Racerbilen står grunnet, stemmen sier «Mal bilen rød», og han velger riktig malingsbøtte — da blir bilen rød. Fire farger på «Liten» (rød, blå, gul, grønn), åtte på «Større». Fargene teller ikke mot bokstav- og tallsamlingen. |
 
 **Hvorfor «Hent»?** Å telle ordentlig er mer enn å ramse opp tallene. Det er å
 vite at det siste tallordet er *hvor mange* – og å kunne stoppe der. Det står

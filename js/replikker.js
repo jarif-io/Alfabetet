@@ -46,6 +46,7 @@ var Replikker = (function () {
     { id: 'ordet',       navn: 'Ordene alene' },
     { id: 'forstelyd',   navn: 'Første lyd' },
     { id: 'telling',     navn: 'Telling' },
+    { id: 'farge',       navn: 'Farger' },
     { id: 'setning',     navn: 'Faste setninger' },
     { id: 'ros',         navn: 'Ros og hilsener' }
   ];
@@ -148,6 +149,12 @@ var Replikker = (function () {
           legg('telling', hentSvar(id, tall));
         });
       }
+    });
+
+    /* --- fargene i «Mal bilen» --- */
+    FARGER.forEach(function (f) {
+      legg('farge', malSetning(f.id));
+      legg('farge', f.id + '.');
     });
 
     /* --- faste setninger --- */

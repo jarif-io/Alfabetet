@@ -415,10 +415,12 @@ var Moduser = (function () {
   function oppsett() {
     var liten = Lagring.innstilling('niva') !== 'storre';
     /* hentTall: hvor mange biler «Hent» kan be om. Små mengder først –
-     * to, tre og fire er det en treåring faktisk kan hente riktig. */
+     * to, tre og fire er det en treåring faktisk kan hente riktig.
+     * farger: hvor mange av FARGER «Mal bilen» bruker – de fire første er
+     * de en treåring lærer først. */
     return liten
-      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4) }
-      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7) };
+      ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4), farger: 4 }
+      : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7), farger: FARGER.length };
   }
 
   /* Etter noen runder på rad foreslår figuren en pause: den er trøtt på
@@ -609,6 +611,53 @@ var Moduser = (function () {
         opprykk: false,
         runde: false,
         brikke: function (b) { return '<b>' + b + '</b><i>' + VERDENER[okt.verden].hent.ikon + '</i>'; }
+      },
+
+      /* «Mal bilen»: fargene. Bilen står grunnet i midten, stemmen sier
+       * hvilken farge, og han velger riktig malingsbøtte. Fargene er ikke
+       * bokstaver eller tall, så de teller ikke mot samlingen eller
+       * vanskegraden der – runden er like lett hver gang. */
+      maling: {
+        tittel: 'Mal bilen',
+        mal: 'maling',
+        forbered: function (opps) {
+          var farger = FARGER.slice(0, opps.farger)
+            .map(function (f) { return f.id; });
+          var ko = [];
+          while (ko.length < opps.antall) {
+            var f = tilfeldig(farger);
+            if (f !== ko[ko.length - 1]) ko.push(f);
+          }
+          okt.farger = farger;
+          return { ko: ko, oppsett: opps, antallValg: opps.maksValg };
+        },
+        utvalg: function () { return okt.farger; },
+        tegn: function () {
+          var mal = el('oppgave-mal');
+          el('oppgave-tekst').textContent = 'Mal bilen';
+          mal.innerHTML = Figurer.malbil('#d5d9df');
+          mal.dataset.farge = okt.fasit;
+          mal.setAttribute('aria-label', 'Mal bilen ' + okt.fasit);
+        },
+        skiltInnhold: function (farge, knapp) {
+          knapp.classList.add('skilt--botte');
+          knapp.innerHTML = Figurer.malingsbotte(fargeFor(farge).hex);
+          knapp.setAttribute('aria-label', farge);
+        },
+        navnPa: function (farge) { return farge; },
+        sporsmal: function () { return [malSetning(okt.fasit)]; },
+        /* Bilen får fargen med én gang – det er belønningen. */
+        vedRiktig: function () {
+          var mal = el('oppgave-mal');
+          mal.innerHTML = Figurer.malbil(fargeFor(okt.fasit).hex);
+          spillOm(mal, 'bytter', 460);
+        },
+        opprykk: false,
+        mestring: false,
+        runde: false,
+        brikke: function (f) {
+          return '<b><span class="fargeklatt" style="--farge: ' + fargeFor(f).hex + '"></span></b>';
+        }
       },
 
       forstelyd: {
@@ -1221,7 +1270,8 @@ var Moduser = (function () {
         if (!runde.ko.length) { okt = null; return false; }
         okt.ko = runde.ko;
         okt.oppsett = runde.oppsett;
-        okt.antallValg = Math.min(Lagring.antallValgFor(verdenId), runde.oppsett.maksValg);
+        okt.antallValg = runde.antallValg ||
+          Math.min(Lagring.antallValgFor(verdenId), runde.oppsett.maksValg);
 
         Spill.visSkjerm('skjerm-oppgave');
         var tittel = typeof okt.typ.tittel === 'function' ? okt.typ.tittel() : okt.typ.tittel;

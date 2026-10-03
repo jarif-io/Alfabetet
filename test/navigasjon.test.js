@@ -109,6 +109,31 @@ module.exports = async function (t) {
   ok(s2.feil.length === 0, 'ingen feil i konsollen etter foreldremenyen' + (s2.feil.length ? ' – ' + s2.feil.join(' | ') : ''));
   await s2.context().close();
 
+  /* ---------- «Mal bilen»: feil bøtte gir hjelp, riktig maler bilen ---------- */
+  var s7 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s7, 'Verkstedet');
+  await hjelp.velgModus(s7, 'Mal bilen');
+  await hjelp.vaken(s7);
+  var maling = await s7.evaluate(function () {
+    var mal = document.getElementById('oppgave-mal');
+    var botter = document.querySelectorAll('#oppgave-valg .skilt--botte');
+    return { farge: mal.getAttribute('data-farge'), botter: botter.length, bil: !!mal.querySelector('svg.fig--bil') };
+  });
+  ok(maling.bil && maling.botter === 3, 'Mal bilen: en bil å male og tre malingsbøtter (' + maling.botter + ')');
+  await s7.locator('#oppgave-valg .skilt--botte:not([data-bokstav="' + maling.farge + '"])').first().click();
+  await s7.clock.runFor(300);
+  var pekes = await s7.locator('#oppgave-valg .skilt[data-bokstav="' + maling.farge + '"]').evaluate(function (k) {
+    return k.classList.contains('pekes');
+  });
+  ok(pekes, 'Mal bilen: etter feil bøtte peker hjelpen på ' + maling.farge);
+  await hjelp.vaken(s7);
+  var grunnet = await s7.locator('#oppgave-mal').innerHTML();
+  await s7.locator('#oppgave-valg .skilt[data-bokstav="' + maling.farge + '"]').click();
+  await s7.clock.runFor(300);
+  ok(await s7.locator('#oppgave-mal').innerHTML() !== grunnet, 'Mal bilen: riktig bøtte maler bilen');
+  ok(s7.feil.length === 0, 'Mal bilen: ingen feil i konsollen' + (s7.feil.length ? ' – ' + s7.feil.join(' | ') : ''));
+  await s7.context().close();
+
   /* ---------- «Hent»: for mange, for få, og hjelpen som sørger for at
    * runden alltid ender med at han klarte det ---------- */
   var s6 = await t.nySide({ lagret: lagret });

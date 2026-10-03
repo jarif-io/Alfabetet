@@ -394,6 +394,16 @@ var Spill = (function () {
         start: function () { Lyd.klikk(); startOppgave('hent'); }
       },
       {
+        id: 'maling',
+        bilde: 'maling',
+        tegn: function () { return []; },
+        navn: 'Mal bilen',
+        /* Fargene: en annen ting å lære, i verkstedet der bilene males. */
+        mulig: function () { return !!v.maling; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('maling'); }
+      },
+      {
         id: 'finntall',
         bilde: 'finn',
         tegn: function () { return ['3', '7']; },
