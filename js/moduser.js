@@ -417,15 +417,17 @@ var Moduser = (function () {
     /* seMaks: største mengde i «Se raskt» – en treåring ser opp til tre,
      * fire uten å telle. flestLett: i «Hvem har flest?» er den ene mengden
      * minst dobbelt så stor; ellers holder det at de skiller seg med to.
+     * baner: bokstaver per runde i «Bokstavbanen» – å kjøre en bokstav med
+     * fingeren tar lengre tid enn å velge et skilt.
      * hentTall: hvor mange biler «Hent» kan be om. Små mengder først –
      * to, tre og fire er det en treåring faktisk kan hente riktig.
      * farger: hvor mange av FARGER «Mal bilen» bruker – de fire første er
      * de en treåring lærer først. */
     return liten
       ? { antall: 5, maksValg: 3, bomForHjelp: 1, opprykk: 4, hentTall: TALL.slice(1, 4), farger: 4,
-          seMaks: 4, flestLett: true }
+          seMaks: 4, flestLett: true, baner: 3 }
       : { antall: 8, maksValg: 4, bomForHjelp: 2, opprykk: 5, hentTall: TALL.slice(1, 7), farger: FARGER.length,
-          seMaks: 5, flestLett: false };
+          seMaks: 5, flestLett: false, baner: 5 };
   }
 
   /* Etter noen runder på rad foreslår figuren en pause: den er trøtt på
@@ -765,6 +767,47 @@ var Moduser = (function () {
         brikker: function () { return []; }
       },
 
+      /* «Bokstavbanen»: bokstaven er en racerbane, og han kjører en liten
+       * racerbil langs veien med fingeren – strek for strek, i riktig
+       * rekkefølge og retning. Formen sitter i hånden, ikke bare i øyet.
+       * Først bokstavene i navnet hans. Ingen feil: kjører han av veien,
+       * står bilen bare stille til fingeren er tilbake. */
+      bane: {
+        tittel: 'Bokstavbanen',
+        mal: 'bane',
+        forbered: function (opps) {
+          var antall = opps.baner;
+          var navn = navnBokstaver(Lagring.barnenavn()).filter(function (b, i, l) {
+            return l.indexOf(b) === i;
+          });
+          var ko = bland(navn).slice(0, antall);
+          byggKo(okt.verden, antall).forEach(function (b) {
+            if (ko.length < antall && ko.indexOf(b) === -1) ko.push(b);
+          });
+          var o = Object.assign({}, opps, { antall: ko.length });
+          return { ko: ko, oppsett: o };
+        },
+        tegn: function () {
+          el('oppgave-tekst').textContent = 'Kjør på bokstaven';
+          tegnBane(okt.fasit);
+        },
+        valg: function () { return 0; },
+        sporsmal: function () {
+          var navn = bokstavnavnFor(okt.fasit) + '.';
+          return okt.indeks === 0
+            ? ['Kjør på bokstaven…', 300, navn, 400, 'Følg veien med fingeren.']
+            : ['Kjør på bokstaven…', 300, navn];
+        },
+        /* «B for bil» – så rosen. */
+        ros: function (ros) {
+          var o = ordFor(okt.verden, okt.fasit);
+          return [bokstavnavnFor(okt.fasit) + ' for ' + tilTale(o.ord) + '.', 300].concat(ros);
+        },
+        opprykk: false,
+        mestring: false,
+        runde: false
+      },
+
       forstelyd: {
         tittel: 'Første lyd',
         mal: 'ord',
@@ -808,6 +851,109 @@ var Moduser = (function () {
     function avdekk() {
       window.clearTimeout(okt.dekkTimer);
       el('oppgave-mal').classList.remove('dekket');
+    }
+
+    /* ---------- Bokstavbanen ----------
+     *
+     * Veien er bokstavens streker, og bilen står der han har kommet. Fingeren
+     * flytter bilen framover når den er nær veien og litt foran bilen – ikke
+     * bakover, og ikke over til en annen del av bokstaven. Et spor i farge
+     * viser hvor han har kjørt. Når siste strek er kjørt, er det riktig. */
+    var VEI_TOLERANSE = 13, VEI_FORAN = 22;
+    function punktTekst(p) { return p[0] + ' ' + p[1]; }
+    function tegnBane(bokstav) {
+      var strek = BOKSTAVSTREK[bokstav].map(function (pts) {
+        var L = [0];
+        for (var i = 1; i < pts.length; i++) {
+          L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+        }
+        return { p: pts, L: L, T: L[L.length - 1], d: 'M' + pts.map(punktTekst).join('L') };
+      });
+      okt.bane = { strek: strek, nr: 0, s: 0, ferdig: false };
+      var mal = el('oppgave-mal');
+      mal.dataset.bokstav = bokstav;
+      mal.setAttribute('aria-label', 'Kjør på bokstaven ' + bokstav);
+      mal.innerHTML = '<svg class="bokstavbane" viewBox="-6 -8 112 110">' +
+        strek.map(function (st) { return '<path class="bane-vei" d="' + st.d + '"/>'; }).join('') +
+        strek.map(function (st) { return '<path class="bane-midt" d="' + st.d + '"/>'; }).join('') +
+        strek.map(function (st, i) {
+          return '<path class="bane-spor" data-nr="' + i + '" d="' + st.d +
+                 '" pathLength="1000" stroke-dasharray="1000" stroke-dashoffset="1000"/>';
+        }).join('') +
+        '<g class="bane-maal"><rect x="-4" y="-4" width="8" height="8" fill="#fff"/>' +
+          '<path d="M-4 -4h4v4h-4zM0 0h4v4h-4z" fill="#23262d"/></g>' +
+        '<circle class="bane-start" r="5.5"/>' +
+        '<g class="bane-bil"><g>' +
+          '<rect x="-8" y="-5.5" width="16" height="11" rx="4" fill="#e3281c"/>' +
+          '<rect x="1.5" y="-4.2" width="3.6" height="8.4" rx="1.4" fill="#cfe8f7"/>' +
+          '<circle cx="6.6" cy="-2.4" r="1.3" fill="#fff"/><circle cx="6.6" cy="2.4" r="1.3" fill="#fff"/>' +
+        '</g></g>' +
+      '</svg>';
+      var svg = mal.querySelector('svg');
+      plasserBane();
+      svg.addEventListener('pointerdown', function (e) {
+        if (svg.setPointerCapture) svg.setPointerCapture(e.pointerId);
+        kjorBane(svg, e);
+      });
+      svg.addEventListener('pointermove', function (e) {
+        if (e.buttons || e.pointerType === 'touch') kjorBane(svg, e);
+      });
+    }
+    /* Startprikken, målflagget og bilen der han er nå. */
+    function plasserBane() {
+      var b = okt.bane, svg = el('oppgave-mal').querySelector('svg.bokstavbane');
+      if (!svg || b.ferdig) return;
+      var st = b.strek[b.nr], p = punktPa(st, b.s), retning = punktPa(st, Math.min(st.T, b.s + 3));
+      var start = st.p[0], maal = st.p[st.p.length - 1];
+      svg.querySelector('.bane-start').setAttribute('transform', 'translate(' + punktTekst(start) + ')');
+      svg.querySelector('.bane-maal').setAttribute('transform', 'translate(' + punktTekst(maal) + ')');
+      var vinkel = Math.atan2(retning[1] - p[1], retning[0] - p[0]) * 180 / Math.PI;
+      if (b.s >= st.T) vinkel = Math.atan2(maal[1] - st.p[st.p.length - 2][1], maal[0] - st.p[st.p.length - 2][0]) * 180 / Math.PI;
+      svg.querySelector('.bane-bil').setAttribute('transform',
+        'translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ') rotate(' + vinkel.toFixed(0) + ')');
+      svg.querySelector('.bane-spor[data-nr="' + b.nr + '"]').setAttribute('stroke-dashoffset',
+        (1000 * (1 - b.s / st.T)).toFixed(0));
+    }
+    function punktPa(st, s) {
+      for (var i = 1; i < st.p.length; i++) {
+        if (s <= st.L[i] || i === st.p.length - 1) {
+          var t = Math.max(0, Math.min(1, (s - st.L[i - 1]) / ((st.L[i] - st.L[i - 1]) || 1)));
+          return [st.p[i - 1][0] + (st.p[i][0] - st.p[i - 1][0]) * t, st.p[i - 1][1] + (st.p[i][1] - st.p[i - 1][1]) * t];
+        }
+      }
+      return st.p[0];
+    }
+    function kjorBane(svg, e) {
+      var b = okt && okt.bane;
+      if (!b || b.ferdig || okt.lytter || okt.ferdigMedDenne) return;
+      var m = svg.getScreenCTM();
+      if (!m) return;
+      var q = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+      var st = b.strek[b.nr], beste = -1, avst = VEI_TOLERANSE;
+      /* Nærmeste punkt på veien, men bare et lite stykke foran bilen. */
+      for (var i = 1; i < st.p.length; i++) {
+        var a = st.p[i - 1], c = st.p[i], dx = c[0] - a[0], dy = c[1] - a[1];
+        var len2 = dx * dx + dy * dy || 1;
+        var t = Math.max(0, Math.min(1, ((q.x - a[0]) * dx + (q.y - a[1]) * dy) / len2));
+        var s = st.L[i - 1] + t * Math.sqrt(len2);
+        var d = Math.hypot(q.x - (a[0] + dx * t), q.y - (a[1] + dy * t));
+        if (d <= avst && s >= b.s - 6 && s <= b.s + VEI_FORAN) { avst = d; beste = s; }
+      }
+      if (beste <= b.s) return;
+      b.s = beste >= st.T - 3 ? st.T : beste;
+      plasserBane();
+      if (b.s < st.T) return;
+      /* Streken er kjørt. Neste strek, eller hele bokstaven. */
+      Lyd.klikk();
+      if (b.nr + 1 < b.strek.length) {
+        b.nr += 1;
+        b.s = 0;
+        plasserBane();
+        return;
+      }
+      b.ferdig = true;
+      svg.classList.add('ferdig');
+      riktig(el('oppgave-mal'));
     }
 
     /* To mengder til «Hvem har flest?». Lett: den ene minst dobbelt så

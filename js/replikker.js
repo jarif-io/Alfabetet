@@ -154,6 +154,8 @@ var Replikker = (function () {
     /* --- «Se raskt» og «Hvem har flest?» (spørsmålet «Hvor mange egg?»
      * finnes allerede fra «Tell») --- */
     legg('setning', 'Se godt etter.');
+    legg('setning', 'Kjør på bokstaven…');
+    legg('setning', 'Følg veien med fingeren.');
     legg('setning', 'den med flest.');
     Object.keys(VERDENER).forEach(function (id) {
       if (!VERDENER[id].tallsans) return;

@@ -69,6 +69,7 @@ Fem ting å gjøre, ordnet fra lettest til vanskeligst:
 | **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «L … L for Løve» — samme formel som alfabetbøkene bruker. Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil, fint å slå opp i mens dere leser. |
 | **Alfabetløypa** | Hele alfabetet fra A til Å, én bokstav per trykk, med bilde og ord. Figuren kommer litt lenger bortover veien for hvert trykk. Ingen oppgaver og ingen stjerner — han blir lest for, slik dere leser alfabetboka sammen. |
 | **Navnet mitt** | Han bygger sitt eget navn, bokstav for bokstav. Rutene fylles fra venstre, og runden er akkurat så lang som navnet. Skriv inn fornavnet under **For voksne** for å få den fram. |
+| **Bokstavbanen** (Racerbanen) | Bokstaven er en racerbane, og han kjører en liten racerbil langs veien med fingeren — strek for strek, i den rekkefølgen og retningen bokstaven skrives. Sporet fylles i farge, og når bokstaven er kjørt, sies «B for bil». Først bokstavene i navnet hans, tre per runde («Liten»). Ingen feil: kjører han av veien, står bilen stille til fingeren er tilbake, og den kan ikke hoppe forbi formen. |
 | **Finn bokstaven** | Spillet sier en bokstav, og han velger blant skiltene. Bokstaven er skjult bak et spørsmålstegn han kan trykke på hvis han trenger å se den — ellers ville oppgaven bare vært å finne to like. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? Dette er den vanskeligste, og den kommer ofte først rundt fire år. |
 

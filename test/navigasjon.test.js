@@ -139,6 +139,48 @@ module.exports = async function (t) {
   ok(s7.feil.length === 0, 'Mal bilen: ingen feil i konsollen' + (s7.feil.length ? ' – ' + s7.feil.join(' | ') : ''));
   await s7.context().close();
 
+  /* ---------- «Bokstavbanen»: bilen følger veien, og bare veien ---------- */
+  var s9 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s9, 'Racerbanen');
+  var strekdata = await s9.evaluate(function () {
+    return ALFABET.filter(function (b) {
+      var st = BOKSTAVSTREK[b];
+      return !st || !st.length || st.some(function (p) {
+        return p.length < 2 || p.some(function (q) { return q[0] < -6 || q[0] > 106 || q[1] < -8 || q[1] > 102; });
+      });
+    });
+  });
+  ok(strekdata.length === 0, 'Bokstavbanen: alle 29 bokstavene har streker innenfor boksen (' + strekdata.join(', ') + ')');
+  await hjelp.velgModus(s9, 'Bokstavbanen');
+  await hjelp.vaken(s9);
+  function bane() {
+    return s9.evaluate(function () {
+      var mal = document.getElementById('oppgave-mal');
+      var m = mal.querySelector('svg.bokstavbane').getScreenCTM();
+      var st = BOKSTAVSTREK[mal.dataset.bokstav][0];
+      function skjerm(p) { return [m.a * p[0] + m.c * p[1] + m.e, m.b * p[0] + m.d * p[1] + m.f]; }
+      return {
+        punkter: st.map(skjerm),
+        hjorne: skjerm([-4, -6]),
+        spor: mal.querySelector('.bane-spor[data-nr="0"]').getAttribute('stroke-dashoffset')
+      };
+    });
+  }
+  var bn = await bane();
+  var slutt = bn.punkter[bn.punkter.length - 1];
+  await s9.mouse.move(bn.punkter[0][0], bn.punkter[0][1]);
+  await s9.mouse.down();
+  await s9.mouse.move(slutt[0], slutt[1]);
+  ok((await bane()).spor === '1000', 'Bokstavbanen: et hopp rett til målet flytter ikke bilen');
+  await s9.mouse.move(bn.hjorne[0], bn.hjorne[1]);
+  ok((await bane()).spor === '1000', 'Bokstavbanen: en finger utenfor veien gjør ingenting');
+  await s9.mouse.move(bn.punkter[0][0], bn.punkter[0][1]);
+  await s9.mouse.move(bn.punkter[1][0], bn.punkter[1][1], { steps: 12 });
+  ok(Number((await bane()).spor) < 1000, 'Bokstavbanen: å følge veien flytter bilen og legger spor (' + (await bane()).spor + ')');
+  await s9.mouse.up();
+  ok(s9.feil.length === 0, 'Bokstavbanen: ingen feil i konsollen' + (s9.feil.length ? ' – ' + s9.feil.join(' | ') : ''));
+  await s9.context().close();
+
   /* ---------- «Se raskt»: teppet kommer, og et trykk løfter det ----------
    * ---------- «Hvem har flest?»: feil reir gir hjelp ---------- */
   var s8 = await t.nySide({ lagret: lagret });

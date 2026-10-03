@@ -854,6 +854,13 @@ var Figurer = (function () {
                   (k + 1) + '</text>';
       }
 
+    } else if (art === 'bane') {
+      /* En A som racerbane, med en liten bil på vei opp. */
+      inni = '<path d="M30 62L50 10L70 62M38 44h24" fill="none" stroke="#5c6470" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M30 62L42 31" fill="none" style="stroke: var(--aksent)" stroke-width="6" stroke-linecap="round"/>' +
+        '<g transform="translate(42 31) rotate(-69)"><rect x="-6" y="-4" width="12" height="8" rx="3" fill="#e3281c"/>' +
+        '<circle cx="4.5" cy="-1.7" r="1" fill="#fff"/><circle cx="4.5" cy="1.7" r="1" fill="#fff"/></g>';
+
     } else if (art === 'seraskt') {
       /* En terning med tre øyne – å se tallet uten å telle. */
       inni = '<rect x="30" y="10" width="40" height="40" rx="9" style="fill: var(--flate); stroke: var(--aksent); stroke-width: 3"/>' +

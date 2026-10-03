@@ -449,6 +449,16 @@ var Spill = (function () {
         start: function () { Lyd.klikk(); startOppgave('navn'); }
       },
       {
+        id: 'bane',
+        bilde: 'bane',
+        tegn: function () { return []; },
+        navn: 'Bokstavbanen',
+        /* Bokstavene som racerbaner: formen kjøres med fingeren. */
+        mulig: function () { return !!VERDENER[naVerden].bokstavbane; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('bane'); }
+      },
+      {
         id: 'finn',
         bilde: 'finn',
         tegn: function () { return Lagring.aktiveTegn(naVerden).slice(0, 2); },
