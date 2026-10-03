@@ -46,6 +46,7 @@ var Replikker = (function () {
     { id: 'ordet',       navn: 'Ordene alene' },
     { id: 'forstelyd',   navn: 'Første lyd' },
     { id: 'telling',     navn: 'Telling' },
+    { id: 'farge',       navn: 'Farger' },
     { id: 'setning',     navn: 'Faste setninger' },
     { id: 'ros',         navn: 'Ros og hilsener' }
   ];
@@ -148,6 +149,25 @@ var Replikker = (function () {
           legg('telling', hentSvar(id, tall));
         });
       }
+    });
+
+    /* --- «Se raskt» og «Hvem har flest?» (spørsmålet «Hvor mange egg?»
+     * finnes allerede fra «Tell») --- */
+    legg('setning', 'Se godt etter.');
+    legg('setning', 'Kjør på bokstaven…');
+    legg('setning', 'Følg veien med fingeren.');
+    legg('setning', 'den med flest.');
+    Object.keys(VERDENER).forEach(function (id) {
+      if (!VERDENER[id].tallsans) return;
+      tellingFor(id).forEach(function (t) {
+        legg('telling', 'Hvem har flest ' + t.ord + '?', 'Hvem har flest ' + uttaleFor(t.ord) + '?');
+      });
+    });
+
+    /* --- fargene i «Mal bilen» --- */
+    FARGER.forEach(function (f) {
+      legg('farge', malSetning(f.id));
+      legg('farge', f.id + '.');
     });
 
     /* --- faste setninger --- */

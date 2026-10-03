@@ -125,6 +125,10 @@ var hjelp = {
     var art = await side.evaluate(function () {
       var mal = document.getElementById('oppgave-mal');
       if (mal.classList.contains('oppdrag-mal--hent')) return 'hent';
+      if (mal.classList.contains('oppdrag-mal--maling')) return 'maling';
+      if (mal.classList.contains('oppdrag-mal--se')) return 'se';
+      if (mal.classList.contains('oppdrag-mal--bane')) return 'bane';
+      if (document.querySelector('#oppgave-valg .skilt--reir')) return 'flest';
       if (mal.classList.contains('oppdrag-mal--tell')) return 'tell';
       if (mal.classList.contains('oppdrag-mal--ord')) return 'ord';
       if (mal.classList.contains('oppdrag-mal--navn')) return 'navn';
@@ -138,6 +142,22 @@ var hjelp = {
         await side.clock.runFor(60);
       }
       return 'hent';
+    }
+    if (art === 'bane') return 'bane';
+    /* «Se raskt»: tingene i terningen er svaret. «Hvem har flest?»: reiret
+     * med flest ting. */
+    if (art === 'se') {
+      return String(await side.locator('#oppgave-mal .ting').count());
+    }
+    if (art === 'flest') {
+      return await side.evaluate(function () {
+        var r = document.querySelectorAll('#oppgave-valg .skilt--reir');
+        return r[0].children.length > r[1].children.length ? 'venstre' : 'høyre';
+      });
+    }
+    /* «Mal bilen»: fargen han skal velge, sier stemmen – her leser vi den. */
+    if (art === 'maling') {
+      return await side.locator('#oppgave-mal').getAttribute('data-farge');
     }
     if (art === 'tell') {
       var ting = side.locator('#oppgave-mal .ting');
@@ -163,6 +183,7 @@ var hjelp = {
   /* Venter til skiltene kan trykkes på, og trykker på riktig. */
   svarRiktig: async function (side) {
     var fasit = await hjelp.fasit(side);
+    if (fasit === 'bane') { await hjelp.kjorBane(side); return fasit; }
     var velger = fasit === 'hent'
       ? '#oppgave-valg .skilt--garasje'
       : '#oppgave-valg .skilt[data-bokstav="' + fasit + '"]';
@@ -179,6 +200,26 @@ var hjelp = {
     }
     await side.locator(velger).click();
     return fasit;
+  },
+
+  /* «Bokstavbanen»: kjør hver strek med musa, fra start til mål, slik en
+   * finger ville gjort. */
+  kjorBane: async function (side) {
+    var strek = await side.evaluate(function () {
+      var mal = document.getElementById('oppgave-mal');
+      var m = mal.querySelector('svg.bokstavbane').getScreenCTM();
+      return BOKSTAVSTREK[mal.dataset.bokstav].map(function (st) {
+        return st.map(function (p) { return [m.a * p[0] + m.c * p[1] + m.e, m.b * p[0] + m.d * p[1] + m.f]; });
+      });
+    });
+    for (var i = 0; i < strek.length; i++) {
+      var st = strek[i];
+      await side.mouse.move(st[0][0], st[0][1]);
+      await side.mouse.down();
+      for (var j = 1; j < st.length; j++) await side.mouse.move(st[j][0], st[j][1], { steps: 6 });
+      await side.mouse.up();
+    }
+    await side.clock.runFor(100);
   },
 
   /* Hvilken oppgave i runden som står framme (0, 1, 2 …). */

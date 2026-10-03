@@ -38,7 +38,7 @@
 /* Versjonen vises nederst i foreldremenyen. Den finnes fordi feilsøking på
  * andres telefon er umulig uten å vite hva de faktisk kjører: Safari kan sitte
  * på en gammel kopi i timevis. Bump denne ved hver publisering. */
-var SPILLVERSJON = '2026-10-03 · 19';
+var SPILLVERSJON = '2026-10-03 · 20';
 
 var ALFABET = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
@@ -164,6 +164,62 @@ function navnBokstaver(navn) {
   return ut;
 }
 
+/* Strekene i de store bokstavene, til «Bokstavbanen»: hver bokstav er en
+ * liste med streker i den rekkefølgen de skrives, og hver strek er punkter
+ * i en boks på 100 × 100 (y nedover) fra der den begynner til der den
+ * slutter. Buene er punkter langs en ellipse (vinkel 0 = høyre, 90 = ned).
+ * Rekkefølgen følger blokkbokstavene i skolen: loddrett først, så buer og
+ * tverrstreker, ovenfra og ned. */
+var BOKSTAVSTREK = (function () {
+  function bue(cx, cy, rx, ry, fra, til) {
+    var n = Math.max(4, Math.ceil(Math.abs(til - fra) / 15)), ut = [];
+    for (var i = 0; i <= n; i++) {
+      var v = (fra + (til - fra) * i / n) * Math.PI / 180;
+      ut.push([Math.round((cx + rx * Math.cos(v)) * 10) / 10, Math.round((cy + ry * Math.sin(v)) * 10) / 10]);
+    }
+    return ut;
+  }
+  function s() { return [].concat.apply([], Array.prototype.map.call(arguments, function (d) {
+    return typeof d[0] === 'number' ? [d] : d;
+  })); }
+  var O = bue(50, 50, 32, 40, -90, -450);
+  var A = [s([50, 10], [18, 90]), s([50, 10], [82, 90]), s([31, 62], [69, 62])];
+  var P = [s([25, 10], [25, 90]), s([25, 10], [52, 10], bue(52, 30, 20, 20, -90, 90), [25, 50])];
+  return {
+    A: A,
+    B: [s([25, 10], [25, 90]), s([25, 10], [55, 10], bue(55, 30, 20, 20, -90, 90), [25, 50]),
+        s([25, 50], [58, 50], bue(58, 70, 20, 20, -90, 90), [25, 90])],
+    C: [bue(54, 50, 32, 40, -40, -320)],
+    D: [s([25, 10], [25, 90]), s([25, 10], [45, 10], bue(45, 50, 32, 40, -90, 90), [25, 90])],
+    E: [s([25, 10], [25, 90]), s([25, 10], [75, 10]), s([25, 50], [68, 50]), s([25, 90], [75, 90])],
+    F: [s([25, 10], [25, 90]), s([25, 10], [75, 10]), s([25, 50], [65, 50])],
+    G: [s(bue(54, 50, 32, 40, -40, -360), [58, 50])],
+    H: [s([25, 10], [25, 90]), s([75, 10], [75, 90]), s([25, 50], [75, 50])],
+    I: [s([50, 10], [50, 90])],
+    J: [s([65, 10], bue(45, 68, 20, 22, 0, 180))],
+    K: [s([25, 10], [25, 90]), s([72, 10], [25, 56]), s([40, 44], [75, 90])],
+    L: [s([25, 10], [25, 90], [72, 90])],
+    M: [s([20, 90], [20, 10], [50, 60], [80, 10], [80, 90])],
+    N: [s([25, 90], [25, 10], [75, 90], [75, 10])],
+    O: [O],
+    P: P,
+    Q: [O, s([56, 66], [82, 94])],
+    R: P.concat([s([45, 50], [75, 90])]),
+    S: [s(bue(50, 30, 24, 20, -20, -270), bue(50, 70, 24, 20, -90, 160))],
+    T: [s([20, 10], [80, 10]), s([50, 10], [50, 90])],
+    U: [s([25, 10], bue(50, 62, 25, 28, 180, 0), [75, 10])],
+    V: [s([20, 10], [50, 90], [80, 10])],
+    W: [s([12, 10], [30, 90], [50, 30], [70, 90], [88, 10])],
+    X: [s([22, 10], [78, 90]), s([78, 10], [22, 90])],
+    Y: [s([20, 10], [50, 50], [50, 90]), s([80, 10], [50, 50])],
+    Z: [s([22, 10], [78, 10], [22, 90], [78, 90])],
+    'Æ': [s([45, 10], [12, 90]), s([45, 10], [45, 90]), s([45, 10], [86, 10]), s([45, 50], [80, 50]),
+          s([45, 90], [86, 90]), s([25, 62], [45, 62])],
+    'Ø': [O, s([80, 6], [20, 94])],
+    'Å': [s([50, 24], [18, 92]), s([50, 24], [82, 92]), s([31, 68], [69, 68]), bue(50, 10, 8, 8, -90, -450)]
+  };
+})();
+
 var VERDENER = {
   bane: {
     id: 'bane',
@@ -180,6 +236,8 @@ var VERDENER = {
     samling: 'Garasjeveggen',
     oppdrag: 'Kjør til',
     ros: ['Bra kjørt', 'Full fart', 'Så flink du er', 'Det klarte du'],
+    /* Bokstavene som racerbaner: «Bokstavbanen». */
+    bokstavbane: true,
     ord: {
       'A': { ord: 'Ambulanse',    ikon: '🚑' },
       'B': { ord: 'Bil',          ikon: '🚗' },
@@ -290,6 +348,8 @@ var VERDENER = {
     samling: 'Eggsamlingen',
     oppdrag: 'Tramp til',
     ros: ['Kjempebra', 'Bra trampet', 'Så flink du er', 'Det klarte du'],
+    /* Tallforståelse uten å telle: «Se raskt» og «Hvem har flest?». */
+    tallsans: true,
     ord: {
       '1':  { ord: 'dinosaur',  ikon: '🦕' },
       '2':  { ord: 'egg',       ikon: '🥚' },
@@ -341,6 +401,8 @@ var VERDENER = {
     ],
     /* Det «Hent» ber om: «Hent tre biler.» */
     hent: { entall: 'bil', flertall: 'biler', ikon: '🚗' },
+    /* Verkstedet maler biler – her ligger «Mal bilen» (fargene). */
+    maling: true,
     ord: {
       '1':  { ord: 'bil',          ikon: '🚗' },
       '2':  { ord: 'nøkler',       ikon: '🔑' },
@@ -391,6 +453,24 @@ function hentTing(verdenId, tall) {
   var h = VERDENER[verdenId].hent;
   return tallnavnFor(tall) + ' ' + (tall === '1' ? h.entall : h.flertall);
 }
+/* Fargene i «Mal bilen». De fire første er de en treåring lærer først, og
+ * de eneste på nivået «Liten»; resten kommer på «Større». */
+var FARGER = [
+  { id: 'rød',     hex: '#e3281c' },
+  { id: 'blå',     hex: '#2f7fe0' },
+  { id: 'gul',     hex: '#f5c518' },
+  { id: 'grønn',   hex: '#2fa84f' },
+  { id: 'oransje', hex: '#f07f1e' },
+  { id: 'lilla',   hex: '#8e4fd0' },
+  { id: 'rosa',    hex: '#f06aa8' },
+  { id: 'brun',    hex: '#8a5a2e' }
+];
+function fargeFor(id) {
+  for (var i = 0; i < FARGER.length; i++) if (FARGER[i].id === id) return FARGER[i];
+  return null;
+}
+function malSetning(farge) { return 'Mal bilen ' + farge + '.'; }
+
 function hentSetning(verdenId, tall) { return 'Hent ' + hentTing(verdenId, tall) + '.'; }
 function hentSvar(verdenId, tall) { return hentTing(verdenId, tall) + '.'; }
 

@@ -69,6 +69,7 @@ Fem ting å gjøre, ordnet fra lettest til vanskeligst:
 | **Garasjen / Skattekartet** | Trykk på en bokstav og hør den: «L … L for Løve» — samme formel som alfabetbøkene bruker. Bilen kjører bort til bokstaven. Ingen oppgaver, ingen feil, fint å slå opp i mens dere leser. |
 | **Alfabetløypa** | Hele alfabetet fra A til Å, én bokstav per trykk, med bilde og ord. Figuren kommer litt lenger bortover veien for hvert trykk. Ingen oppgaver og ingen stjerner — han blir lest for, slik dere leser alfabetboka sammen. |
 | **Navnet mitt** | Han bygger sitt eget navn, bokstav for bokstav. Rutene fylles fra venstre, og runden er akkurat så lang som navnet. Skriv inn fornavnet under **For voksne** for å få den fram. |
+| **Bokstavbanen** (Racerbanen) | Bokstaven er en racerbane, og han kjører en liten racerbil langs veien med fingeren — strek for strek, i den rekkefølgen og retningen bokstaven skrives. Sporet fylles i farge, og når bokstaven er kjørt, sies «B for bil». Først bokstavene i navnet hans, tre per runde («Liten»). Ingen feil: kjører han av veien, står bilen stille til fingeren er tilbake, og den kan ikke hoppe forbi formen. |
 | **Finn bokstaven** | Spillet sier en bokstav, og han velger blant skiltene. Bokstaven er skjult bak et spørsmålstegn han kan trykke på hvis han trenger å se den — ellers ville oppgaven bare vært å finne to like. Hovedøvelsen. |
 | **Første lyd** | Et bilde vises og ordet leses opp — hvilken bokstav begynner det på? Dette er den vanskeligste, og den kommer ofte først rundt fire år. |
 
@@ -84,8 +85,11 @@ ikke stedet.
 | **Reiret** | Trykk på et tall og hør det. Ved siden av tallet står like mange ting som tallet sier — trykker han på 4, ser han fire biler. Hvert tall har sin egen ting, så det er variasjon å se på. Ingen oppgaver, ingen feil. |
 | **Tallrekka** | Fra 1 til 10, ett trykk om gangen, med mengden ved siden av. Samme rolige tur som Alfabetløypa. |
 | **Tell** | Et antall ting vises. Han **trykker på hver enkelt**, og spillet teller høyt: «én … to … tre». Så velger han tallet. |
+| **Se raskt** (Dinodalen) | Én til fire ting i terningmønster, så kommer et grønt teppe over. Hvor mange var det? Han svarer uten å telle — å *se* tre kommer før å telle til tre. Skiltene har tallet og like mange prikker, en bro fra mengde til tegn. Trykk på teppet, så titter tingene fram igjen. |
+| **Hvem har flest?** (Dinodalen) | To reir med ting, og han trykker på reiret med flest. Ingen tall og ingen telling — bare øyet. På «Liten» er det ene reiret minst dobbelt så fullt. |
 | **Finn tallet** | Hør tallet, og velg riktig skilt. Kommer når tre tall sitter — å kjenne igjen tallsymbolet er vanskeligere enn å telle ting. |
 | **Hent** (Verkstedet) | «Hent tre biler!» Han trykker på én bil om gangen, tauebilen henter den, og spillet teller høyt. Så trykker han på garasjen. |
+| **Mal bilen** (Verkstedet) | Fargene. Racerbilen står grunnet, stemmen sier «Mal bilen rød», og han velger riktig malingsbøtte — da blir bilen rød. Fire farger på «Liten» (rød, blå, gul, grønn), åtte på «Større». Fargene teller ikke mot bokstav- og tallsamlingen. |
 
 **Hvorfor «Hent»?** Å telle ordentlig er mer enn å ramse opp tallene. Det er å
 vite at det siste tallordet er *hvor mange* – og å kunne stoppe der. Det står

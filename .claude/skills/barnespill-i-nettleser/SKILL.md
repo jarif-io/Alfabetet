@@ -352,6 +352,22 @@ scroll-effekter og «én aksentfarge» (rød for bokstaver og grønn for tall er
 Og sjekk at en CSS-regel ikke overstyrer `fill="url(#…)"`: `.fig-skygge { fill }`
 gjorde de myke skyggene flate i flere versjoner.
 
+**Nye moduser er oppføringer, ikke forgreininger.** Oppgavemotoren
+(`Moduser.Oppgave`) er felles: kø, lytt først, skilt, hjelp, ros, nedtelling og
+oppsummering. Det som skiller modusene står i `TYPER` i `js/moduser.js`, og hver
+type overstyrer bare det som er annerledes enn `STANDARD` (merket, valgene,
+spørsmålet, `mestring`/`runde`/`opprykk`). Moduser som ikke er bokstaver eller tall
+(farger, mengder, sporing) skal ha `mestring: false`, ellers blandes de inn i
+samlingen. Vanskegrad hører hjemme i `oppsett()`, ikke i triks som `antall === 5`.
+
+**En ny variant av `.skilt` trenger dobbel klasse.** `.skilt--reir` sto tidligere
+i stilarket enn `.skilt` med samme spesifisitet, så `.skilt` vant på størrelse og
+font – og i mediespørringene for små skjermer. Skriv `.skilt.skilt--reir`.
+
+**Spol ikke en fast tid med liten margin i testene.** Tallrekka-testen spolte
+3,6 s mot en nedtelling på 4 s (pluss 0,6 s før) og feilet av og til når hele
+nettet kjørte. Bruk `hjelp.ventTil` med små steg og et tak i stedet.
+
 **Unike id-er i SVG-gradienter.** To figurer med samme `<linearGradient id>`
 gjør at den ene blir usynlig. Generer id per instans. CSS-variabler virker
 heller ikke i `stop-color` – bruk literale farger.

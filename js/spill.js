@@ -394,6 +394,35 @@ var Spill = (function () {
         start: function () { Lyd.klikk(); startOppgave('hent'); }
       },
       {
+        id: 'seraskt',
+        bilde: 'seraskt',
+        tegn: function () { return []; },
+        navn: 'Se raskt',
+        /* Å se tre uten å telle kommer før tallsymbolene. */
+        mulig: function () { return !!v.tallsans; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('seraskt'); }
+      },
+      {
+        id: 'flest',
+        bilde: 'flest',
+        tegn: function () { return []; },
+        navn: 'Hvem har flest?',
+        mulig: function () { return !!v.tallsans; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('flest'); }
+      },
+      {
+        id: 'maling',
+        bilde: 'maling',
+        tegn: function () { return []; },
+        navn: 'Mal bilen',
+        /* Fargene: en annen ting å lære, i verkstedet der bilene males. */
+        mulig: function () { return !!v.maling; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('maling'); }
+      },
+      {
         id: 'finntall',
         bilde: 'finn',
         tegn: function () { return ['3', '7']; },
@@ -418,6 +447,16 @@ var Spill = (function () {
         mulig: function () { return navnBokstaver(Lagring.barnenavn()).length > 0; },
         apen: alltid,
         start: function () { Lyd.klikk(); startOppgave('navn'); }
+      },
+      {
+        id: 'bane',
+        bilde: 'bane',
+        tegn: function () { return []; },
+        navn: 'Bokstavbanen',
+        /* Bokstavene som racerbaner: formen kjøres med fingeren. */
+        mulig: function () { return !!VERDENER[naVerden].bokstavbane; },
+        apen: alltid,
+        start: function () { Lyd.klikk(); startOppgave('bane'); }
       },
       {
         id: 'finn',

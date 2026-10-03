@@ -40,7 +40,12 @@ module.exports = async function (t) {
         var ventet = await side.locator('#utforsk-rutenett .bokstav').nth(1).getAttribute('data-bokstav');
         ok(vist === ventet, sted + '/' + modus + ': kortet viser tegnet som ble trykket (' + vist + ')');
       } else if (skjerm === 'skjerm-loype') {
-        await side.clock.runFor(3600);
+        /* Nedtellingen tar fire sekunder (3, 2, 1, 0). Vi spoler i små steg
+         * til telleren har gått videre, i stedet for ett fast hopp med liten
+         * margin – det feilet av og til når hele testnettet kjørte. */
+        await hjelp.ventTil(side, function () {
+          return /^2 av/.test(document.getElementById('loype-teller').textContent);
+        }, null, 6000);
         var teller = await side.locator('#loype-teller').textContent();
         ok(/^2 av/.test(teller), sted + '/' + modus + ': nedtellingen går videre av seg selv (' + teller + ')');
       } else if (skjerm === 'skjerm-oppgave') {
@@ -108,6 +113,106 @@ module.exports = async function (t) {
   ok(for_ === etter, 'løypa står stille etter at man gikk ut via foreldremenyen (' + for_ + ' → ' + etter + ')');
   ok(s2.feil.length === 0, 'ingen feil i konsollen etter foreldremenyen' + (s2.feil.length ? ' – ' + s2.feil.join(' | ') : ''));
   await s2.context().close();
+
+  /* ---------- «Mal bilen»: feil bøtte gir hjelp, riktig maler bilen ---------- */
+  var s7 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s7, 'Verkstedet');
+  await hjelp.velgModus(s7, 'Mal bilen');
+  await hjelp.vaken(s7);
+  var maling = await s7.evaluate(function () {
+    var mal = document.getElementById('oppgave-mal');
+    var botter = document.querySelectorAll('#oppgave-valg .skilt--botte');
+    return { farge: mal.getAttribute('data-farge'), botter: botter.length, bil: !!mal.querySelector('svg.fig--bil') };
+  });
+  ok(maling.bil && maling.botter === 3, 'Mal bilen: en bil å male og tre malingsbøtter (' + maling.botter + ')');
+  await s7.locator('#oppgave-valg .skilt--botte:not([data-bokstav="' + maling.farge + '"])').first().click();
+  await s7.clock.runFor(300);
+  var pekes = await s7.locator('#oppgave-valg .skilt[data-bokstav="' + maling.farge + '"]').evaluate(function (k) {
+    return k.classList.contains('pekes');
+  });
+  ok(pekes, 'Mal bilen: etter feil bøtte peker hjelpen på ' + maling.farge);
+  await hjelp.vaken(s7);
+  var grunnet = await s7.locator('#oppgave-mal').innerHTML();
+  await s7.locator('#oppgave-valg .skilt[data-bokstav="' + maling.farge + '"]').click();
+  await s7.clock.runFor(300);
+  ok(await s7.locator('#oppgave-mal').innerHTML() !== grunnet, 'Mal bilen: riktig bøtte maler bilen');
+  ok(s7.feil.length === 0, 'Mal bilen: ingen feil i konsollen' + (s7.feil.length ? ' – ' + s7.feil.join(' | ') : ''));
+  await s7.context().close();
+
+  /* ---------- «Bokstavbanen»: bilen følger veien, og bare veien ---------- */
+  var s9 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s9, 'Racerbanen');
+  var strekdata = await s9.evaluate(function () {
+    return ALFABET.filter(function (b) {
+      var st = BOKSTAVSTREK[b];
+      return !st || !st.length || st.some(function (p) {
+        return p.length < 2 || p.some(function (q) { return q[0] < -6 || q[0] > 106 || q[1] < -8 || q[1] > 102; });
+      });
+    });
+  });
+  ok(strekdata.length === 0, 'Bokstavbanen: alle 29 bokstavene har streker innenfor boksen (' + strekdata.join(', ') + ')');
+  await hjelp.velgModus(s9, 'Bokstavbanen');
+  await hjelp.vaken(s9);
+  function bane() {
+    return s9.evaluate(function () {
+      var mal = document.getElementById('oppgave-mal');
+      var m = mal.querySelector('svg.bokstavbane').getScreenCTM();
+      var st = BOKSTAVSTREK[mal.dataset.bokstav][0];
+      function skjerm(p) { return [m.a * p[0] + m.c * p[1] + m.e, m.b * p[0] + m.d * p[1] + m.f]; }
+      return {
+        punkter: st.map(skjerm),
+        hjorne: skjerm([-4, -6]),
+        spor: mal.querySelector('.bane-spor[data-nr="0"]').getAttribute('stroke-dashoffset')
+      };
+    });
+  }
+  var bn = await bane();
+  var slutt = bn.punkter[bn.punkter.length - 1];
+  await s9.mouse.move(bn.punkter[0][0], bn.punkter[0][1]);
+  await s9.mouse.down();
+  await s9.mouse.move(slutt[0], slutt[1]);
+  ok((await bane()).spor === '1000', 'Bokstavbanen: et hopp rett til målet flytter ikke bilen');
+  await s9.mouse.move(bn.hjorne[0], bn.hjorne[1]);
+  ok((await bane()).spor === '1000', 'Bokstavbanen: en finger utenfor veien gjør ingenting');
+  await s9.mouse.move(bn.punkter[0][0], bn.punkter[0][1]);
+  await s9.mouse.move(bn.punkter[1][0], bn.punkter[1][1], { steps: 12 });
+  ok(Number((await bane()).spor) < 1000, 'Bokstavbanen: å følge veien flytter bilen og legger spor (' + (await bane()).spor + ')');
+  await s9.mouse.up();
+  ok(s9.feil.length === 0, 'Bokstavbanen: ingen feil i konsollen' + (s9.feil.length ? ' – ' + s9.feil.join(' | ') : ''));
+  await s9.context().close();
+
+  /* ---------- «Se raskt»: teppet kommer, og et trykk løfter det ----------
+   * ---------- «Hvem har flest?»: feil reir gir hjelp ---------- */
+  var s8 = await t.nySide({ lagret: lagret });
+  await hjelp.tilVerden(s8, 'Dinodalen');
+  await hjelp.velgModus(s8, 'Se raskt');
+  function dekket() {
+    return s8.evaluate(function () { return document.getElementById('oppgave-mal').classList.contains('dekket'); });
+  }
+  ok(!(await dekket()), 'Se raskt: tingene vises først');
+  await s8.clock.runFor(2600);
+  ok(await dekket(), 'Se raskt: så kommer teppet over');
+  await hjelp.vaken(s8);
+  await s8.locator('#oppgave-mal').click();
+  await s8.clock.runFor(200);
+  ok(!(await dekket()), 'Se raskt: trykk på teppet, og tingene titter fram igjen');
+  await hjelp.tilbake(s8);
+  await hjelp.velgModus(s8, 'Hvem har flest');
+  await hjelp.vaken(s8);
+  var flest = await s8.evaluate(function () {
+    var r = document.querySelectorAll('#oppgave-valg .skilt--reir');
+    return { reir: r.length, a: r[0].children.length, b: r[1].children.length };
+  });
+  ok(flest.reir === 2 && flest.a !== flest.b && Math.max(flest.a, flest.b) >= 2 * Math.min(flest.a, flest.b),
+     'Hvem har flest?: to reir, det ene minst dobbelt så stort på «Liten» (' + flest.a + ' mot ' + flest.b + ')');
+  var feilSide = flest.a > flest.b ? 'høyre' : 'venstre', rettSide = feilSide === 'høyre' ? 'venstre' : 'høyre';
+  await s8.locator('#oppgave-valg .skilt[data-bokstav="' + feilSide + '"]').click();
+  await s8.clock.runFor(300);
+  ok(await s8.locator('#oppgave-valg .skilt[data-bokstav="' + rettSide + '"]').evaluate(function (k) {
+    return k.classList.contains('pekes');
+  }), 'Hvem har flest?: etter feil reir peker hjelpen på det med flest');
+  ok(s8.feil.length === 0, 'Se raskt og Hvem har flest: ingen feil i konsollen' + (s8.feil.length ? ' – ' + s8.feil.join(' | ') : ''));
+  await s8.context().close();
 
   /* ---------- «Hent»: for mange, for få, og hjelpen som sørger for at
    * runden alltid ender med at han klarte det ---------- */

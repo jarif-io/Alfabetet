@@ -416,8 +416,11 @@ var Figurer = (function () {
   /* Vår egen racerbil: rød og blank, med store øyne i frontruta, et bredt
    * smil og spoiler. I samme ånd som bilfilmene, men ingen andres figur –
    * ingen startnummer eller logoer, og barnet gir den navn selv. */
-  function bil() {
-    var RODT = '#e3281c';
+  /* farge: lakken (rød som standard). felg: felgene – grå på bilene som
+   * males i Verkstedet, så lakken er det eneste som skifter. */
+  function bil(farge, felg) {
+    var RODT = farge || '#e3281c';
+    felg = felg || '#d8261c';
     /* Kort, høyt panser som holder full bredde helt fram, og en butt front
      * med plass til et bredt smil – ikke en lang snute som smalner. */
     var st = [
@@ -437,8 +440,8 @@ var Figurer = (function () {
       bjelke([-91, 41, 14], [-91, 52, 14], 1.6, 1.6, '#9c1c12', 0.3),
       bjelke([-91, 41, -14], [-91, 52, -14], 1.6, 1.6, '#9c1c12', 0.3),
       bjelke([-92, 53, -28], [-92, 53, 28], 1.8, 9, RODT, 0.5),
-      hjul3d(-58, 17, 26, 17, 13, 1, '#d8261c', 'hjul--bak'), hjul3d(58, 17, 26, 17, 13, 1, '#d8261c', 'hjul--front'),
-      hjul3d(-58, 17, -26, 17, 13, -1, '#d8261c', 'hjul--bak'), hjul3d(58, 17, -26, 17, 13, -1, '#d8261c', 'hjul--front')
+      hjul3d(-58, 17, 26, 17, 13, 1, felg, 'hjul--bak'), hjul3d(58, 17, 26, 17, 13, 1, felg, 'hjul--front'),
+      hjul3d(-58, 17, -26, 17, 13, -1, felg, 'hjul--bak'), hjul3d(58, 17, -26, 17, 13, -1, felg, 'hjul--front')
     );
     /* frontruta fra underkanten (x 47) til toppen (x 17), midt på bilen */
     var ned = [47, glatt(st, 2, 47) + glatt(st, 4, 47), 0], opp = [17, glatt(st, 2, 17) + glatt(st, 4, 17), 0];
@@ -780,6 +783,18 @@ var Figurer = (function () {
   }
 
   /* art: hvilken form spillet har. tegn: tegnene som skal stå i bildet. */
+  /* En malingsbøtte med bøyle, fylt med farge som har rent ned på siden.
+   * Tegnet i en boks på 60 × 60. */
+  function botte(hex) {
+    return '<path d="M9 23C9 4 51 4 51 23" fill="none" stroke="#6b7078" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<path d="M11 21h38l-4.5 31a4 4 0 0 1-4 3.4H19.5a4 4 0 0 1-4-3.4z" fill="#cdd2da"/>' +
+      '<path d="M41 21h8l-4.5 31a4 4 0 0 1-4 3.4h-3z" fill="#aab0b9"/>' +
+      '<path d="M18 23q-1.2 9 .6 13 2 3.2 3.4 0 1-4.5 1.6-12z" fill="' + hex + '"/>' +
+      '<ellipse cx="30" cy="21" rx="19" ry="6" fill="#8e949d"/>' +
+      '<ellipse cx="30" cy="21" rx="17" ry="4.8" fill="' + hex + '"/>' +
+      '<ellipse cx="25" cy="19.8" rx="6" ry="1.4" fill="#fff" opacity=".35"/>';
+  }
+
   function modusbilde(art, tegn) {
     var t = tegn || [];
     function n(i, res) { return t[i] !== undefined ? t[i] : (res || ''); }
@@ -838,6 +853,39 @@ var Figurer = (function () {
                 '<text class="mb-merketall" x="' + (x + 23) + '" y="24" dy=".35em">' +
                   (k + 1) + '</text>';
       }
+
+    } else if (art === 'bane') {
+      /* En A som racerbane, med en liten bil på vei opp. */
+      inni = '<path d="M30 62L50 10L70 62M38 44h24" fill="none" stroke="#5c6470" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M30 62L42 31" fill="none" style="stroke: var(--aksent)" stroke-width="6" stroke-linecap="round"/>' +
+        '<g transform="translate(42 31) rotate(-69)"><rect x="-6" y="-4" width="12" height="8" rx="3" fill="#e3281c"/>' +
+        '<circle cx="4.5" cy="-1.7" r="1" fill="#fff"/><circle cx="4.5" cy="1.7" r="1" fill="#fff"/></g>';
+
+    } else if (art === 'seraskt') {
+      /* En terning med tre øyne – å se tallet uten å telle. */
+      inni = '<rect x="30" y="10" width="40" height="40" rx="9" style="fill: var(--flate); stroke: var(--aksent); stroke-width: 3"/>' +
+        [[39, 19], [50, 30], [61, 41]].map(function (p) {
+          return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.6" style="fill: var(--aksent)"/>';
+        }).join('');
+
+    } else if (art === 'flest') {
+      /* To reir: to egg mot fem, og det største er merket. */
+      function reir(x, n, merket) {
+        var ut = '<rect x="' + x + '" y="16" width="40" height="34" rx="8" style="fill: var(--flate); stroke: ' +
+          (merket ? 'var(--aksent)' : 'rgba(0,0,0,.15)') + '; stroke-width: 3"/>';
+        for (var e = 0; e < n; e++) {
+          ut += '<circle cx="' + (x + 9 + (e % 3) * 11) + '" cy="' + (27 + Math.floor(e / 3) * 12) +
+                '" r="4.2" style="fill: var(--aksent)"/>';
+        }
+        return ut;
+      }
+      inni = reir(6, 2, false) + reir(54, 5, true);
+
+    } else if (art === 'maling') {
+      /* Tre malingsbøtter i fargene han skal lære. */
+      inni = ['#e3281c', '#2f7fe0', '#f5c518'].map(function (f, i) {
+        return '<g transform="translate(' + (4 + i * 31) + ' 19) scale(.52)">' + botte(f) + '</g>';
+      }).join('');
 
     } else if (art === 'hent') {
       /* Biler som hentes inn i garasjen: to biler, pila, og garasjen som
@@ -1211,6 +1259,11 @@ var Figurer = (function () {
     ikon: function (navn) { return IKONER[navn] || ''; },
     nedtelling: nedtelling,
     nedtellingOmkrets: NEDTELLING_OMKRETS,
+    /* Bilen i «Mal bilen»: racerbilen i den lakken den har fått. */
+    malbil: function (hex) { return bil(hex, '#9aa0a8'); },
+    malingsbotte: function (hex) {
+      return '<svg class="botte" viewBox="0 0 60 60" aria-hidden="true">' + botte(hex) + '</svg>';
+    },
     figurFor: function (verdenId) {
       return ({ bil: bil, skip: skip, dino: dino, tauebil: tauebil })[VERDENER[verdenId].figur]();
     },
